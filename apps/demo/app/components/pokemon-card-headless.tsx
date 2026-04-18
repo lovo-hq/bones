@@ -3,9 +3,6 @@
 import { useBone } from "bones";
 import type { PokemonListItem } from "@/lib/pokeapi";
 
-const TRANSPARENT_PIXEL =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-
 export function PokemonCardHeadless({
   pokemon,
 }: {
@@ -13,28 +10,17 @@ export function PokemonCardHeadless({
 }) {
   const bone = useBone(!pokemon);
 
-  const imgProps = bone();
-  const headingProps = bone();
-  const badgeProps = bone({ width: "8ch" });
-
   return (
     <div className="card">
       <img
-        {...imgProps}
-        className={["card-image", imgProps.className]
-          .filter(Boolean)
-          .join(" ")}
-        src={pokemon?.sprite ?? TRANSPARENT_PIXEL}
+        {...bone("block")}
+        className="card-image"
+        src={pokemon?.sprite}
         width={120}
         height={120}
         alt={pokemon?.name ?? "Pokemon"}
       />
-      <h3
-        {...headingProps}
-        className={["card-name", headingProps.className]
-          .filter(Boolean)
-          .join(" ")}
-      >
+      <h3 {...bone("text")} className="card-name">
         {pokemon?.name}
       </h3>
       <div className="card-types">
@@ -46,13 +32,10 @@ export function PokemonCardHeadless({
           ))
         ) : (
           <span
-            {...badgeProps}
-            className={["type-badge", badgeProps.className]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {undefined}
-          </span>
+            {...bone("text")}
+            className="type-badge"
+            style={{ width: "8ch" }}
+          />
         )}
       </div>
     </div>
