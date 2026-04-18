@@ -21,31 +21,31 @@ function TestMultiline({ loading }: { loading: boolean }) {
 afterEach(cleanup);
 
 describe("useBone", () => {
-  test("returns bone-text class and aria-busy when loading", () => {
+  test("returns data-bone=text and aria-busy when loading", () => {
     const { getByTestId } = render(<TestText loading={true} />);
     const el = getByTestId("target");
-    expect(el.classList.contains("bone-text")).toBe(true);
+    expect(el.getAttribute("data-bone")).toBe("text");
     expect(el.getAttribute("aria-busy")).toBe("true");
   });
 
-  test("returns bone-block class and aria-busy when loading", () => {
+  test("returns data-bone=block and aria-busy when loading", () => {
     const { getByTestId } = render(<TestBlock loading={true} />);
     const el = getByTestId("target");
-    expect(el.classList.contains("bone-block")).toBe(true);
+    expect(el.getAttribute("data-bone")).toBe("block");
     expect(el.getAttribute("aria-busy")).toBe("true");
   });
 
   test("returns empty props when not loading", () => {
     const { getByTestId } = render(<TestText loading={false} />);
     const el = getByTestId("target");
-    expect(el.classList.contains("bone-text")).toBe(false);
+    expect(el.getAttribute("data-bone")).toBeNull();
     expect(el.getAttribute("aria-busy")).toBeNull();
   });
 
   test("sets --bone-lines CSS variable for multiline text", () => {
     const { getByTestId } = render(<TestMultiline loading={true} />);
     const el = getByTestId("target") as HTMLElement;
-    expect(el.classList.contains("bone-text")).toBe(true);
+    expect(el.getAttribute("data-bone")).toBe("text");
     expect(el.style.getPropertyValue("--bone-lines")).toBe("3");
   });
 
@@ -62,7 +62,7 @@ describe("useBone", () => {
       </Bones>,
     );
     const el = getByTestId("target");
-    expect(el.classList.contains("bone-text")).toBe(true);
+    expect(el.getAttribute("data-bone")).toBe("text");
     expect(el.getAttribute("aria-busy")).toBe("true");
   });
 });

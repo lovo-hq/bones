@@ -21,9 +21,8 @@ export function useBone(loading: boolean) {
         return {};
       }
 
-      const className = type === "text" ? "bone-text" : "bone-block";
       const props: BoneProps = {
-        className,
+        "data-bone": type,
         "aria-busy": true,
       };
 
