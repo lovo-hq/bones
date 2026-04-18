@@ -1,25 +1,27 @@
 "use client";
 
-import { Bone, BoneImage, useBones } from "bones";
+import { useBone, useBones } from "bones";
 import type { PokemonDetail } from "@/lib/pokeapi";
 
-function StatBar({ name, value }: { name?: string; value?: number }) {
-  const { isLoading } = useBones();
+function StatBar({ name, value, loading }: { name?: string; value?: number; loading: boolean }) {
+  const bone = useBone(loading);
   const pct = value !== undefined ? (value / 255) * 100 : 0;
 
   return (
     <div className="stat-row">
-      <Bone as="span" className="stat-name" width={100}>
+      <span {...bone("text")} className="stat-name" style={{ width: 100 }}>
         {name}
-      </Bone>
-      <Bone as="span" className="stat-value" width={30}>
+      </span>
+      <span {...bone("text")} className="stat-value" style={{ width: 30 }}>
         {value !== undefined ? String(value) : undefined}
-      </Bone>
+      </span>
       <div className="stat-bar-track">
-        {isLoading ? (
-          <Bone as="div" className="stat-bar-fill" width="60%" height={8}>
-            {undefined}
-          </Bone>
+        {loading ? (
+          <div
+            {...bone("block")}
+            className="stat-bar-fill"
+            style={{ width: "60%", height: 8 }}
+          />
         ) : (
           <div
             className="stat-bar-fill loaded"
@@ -31,20 +33,20 @@ function StatBar({ name, value }: { name?: string; value?: number }) {
   );
 }
 
-/**
- * Detailed Pokemon view. Works with both:
- * - Auto-detection: pass `pokemon` prop (undefined = skeleton, data = content)
- * - Forced mode: wrap in <Bones> provider to force skeleton regardless
- */
 export function PokemonDetailView({
   pokemon,
 }: {
   pokemon?: PokemonDetail;
 }) {
+  const { isLoading: forced } = useBones();
+  const loading = forced || !pokemon;
+  const bone = useBone(loading);
+
   return (
     <div className="detail">
       <div className="detail-header">
-        <BoneImage
+        <img
+          {...bone("block")}
           className="detail-image"
           src={pokemon?.artwork}
           width={200}
@@ -52,9 +54,9 @@ export function PokemonDetailView({
           alt={pokemon?.name ?? "Pokemon"}
         />
         <div className="detail-info">
-          <Bone as="h1" className="detail-name">
+          <h1 {...bone("text")} className="detail-name">
             {pokemon?.name}
-          </Bone>
+          </h1>
           <div className="detail-types">
             {pokemon?.types ? (
               pokemon.types.map((type) => (
@@ -64,31 +66,27 @@ export function PokemonDetailView({
               ))
             ) : (
               <>
-                <Bone as="span" className="type-badge" width={56}>
-                  {undefined}
-                </Bone>
-                <Bone as="span" className="type-badge" width={56}>
-                  {undefined}
-                </Bone>
+                <span {...bone("text")} className="type-badge" style={{ width: 56 }} />
+                <span {...bone("text")} className="type-badge" style={{ width: 56 }} />
               </>
             )}
           </div>
           <div className="detail-meta">
-            <Bone as="span" className="meta-item">
+            <span {...bone("text")} className="meta-item">
               {pokemon ? `${pokemon.height / 10} m` : undefined}
-            </Bone>
-            <Bone as="span" className="meta-item">
+            </span>
+            <span {...bone("text")} className="meta-item">
               {pokemon ? `${pokemon.weight / 10} kg` : undefined}
-            </Bone>
+            </span>
           </div>
         </div>
       </div>
 
       <section className="detail-section">
         <h2>Description</h2>
-        <Bone as="p" className="detail-description" lines={3}>
+        <p {...bone("text", { lines: 3 })} className="detail-description">
           {pokemon?.description}
-        </Bone>
+        </p>
       </section>
 
       <section className="detail-section">
@@ -96,12 +94,12 @@ export function PokemonDetailView({
         <div className="stats">
           {pokemon?.stats ? (
             pokemon.stats.map((stat) => (
-              <StatBar key={stat.name} name={stat.name} value={stat.value} />
+              <StatBar key={stat.name} name={stat.name} value={stat.value} loading={loading} />
             ))
           ) : (
             <>
               {Array.from({ length: 6 }, (_, i) => (
-                <StatBar key={i} />
+                <StatBar key={i} loading={loading} />
               ))}
             </>
           )}
