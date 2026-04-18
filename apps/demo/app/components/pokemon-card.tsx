@@ -1,27 +1,25 @@
-import { Bone, BoneImage } from "bones";
+"use client";
+
+import { useBone } from "bones";
 import Link from "next/link";
 import type { PokemonListItem } from "@/lib/pokeapi";
 
-/**
- * The same component serves both states:
- * - No `pokemon` prop → Bone/BoneImage children are undefined → skeletons render
- * - With `pokemon` prop → children are truthy → real content renders
- *
- * When wrapped in <Bones>, skeletons are forced regardless of children.
- */
 export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem }) {
+  const bone = useBone(!pokemon);
+
   const card = (
     <div className="card">
-      <BoneImage
+      <img
+        {...bone("block")}
         className="card-image"
         src={pokemon?.sprite}
         width={120}
         height={120}
         alt={pokemon?.name ?? "Pokemon"}
       />
-      <Bone as="h3" className="card-name">
+      <h3 {...bone("text")} className="card-name">
         {pokemon?.name}
-      </Bone>
+      </h3>
       <div className="card-types">
         {pokemon?.types ? (
           pokemon.types.map((type) => (
@@ -30,11 +28,11 @@ export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem }) {
             </span>
           ))
         ) : (
-          <>
-            <Bone as="span" className="type-badge" width={56}>
-              {undefined}
-            </Bone>
-          </>
+          <span
+            {...bone("text")}
+            className="type-badge"
+            style={{ width: 56 }}
+          />
         )}
       </div>
     </div>
