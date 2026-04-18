@@ -11,11 +11,10 @@ import type { PokemonDetail } from "@/lib/pokeapi";
  * Client Component pattern:
  *
  * This page fetches data client-side using useEffect.
- * PokemonDetailView starts with no data — all <Bone> and <BoneImage>
- * children are undefined, so skeletons render automatically via
- * auto-detection. No Suspense needed.
+ * PokemonDetailView starts with no data — useBone returns skeleton
+ * classes so placeholders render automatically. No Suspense needed.
  *
- * When data arrives, children become truthy → content renders.
+ * When data arrives, useBone returns empty props → content renders.
  */
 export default function PokemonPage() {
   const params = useParams<{ id: string }>();
@@ -42,22 +41,15 @@ export default function PokemonPage() {
         sprite:
           pokemonData.sprites.other["official-artwork"].front_default ||
           pokemonData.sprites.front_default,
-        artwork:
-          pokemonData.sprites.other["official-artwork"].front_default,
-        types: pokemonData.types.map(
-          (t: { type: { name: string } }) => t.type.name,
-        ),
+        artwork: pokemonData.sprites.other["official-artwork"].front_default,
+        types: pokemonData.types.map((t: { type: { name: string } }) => t.type.name),
         height: pokemonData.height,
         weight: pokemonData.weight,
-        description: englishEntry
-          ? englishEntry.flavor_text.replace(/\f|\n/g, " ")
-          : "",
-        stats: pokemonData.stats.map(
-          (s: { base_stat: number; stat: { name: string } }) => ({
-            name: s.stat.name,
-            value: s.base_stat,
-          }),
-        ),
+        description: englishEntry ? englishEntry.flavor_text.replace(/\f|\n/g, " ") : "",
+        stats: pokemonData.stats.map((s: { base_stat: number; stat: { name: string } }) => ({
+          name: s.stat.name,
+          value: s.base_stat,
+        })),
       });
     }
 
@@ -73,10 +65,7 @@ export default function PokemonPage() {
           ← Back to Pokédex
         </Link>
         {pokemon && (
-          <button
-            className="toggle-button"
-            onClick={() => setShowForced((prev) => !prev)}
-          >
+          <button className="toggle-button" onClick={() => setShowForced((prev) => !prev)}>
             {showForced ? "Show Content" : "Force Skeletons"}
           </button>
         )}
@@ -84,10 +73,10 @@ export default function PokemonPage() {
 
       <div className="section-header">
         <p className="section-desc">
-          <strong>Client Component pattern:</strong> This page fetches data
-          client-side. The same <code>PokemonDetailView</code> component renders
-          skeletons when data is undefined, then real content when it arrives.
-          The <code>useBones()</code> hook drives custom stat bar rendering.
+          <strong>Client Component pattern:</strong> This page fetches data client-side. The same{" "}
+          <code>PokemonDetailView</code> component renders skeletons when data is undefined, then
+          real content when it arrives. The <code>useBones()</code> hook drives custom stat bar
+          rendering.
         </p>
       </div>
 

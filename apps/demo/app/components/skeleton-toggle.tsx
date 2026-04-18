@@ -5,8 +5,7 @@ import { Bones } from "bones";
 
 /**
  * Demonstrates the <Bones> provider — forces all nested
- * Bone/BoneImage components into skeleton mode, even when
- * they have truthy children.
+ * useBone hooks into skeleton mode, even when data is loaded.
  */
 export function SkeletonToggle({ children }: { children: ReactNode }) {
   const [forced, setForced] = useState(false);
@@ -15,10 +14,7 @@ export function SkeletonToggle({ children }: { children: ReactNode }) {
 
   return (
     <div>
-      <button
-        className="toggle-button"
-        onClick={() => setForced((prev) => !prev)}
-      >
+      <button className="toggle-button" onClick={() => setForced((prev) => !prev)}>
         {forced ? "Show Content" : "Force Skeletons"}
       </button>
       {content}
