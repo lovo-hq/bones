@@ -1,0 +1,24 @@
+{
+  "name": "bones-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev:demo": "cd apps/demo && vp exec next dev",
+    "dev:lib": "cd packages/bones && vp pack --watch",
+    "build:demo": "vp run build --filter bones-demo",
+    "build:lib": "cd packages/bones && vp pack && node scripts/patch-exports.mjs",
+    "test:lib": "vp run test --filter bones",
+    "check:demo": "vp run check --filter bones-demo",
+    "check:lib": "vp run check --filter bones"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    }
+  },
+  "devDependencies": {
+    "vite-plus": "^0.1.14"
+  }
+}
