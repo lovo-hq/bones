@@ -44,10 +44,7 @@ interface PokeAPISpeciesResponse {
 
 const BASE = "https://pokeapi.co/api/v2";
 
-export async function fetchPokemonList(
-  limit = 12,
-  offset = 0,
-): Promise<PokemonListItem[]> {
+export async function fetchPokemonList(limit = 12, offset = 0): Promise<PokemonListItem[]> {
   const res = await fetch(`${BASE}/pokemon?limit=${limit}&offset=${offset}`);
   const data: PokeAPIListResponse = await res.json();
 
@@ -58,9 +55,7 @@ export async function fetchPokemonList(
       return {
         id: p.id,
         name: p.name,
-        sprite:
-          p.sprites.other["official-artwork"].front_default ||
-          p.sprites.front_default,
+        sprite: p.sprites.other["official-artwork"].front_default || p.sprites.front_default,
         types: p.types.map((t) => t.type.name),
       };
     }),
@@ -69,9 +64,7 @@ export async function fetchPokemonList(
   return pokemon;
 }
 
-export async function fetchPokemonDetail(
-  id: string,
-): Promise<PokemonDetail> {
+export async function fetchPokemonDetail(id: string): Promise<PokemonDetail> {
   const [pokemonRes, speciesRes] = await Promise.all([
     fetch(`${BASE}/pokemon/${id}`),
     fetch(`${BASE}/pokemon-species/${id}`),
@@ -80,23 +73,18 @@ export async function fetchPokemonDetail(
   const pokemon: PokeAPIPokemonResponse = await pokemonRes.json();
   const species: PokeAPISpeciesResponse = await speciesRes.json();
 
-  const englishEntry = species.flavor_text_entries.find(
-    (e) => e.language.name === "en",
-  );
+  const englishEntry = species.flavor_text_entries.find((e) => e.language.name === "en");
 
   return {
     id: pokemon.id,
     name: pokemon.name,
     sprite:
-      pokemon.sprites.other["official-artwork"].front_default ||
-      pokemon.sprites.front_default,
+      pokemon.sprites.other["official-artwork"].front_default || pokemon.sprites.front_default,
     artwork: pokemon.sprites.other["official-artwork"].front_default,
     types: pokemon.types.map((t) => t.type.name),
     height: pokemon.height,
     weight: pokemon.weight,
-    description: englishEntry
-      ? englishEntry.flavor_text.replace(/\f|\n/g, " ")
-      : "",
+    description: englishEntry ? englishEntry.flavor_text.replace(/\f|\n/g, " ") : "",
     stats: pokemon.stats.map((s) => ({
       name: s.stat.name,
       value: s.base_stat,

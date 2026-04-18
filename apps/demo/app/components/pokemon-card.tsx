@@ -28,11 +28,7 @@ export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem }) {
             </span>
           ))
         ) : (
-          <span
-            {...bone("text")}
-            className="type-badge"
-            style={{ width: 56 }}
-          />
+          <span {...bone("text")} className="type-badge" style={{ width: 56 }} />
         )}
       </div>
     </div>

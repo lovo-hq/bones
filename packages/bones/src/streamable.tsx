@@ -1,6 +1,6 @@
-import PLazy from 'p-lazy';
-import { Suspense, use } from 'react';
-import { v4 as uuid } from 'uuid';
+import PLazy from "p-lazy";
+import { Suspense, use } from "react";
+import { v4 as uuid } from "uuid";
 
 export type Streamable<T> = T | Promise<T>;
 
@@ -24,14 +24,14 @@ const stableKeys = (function () {
 
   return {
     get: (streamable: unknown): string =>
-      streamable != null && typeof streamable === 'object'
+      streamable != null && typeof streamable === "object"
         ? getObjectKey(streamable)
         : JSON.stringify(streamable),
   };
 })();
 
 function getCompositeKey(streamables: readonly unknown[]): string {
-  return streamables.map(stableKeys.get).join('.');
+  return streamables.map(stableKeys.get).join(".");
 }
 
 function weakRefCache<K, T extends object>() {

@@ -12,20 +12,21 @@
 
 ## File Structure
 
-| Action | File | Responsibility |
-|--------|------|----------------|
-| Create | `src/use-bone.ts` | `useBone` hook — returns prop getter function |
-| Create | `tests/use-bone.test.tsx` | Tests for the hook's return values in loading/ready states |
-| Modify | `src/css/bones.css` | Add prop getter skeleton styles (x-height bars, multi-line gradients, `ch` widths) |
-| Create | `tests/css-skeleton.test.tsx` | Tests that prop getter output produces correct DOM attributes/classes |
-| Modify | `src/index.ts` | Export `useBone` |
-| Modify | `apps/demo/app/page.tsx` | Add a demo section using `useBone` with plain HTML elements |
+| Action | File                          | Responsibility                                                                     |
+| ------ | ----------------------------- | ---------------------------------------------------------------------------------- |
+| Create | `src/use-bone.ts`             | `useBone` hook — returns prop getter function                                      |
+| Create | `tests/use-bone.test.tsx`     | Tests for the hook's return values in loading/ready states                         |
+| Modify | `src/css/bones.css`           | Add prop getter skeleton styles (x-height bars, multi-line gradients, `ch` widths) |
+| Create | `tests/css-skeleton.test.tsx` | Tests that prop getter output produces correct DOM attributes/classes              |
+| Modify | `src/index.ts`                | Export `useBone`                                                                   |
+| Modify | `apps/demo/app/page.tsx`      | Add a demo section using `useBone` with plain HTML elements                        |
 
 ---
 
 ### Task 1: `useBone` Hook — Loading State Returns Skeleton Props
 
 **Files:**
+
 - Create: `packages/bones/tests/use-bone.test.tsx`
 - Create: `packages/bones/src/use-bone.ts`
 
@@ -131,6 +132,7 @@ git commit -m "feat(bones): add useBone hook with loading state skeleton props"
 ### Task 2: `useBone` Hook — Ready State Returns Empty Props
 
 **Files:**
+
 - Modify: `packages/bones/tests/use-bone.test.tsx`
 
 - [ ] **Step 1: Write the failing test — `bone()` returns empty props when not loading**
@@ -163,6 +165,7 @@ git commit -m "test(bones): verify useBone returns empty props when not loading"
 ### Task 3: `useBone` Hook — Respects `<Bones>` Context Provider
 
 **Files:**
+
 - Modify: `packages/bones/tests/use-bone.test.tsx`
 
 - [ ] **Step 1: Write the failing test — forced skeleton via Bones provider**
@@ -202,6 +205,7 @@ git commit -m "test(bones): verify useBone respects Bones context provider"
 ### Task 4: `useBone` Hook — Options (width, height, circle, lines)
 
 **Files:**
+
 - Modify: `packages/bones/tests/use-bone.test.tsx`
 
 - [ ] **Step 1: Write the failing tests — options pass through as styles**
@@ -275,6 +279,7 @@ git commit -m "test(bones): verify useBone options (width, height, circle, lines
 ### Task 5: CSS — X-Height Skeleton Bars with Baseline Alignment
 
 **Files:**
+
 - Modify: `packages/bones/src/css/bones.css`
 
 - [ ] **Step 1: Write a visual test component for manual browser verification**
@@ -288,16 +293,20 @@ import { useBone } from "../src/use-bone.ts";
 
 function TextSkeleton({ loading }: { loading: boolean }) {
   const bone = useBone(loading);
-  return <h3 data-testid="heading" {...bone()}>
-    {loading ? undefined : "Hello World"}
-  </h3>;
+  return (
+    <h3 data-testid="heading" {...bone()}>
+      {loading ? undefined : "Hello World"}
+    </h3>
+  );
 }
 
 function MultiLineSkeleton({ loading }: { loading: boolean }) {
   const bone = useBone(loading);
-  return <p data-testid="paragraph" {...bone({ lines: 3 })}>
-    {loading ? undefined : "Some longer text content here."}
-  </p>;
+  return (
+    <p data-testid="paragraph" {...bone({ lines: 3 })}>
+      {loading ? undefined : "Some longer text content here."}
+    </p>
+  );
 }
 
 afterEach(cleanup);
@@ -422,6 +431,7 @@ git commit -m "feat(bones): add x-height baseline-aligned skeleton CSS for prop 
 ### Task 6: Export `useBone` from Package Index
 
 **Files:**
+
 - Modify: `packages/bones/src/index.ts`
 
 - [ ] **Step 1: Add export**
@@ -450,6 +460,7 @@ git commit -m "feat(bones): export useBone hook and BoneOptions type"
 ### Task 7: Demo — Add `useBone` Section to Demo App
 
 **Files:**
+
 - Modify: `apps/demo/app/page.tsx`
 - Create: `apps/demo/app/components/pokemon-card-headless.tsx`
 
@@ -510,9 +521,9 @@ import { PokemonCardHeadless } from "./components/pokemon-card-headless";
   <div className="section-header">
     <h2>Headless Mode (useBone)</h2>
     <p className="section-desc">
-      The <code>useBone</code> hook returns a prop getter that applies
-      skeleton styles to <strong>plain HTML elements</strong> — no
-      wrapper components needed. Same loading detection, zero extra DOM.
+      The <code>useBone</code> hook returns a prop getter that applies skeleton styles to{" "}
+      <strong>plain HTML elements</strong> — no wrapper components needed. Same loading detection,
+      zero extra DOM.
     </p>
   </div>
 
@@ -521,7 +532,7 @@ import { PokemonCardHeadless } from "./components/pokemon-card-headless";
     <PokemonCardHeadless />
     <PokemonCardHeadless />
   </div>
-</section>
+</section>;
 ```
 
 - [ ] **Step 3: Start the dev server and verify in browser**
@@ -529,6 +540,7 @@ import { PokemonCardHeadless } from "./components/pokemon-card-headless";
 Run: `cd apps/demo && vp dev`
 
 Check:
+
 1. The headless skeleton cards render with shimmer animation
 2. Skeleton bars for text (h3, span) are x-height tall and baseline-aligned
 3. Image skeletons show the shimmer at the correct 120x120 size

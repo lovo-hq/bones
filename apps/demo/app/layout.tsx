@@ -4,15 +4,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Bones Demo — Pokédex",
-  description:
-    "Demonstrating inline skeleton loaders with Bones and the PokeAPI",
+  description: "Demonstrating inline skeleton loaders with Bones and the PokeAPI",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>

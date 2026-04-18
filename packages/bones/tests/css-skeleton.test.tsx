@@ -22,13 +22,7 @@ function MultiLineSkeleton({ loading }: { loading: boolean }) {
 
 function BlockSkeleton({ loading }: { loading: boolean }) {
   const bone = useBone(loading);
-  return (
-    <div
-      data-testid="block"
-      {...bone("block")}
-      style={{ width: 120, height: 120 }}
-    />
-  );
+  return <div data-testid="block" {...bone("block")} style={{ width: 120, height: 120 }} />;
 }
 
 afterEach(cleanup);

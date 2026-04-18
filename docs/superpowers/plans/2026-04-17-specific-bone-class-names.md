@@ -13,6 +13,7 @@
 ### Task 1: Rewrite the CSS
 
 **Files:**
+
 - Modify: `packages/bones/src/css/bones.css`
 
 - [ ] **Step 1: Replace the entire CSS file with the new classes**
@@ -102,6 +103,7 @@ git commit -m "refactor: replace bone-placeholder with bone-text and bone-block 
 ### Task 2: Update `useBone` hook to require a type argument
 
 **Files:**
+
 - Modify: `packages/bones/src/use-bone.ts`
 
 - [ ] **Step 1: Write the failing tests**
@@ -250,6 +252,7 @@ git commit -m "refactor: useBone requires type argument (text or block)"
 ### Task 3: Rewrite `css-skeleton.test.tsx` for new class names
 
 **Files:**
+
 - Modify: `packages/bones/tests/css-skeleton.test.tsx`
 
 - [ ] **Step 1: Rewrite the CSS integration tests**
@@ -281,13 +284,7 @@ function MultiLineSkeleton({ loading }: { loading: boolean }) {
 
 function BlockSkeleton({ loading }: { loading: boolean }) {
   const bone = useBone(loading);
-  return (
-    <div
-      data-testid="block"
-      {...bone("block")}
-      style={{ width: 120, height: 120 }}
-    />
-  );
+  return <div data-testid="block" {...bone("block")} style={{ width: 120, height: 120 }} />;
 }
 
 afterEach(cleanup);
@@ -335,6 +332,7 @@ git commit -m "test: update CSS skeleton tests for bone-text and bone-block clas
 ### Task 4: Delete `Bone`, `BoneImage`, and `isEmpty`
 
 **Files:**
+
 - Delete: `packages/bones/src/bone.tsx`
 - Delete: `packages/bones/src/bone-image.tsx`
 - Delete: `packages/bones/src/is-empty.ts`
@@ -366,6 +364,7 @@ git commit -m "refactor: remove Bone, BoneImage, and isEmpty"
 ### Task 5: Update exports and types
 
 **Files:**
+
 - Modify: `packages/bones/src/index.ts`
 - Modify: `packages/bones/src/types.ts`
 
@@ -420,6 +419,7 @@ git commit -m "refactor: update exports — remove Bone, BoneImage, add BoneType
 ### Task 6: Rewrite demo `PokemonCard` to use `useBone`
 
 **Files:**
+
 - Modify: `apps/demo/app/components/pokemon-card.tsx`
 
 - [ ] **Step 1: Rewrite PokemonCard using `useBone`**
@@ -457,11 +457,7 @@ export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem }) {
             </span>
           ))
         ) : (
-          <span
-            {...bone("text")}
-            className="type-badge"
-            style={{ width: 56 }}
-          />
+          <span {...bone("text")} className="type-badge" style={{ width: 56 }} />
         )}
       </div>
     </div>
@@ -491,6 +487,7 @@ git commit -m "refactor: PokemonCard uses useBone instead of Bone/BoneImage"
 ### Task 7: Rewrite demo `PokemonCardHeadless` for new API
 
 **Files:**
+
 - Modify: `apps/demo/app/components/pokemon-card-headless.tsx`
 
 - [ ] **Step 1: Update PokemonCardHeadless for the new `bone(type)` signature**
@@ -503,11 +500,7 @@ Replace the contents of `apps/demo/app/components/pokemon-card-headless.tsx` wit
 import { useBone } from "bones";
 import type { PokemonListItem } from "@/lib/pokeapi";
 
-export function PokemonCardHeadless({
-  pokemon,
-}: {
-  pokemon?: PokemonListItem;
-}) {
+export function PokemonCardHeadless({ pokemon }: { pokemon?: PokemonListItem }) {
   const bone = useBone(!pokemon);
 
   return (
@@ -531,11 +524,7 @@ export function PokemonCardHeadless({
             </span>
           ))
         ) : (
-          <span
-            {...bone("text")}
-            className="type-badge"
-            style={{ width: "8ch" }}
-          />
+          <span {...bone("text")} className="type-badge" style={{ width: "8ch" }} />
         )}
       </div>
     </div>
@@ -555,6 +544,7 @@ git commit -m "refactor: PokemonCardHeadless uses new bone(type) signature"
 ### Task 8: Rewrite demo `PokemonDetailView` to use `useBone`
 
 **Files:**
+
 - Modify: `apps/demo/app/components/pokemon-detail-view.tsx`
 
 - [ ] **Step 1: Rewrite PokemonDetailView using `useBone`**
@@ -581,27 +571,16 @@ function StatBar({ name, value, loading }: { name?: string; value?: number; load
       </span>
       <div className="stat-bar-track">
         {loading ? (
-          <div
-            {...bone("block")}
-            className="stat-bar-fill"
-            style={{ width: "60%", height: 8 }}
-          />
+          <div {...bone("block")} className="stat-bar-fill" style={{ width: "60%", height: 8 }} />
         ) : (
-          <div
-            className="stat-bar-fill loaded"
-            style={{ width: `${pct}%` }}
-          />
+          <div className="stat-bar-fill loaded" style={{ width: `${pct}%` }} />
         )}
       </div>
     </div>
   );
 }
 
-export function PokemonDetailView({
-  pokemon,
-}: {
-  pokemon?: PokemonDetail;
-}) {
+export function PokemonDetailView({ pokemon }: { pokemon?: PokemonDetail }) {
   const { isLoading: forced } = useBones();
   const loading = forced || !pokemon;
   const bone = useBone(loading);
@@ -686,6 +665,7 @@ git commit -m "refactor: PokemonDetailView uses useBone instead of Bone/BoneImag
 ### Task 9: Update demo page and grid
 
 **Files:**
+
 - Modify: `apps/demo/app/page.tsx`
 - Modify: `apps/demo/app/components/pokemon-grid.tsx`
 

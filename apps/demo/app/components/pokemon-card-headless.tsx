@@ -3,11 +3,7 @@
 import { useBone } from "bones";
 import type { PokemonListItem } from "@/lib/pokeapi";
 
-export function PokemonCardHeadless({
-  pokemon,
-}: {
-  pokemon?: PokemonListItem;
-}) {
+export function PokemonCardHeadless({ pokemon }: { pokemon?: PokemonListItem }) {
   const bone = useBone(!pokemon);
 
   return (
@@ -31,11 +27,7 @@ export function PokemonCardHeadless({
             </span>
           ))
         ) : (
-          <span
-            {...bone("text")}
-            className="type-badge"
-            style={{ width: "8ch" }}
-          />
+          <span {...bone("text")} className="type-badge" style={{ width: "8ch" }} />
         )}
       </div>
     </div>

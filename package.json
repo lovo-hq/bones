@@ -11,14 +11,14 @@
     "check:demo": "vp run check --filter bones-demo",
     "check:lib": "vp run check --filter bones"
   },
+  "devDependencies": {
+    "vite-plus": "^0.1.14"
+  },
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "overrides": {
       "vite": "npm:@voidzero-dev/vite-plus-core@latest",
       "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
     }
-  },
-  "devDependencies": {
-    "vite-plus": "^0.1.14"
   }
 }
