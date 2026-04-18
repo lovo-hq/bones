@@ -3,11 +3,10 @@
 import { useCallback, useContext } from "react";
 import { BonesContext } from "./context.ts";
 
+export type BoneType = "text" | "block";
+
 export interface BoneOptions {
   lines?: number;
-  width?: string | number;
-  height?: string | number;
-  circle?: boolean;
 }
 
 type BoneProps = Record<string, unknown>;
@@ -17,26 +16,19 @@ export function useBone(loading: boolean) {
   const isLoading = ctx.forced || loading;
 
   const bone = useCallback(
-    (options?: BoneOptions): BoneProps => {
+    (type: BoneType, options?: BoneOptions): BoneProps => {
       if (!isLoading) {
         return {};
       }
 
-      const style: Record<string, string | number> = {};
+      const className = type === "text" ? "bone-text" : "bone-block";
       const props: BoneProps = {
-        className: "bone-placeholder",
+        className,
         "aria-busy": true,
       };
 
-      if (options?.width) style.width = options.width;
-      if (options?.height) style.height = options.height;
-      if (options?.circle) style.borderRadius = "50%";
-      if (options?.lines && options.lines > 1) {
-        style["--bone-lines"] = options.lines;
-      }
-
-      if (Object.keys(style).length > 0) {
-        props.style = style;
+      if (type === "text" && options?.lines && options.lines > 1) {
+        props.style = { "--bone-lines": options.lines };
       }
 
       return props;
