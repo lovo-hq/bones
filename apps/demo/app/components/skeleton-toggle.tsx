@@ -10,7 +10,7 @@ import { Bones } from "bones";
 export function SkeletonToggle({ children }: { children: ReactNode }) {
   const [forced, setForced] = useState(false);
 
-  const content = forced ? <Bones>{children}</Bones> : children;
+  const content = forced ? <Bones forced>{children}</Bones> : children;
 
   return (
     <div>

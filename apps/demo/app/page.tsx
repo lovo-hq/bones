@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { Bones } from "bones";
+import { ArticlePreview } from "./components/article-preview";
 import { PokemonCard } from "./components/pokemon-card";
 import { PokemonGrid, PokemonGridAsync } from "./components/pokemon-grid";
-import { PokemonCardHeadless } from "./components/pokemon-card-headless";
 import { SkeletonToggle } from "./components/skeleton-toggle";
 
 /**
@@ -64,6 +64,32 @@ export default function Home() {
 
       <section className="demo-section">
         <div className="section-header">
+          <h2>Multi-Line Text</h2>
+          <p className="section-desc">
+            Pass <code>{"{ lines: N }"}</code> to <code>bone("text")</code> to create
+            paragraph-sized placeholders. The skeleton automatically generates one bar per line
+            using a CSS repeating gradient — no extra DOM elements.
+          </p>
+        </div>
+
+        <div className="article-demos">
+          <Bones forced>
+            <ArticlePreview />
+          </Bones>
+          <ArticlePreview
+            article={{
+              title: "Understanding React Server Components",
+              excerpt:
+                "Server Components let you render components on the server, reducing the JavaScript sent to the client. This changes how we think about data fetching and component architecture.",
+              author: "Dan Abramov",
+              date: "Mar 2026",
+            }}
+          />
+        </div>
+      </section>
+
+      <section className="demo-section">
+        <div className="section-header">
           <h2>Theming</h2>
           <p className="section-desc">
             Customize skeleton colors with the <code>baseColor</code> and{" "}
@@ -75,39 +101,22 @@ export default function Home() {
         <div className="theme-demos">
           <div className="theme-demo">
             <h3>Warm</h3>
-            <Bones baseColor="#f5e6d3" highlightColor="#faf0e6">
+            <Bones forced baseColor="#f5e6d3" highlightColor="#faf0e6">
               <PokemonCard />
             </Bones>
           </div>
           <div className="theme-demo">
             <h3>Cool</h3>
-            <Bones baseColor="#d3e5f5" highlightColor="#e6f0fa">
+            <Bones forced baseColor="#d3e5f5" highlightColor="#e6f0fa">
               <PokemonCard />
             </Bones>
           </div>
           <div className="theme-demo">
             <h3>Dark</h3>
-            <Bones baseColor="#2a2a2a" highlightColor="#3a3a3a">
+            <Bones forced baseColor="#2a2a2a" highlightColor="#3a3a3a">
               <PokemonCard />
             </Bones>
           </div>
-        </div>
-      </section>
-
-      <section className="demo-section">
-        <div className="section-header">
-          <h2>Headless Mode (useBone)</h2>
-          <p className="section-desc">
-            The <code>useBone</code> hook returns a prop getter that applies skeleton styles to{" "}
-            <strong>plain HTML elements</strong> — no wrapper components needed. Same loading
-            detection, zero extra DOM.
-          </p>
-        </div>
-
-        <div className="grid">
-          <PokemonCardHeadless />
-          <PokemonCardHeadless />
-          <PokemonCardHeadless />
         </div>
       </section>
     </main>
