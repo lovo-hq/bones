@@ -154,6 +154,8 @@ function isForced(props: BonesProps): props is BonesForcedProps {
   return "forced" in props && props.forced === true;
 }
 
+export function Bones<T>(props: BonesStreamingProps<T>): ReactNode;
+export function Bones(props: BonesForcedProps): ReactNode;
 export function Bones(props: BonesProps): ReactNode {
   const { baseColor, highlightColor, duration } = props;
 

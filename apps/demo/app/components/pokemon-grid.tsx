@@ -1,36 +1,12 @@
-import { fetchPokemonList } from "@/lib/pokeapi";
 import { PokemonCard } from "./pokemon-card";
+import type { PokemonListItem } from "@/lib/pokeapi";
 
-/**
- * Skeleton grid — renders 12 empty PokemonCards as placeholders.
- * Used as a Suspense fallback while PokemonGridAsync loads.
- */
-export function PokemonGrid({ count = 12 }: { count?: number }) {
+export function PokemonGrid({ pokemon }: { pokemon?: PokemonListItem[] }) {
   return (
     <div className="grid">
-      {Array.from({ length: count }, (_, i) => (
-        <PokemonCard key={i} />
-      ))}
-    </div>
-  );
-}
-
-/**
- * Async server component — fetches data then renders.
- * While this component is loading, React shows the Suspense fallback.
- */
-export async function PokemonGridAsync({ delay = 0 }: { delay?: number }) {
-  if (delay > 0) {
-    await new Promise((r) => setTimeout(r, delay));
-  }
-
-  const pokemon = await fetchPokemonList(12);
-
-  return (
-    <div className="grid">
-      {pokemon.map((p) => (
-        <PokemonCard key={p.id} pokemon={p} />
-      ))}
+      {pokemon
+        ? pokemon.map((p) => <PokemonCard key={p.id} pokemon={p} />)
+        : Array.from({ length: 12 }, (_, i) => <PokemonCard key={i} />)}
     </div>
   );
 }

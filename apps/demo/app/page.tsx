@@ -1,23 +1,20 @@
-import { Suspense } from "react";
 import { Bones } from "bones";
+import type { PokemonListItem } from "@/lib/pokeapi";
+import { fetchPokemonList } from "@/lib/pokeapi";
 import { ArticlePreview } from "./components/article-preview";
 import { PokemonCard } from "./components/pokemon-card";
-import { PokemonGrid, PokemonGridAsync } from "./components/pokemon-grid";
+import { PokemonGrid } from "./components/pokemon-grid";
 import { SkeletonToggle } from "./components/skeleton-toggle";
 
-/**
- * Server Component pattern:
- *
- * <PokemonGrid> is an async server component that fetches data.
- * While it loads, React renders the Suspense fallback — which uses
- * the SAME <PokemonCard> component, but without data.
- *
- * Since pokemon prop is undefined, useBone returns skeleton classes
- * and the cards render as placeholders automatically.
- *
- * The 2-second delay lets you see the skeleton in action.
- */
+function delay<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve) => {
+    promise.then((value) => setTimeout(() => resolve(value), ms));
+  });
+}
+
 export default function Home() {
+  const pokemonPromise = fetchPokemonList(12);
+
   return (
     <main>
       <section className="hero">
@@ -31,34 +28,34 @@ export default function Home() {
 
       <section className="demo-section">
         <div className="section-header">
-          <h2>Server Components + Suspense</h2>
+          <h2>Streaming with {"<Bones>"}</h2>
           <p className="section-desc">
-            An async server component fetches Pokemon data. While it streams in, the Suspense
-            fallback renders the <strong>same PokemonCard</strong> component — but without data.
-            Bone auto-detects the empty children and shows skeletons.
+            Pass a promise to <code>{"<Bones>"}</code> and it handles the rest — Suspense, fallback,
+            and transition are all internal. The <strong>same PokemonCard</strong> component renders
+            as a skeleton while the data streams in, then swaps to content when it resolves.
           </p>
           <p className="section-hint">Refresh the page to see the skeleton → content transition.</p>
         </div>
 
-        <Suspense fallback={<PokemonGrid />}>
-          <PokemonGridAsync delay={2000} />
-        </Suspense>
+        <Bones value={delay(pokemonPromise, 2000)}>
+          {(pokemon: PokemonListItem[] | undefined) => <PokemonGrid pokemon={pokemon} />}
+        </Bones>
       </section>
 
       <section className="demo-section">
         <div className="section-header">
-          <h2>{"<Bones>"} Provider</h2>
+          <h2>{"<Bones forced>"}</h2>
           <p className="section-desc">
-            The <code>{"<Bones>"}</code> context provider forces <strong>all</strong> nested{" "}
-            <code>useBone</code> hooks into skeleton mode — even when they have real data. Toggle it
-            to see the same loaded cards switch to skeletons.
+            The <code>forced</code> prop forces <strong>all</strong> nested <code>useBone</code>{" "}
+            hooks into skeleton mode — even when they have real data. Toggle it to see the same
+            loaded cards switch to skeletons.
           </p>
         </div>
 
         <SkeletonToggle>
-          <Suspense fallback={<PokemonGrid />}>
-            <PokemonGridAsync />
-          </Suspense>
+          <Bones value={pokemonPromise}>
+            {(pokemon: PokemonListItem[] | undefined) => <PokemonGrid pokemon={pokemon} />}
+          </Bones>
         </SkeletonToggle>
       </section>
 
