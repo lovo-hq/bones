@@ -18,7 +18,7 @@ describe("useBones", () => {
 
   test("returns isLoading true inside Bones provider", () => {
     render(
-      <Bones>
+      <Bones forced>
         <TestConsumer />
       </Bones>,
     );

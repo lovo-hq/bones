@@ -3,7 +3,6 @@
 import { type ReactNode, Suspense, use } from "react";
 import { BonesContext } from "./context.ts";
 import type {
-  Streamable as StreamableT,
   BonesProps,
   BonesForcedProps,
   BonesStreamingProps,
@@ -14,11 +13,11 @@ import type {
 // Streamable utilities — promise caching, all(), from()
 // ---------------------------------------------------------------------------
 
-function isPromise<T>(value: StreamableT<T>): value is Promise<T> {
+function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
   return value instanceof Promise;
 }
 
-function useStreamable<T>(streamable: StreamableT<T>): T {
+function useStreamable<T>(streamable: T | Promise<T>): T {
   return isPromise(streamable) ? use(streamable) : streamable;
 }
 
@@ -70,7 +69,9 @@ const promiseCache = weakRefCache<string, Promise<unknown>>();
 
 function all<T extends readonly unknown[] | []>(
   streamables: T,
-): StreamableT<{ -readonly [P in keyof T]: Awaited<T[P]> }> {
+):
+  | { -readonly [P in keyof T]: Awaited<T[P]> }
+  | Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }> {
   if (!streamables.some(isPromise)) {
     return streamables as { -readonly [P in keyof T]: Awaited<T[P]> };
   }
@@ -86,7 +87,7 @@ function all<T extends readonly unknown[] | []>(
   return result;
 }
 
-function from<T>(thunk: () => Promise<T>): StreamableT<T> {
+function from<T>(thunk: () => Promise<T>): T | Promise<T> {
   let promise: Promise<T> | undefined;
 
   // eslint-disable-next-line unicorn/no-thenable
@@ -120,7 +121,7 @@ function Resolved<T>({
   value,
   children,
 }: {
-  value: StreamableT<T>;
+  value: T | Promise<T>;
   children: (data: T) => ReactNode;
 }) {
   return children(useStreamable(value));

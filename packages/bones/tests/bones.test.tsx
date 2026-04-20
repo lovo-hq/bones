@@ -26,7 +26,7 @@ describe("Bones streaming mode", () => {
     await act(async () => {
       render(
         <Bones value={promise}>
-          {(data) => <TestCard data={data} />}
+          {(data: typeof mockData | undefined) => <TestCard data={data} />}
         </Bones>,
       );
     });
@@ -45,7 +45,7 @@ describe("Bones streaming mode", () => {
   test("renders content immediately when value is not a promise", () => {
     render(
       <Bones value={mockData}>
-        {(data) => <TestCard data={data} />}
+        {(data: typeof mockData | undefined) => <TestCard data={data} />}
       </Bones>,
     );
 
@@ -56,8 +56,12 @@ describe("Bones streaming mode", () => {
   test("handles array of streamables", async () => {
     let resolve1!: (v: { name: string }) => void;
     let resolve2!: (v: { type: string }) => void;
-    const p1 = new Promise<{ name: string }>((r) => { resolve1 = r; });
-    const p2 = new Promise<{ type: string }>((r) => { resolve2 = r; });
+    const p1 = new Promise<{ name: string }>((r) => {
+      resolve1 = r;
+    });
+    const p2 = new Promise<{ type: string }>((r) => {
+      resolve2 = r;
+    });
 
     function TestMulti({ data }: { data?: [{ name: string }, { type: string }] }) {
       const { bone, data: gated } = useBone(data);
@@ -71,7 +75,7 @@ describe("Bones streaming mode", () => {
     await act(async () => {
       render(
         <Bones value={[p1, p2]}>
-          {(data) => <TestMulti data={data} />}
+          {(data: [{ name: string }, { type: string }] | undefined) => <TestMulti data={data} />}
         </Bones>,
       );
     });
