@@ -168,11 +168,10 @@ The server streams the unresolved promise to the client. `Bones` wraps it in Sus
 
 | Item | Change |
 |------|--------|
-| `Bones` component (`bones.tsx`) | Rewritten — streaming + forced modes |
-| `BonesProps` type (`types.ts`) | Rewritten — discriminated union with generics |
-| `index.ts` exports | Updated — add `Streamable` type export, remove `Stream` |
-| `Stream` component (`streamable.tsx`) | Removed — replaced by `Bones` |
-| `UseStreamable` component (`streamable.tsx`) | Renamed to `Resolved`, stays internal |
+| `Bones` component (`bones.tsx`) | Rewritten — streaming + forced modes, includes all streamable infrastructure |
+| `BonesProps` type (`types.ts`) | Rewritten — discriminated union with generics, includes `Streamable<T>` type |
+| `index.ts` exports | Updated — add `Streamable` export, new `BonesProps` types |
+| `streamable.tsx` | Deleted — was a reference file; useful parts absorbed into `bones.tsx` and `types.ts` |
 
 ## What Does Not Change
 
@@ -182,6 +181,3 @@ The server streams the unresolved promise to the client. `Bones` wraps it in Sus
 | `useBones` hook | Still reads context |
 | `BonesContext` | Still provides forced state |
 | CSS / skeleton styling | Unrelated to data flow |
-| `Streamable.all()`, `Streamable.from()` | Already correct |
-| Promise caching infrastructure | Already correct |
-| `useStreamable` hook | Already correct, used internally |

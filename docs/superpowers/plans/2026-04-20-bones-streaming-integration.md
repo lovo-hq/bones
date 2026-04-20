@@ -4,7 +4,7 @@
 
 **Goal:** Replace the ambiguous `undefined`-as-loading signal with promise-based loading detection via a rewritten `Bones` component that wraps Suspense internally.
 
-**Architecture:** `Bones` becomes the streaming orchestration component (accepting `Streamable<T>` via `value` prop, or `forced` for skeleton demos). It wraps Suspense internally and uses `children(undefined)` as the fallback. `useBone` stays unchanged — it only does skeleton prop generation. The existing `streamable.tsx` caching infrastructure (weakRefCache, stableKeys, Streamable.all) is preserved and wired into the new `Bones` component.
+**Architecture:** `Bones` becomes the streaming orchestration component (accepting `Streamable<T>` via `value` prop, or `forced` for skeleton demos). It wraps Suspense internally and uses `children(undefined)` as the fallback. `useBone` stays unchanged — it only does skeleton prop generation. The streamable caching infrastructure (weakRefCache, stableKeys, Streamable.all) is built directly into `bones.tsx`. The reference file `streamable.tsx` is deleted.
 
 **Tech Stack:** React 19 (Suspense, `use()`), TypeScript, Vite+ (vp test, vp check), @testing-library/react
 
@@ -12,157 +12,9 @@
 
 ---
 
-### Task 1: Remove unused dependencies from streamable.tsx
+### Task 1: Rewrite BonesProps types as a discriminated union
 
-`streamable.tsx` imports `p-lazy` and `uuid`, but neither is installed as a dependency. `Streamable.from()` uses `PLazy` and `stableKeys` uses `uuid`. We need to remove these external dependencies and replace them with lightweight inline alternatives before wiring `streamable.tsx` into the public API.
-
-**Files:**
-- Modify: `packages/bones/src/streamable.tsx`
-
-- [ ] **Step 1: Write the failing test for Streamable.from()**
-
-Create a test file for the streamable utilities.
-
-```tsx
-// packages/bones/tests/streamable.test.tsx
-import { cleanup } from "@testing-library/react";
-import { afterEach, describe, expect, test } from "vite-plus/test";
-import { Streamable } from "../src/streamable.tsx";
-
-afterEach(cleanup);
-
-describe("Streamable.from", () => {
-  test("returns a lazy promise that does not execute until awaited", async () => {
-    let called = false;
-    const lazy = Streamable.from(() => {
-      called = true;
-      return Promise.resolve("result");
-    });
-
-    expect(called).toBe(false);
-    const result = await lazy;
-    expect(called).toBe(true);
-    expect(result).toBe("result");
-  });
-});
-
-describe("Streamable.all", () => {
-  test("returns resolved values directly when no promises", () => {
-    const result = Streamable.all([1, "two", 3]);
-    expect(result).toEqual([1, "two", 3]);
-  });
-
-  test("resolves array of promises", async () => {
-    const result = await Streamable.all([
-      Promise.resolve(1),
-      Promise.resolve("two"),
-    ]);
-    expect(result).toEqual([1, "two"]);
-  });
-
-  test("returns the same promise instance for identical inputs", () => {
-    const p1 = Promise.resolve(1);
-    const p2 = Promise.resolve(2);
-    const result1 = Streamable.all([p1, p2]);
-    const result2 = Streamable.all([p1, p2]);
-    expect(result1).toBe(result2);
-  });
-});
-```
-
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `cd packages/bones && vp test tests/streamable.test.tsx`
-Expected: FAIL — `p-lazy` and `uuid` modules not found.
-
-- [ ] **Step 3: Replace p-lazy with an inline lazy promise implementation**
-
-Replace the `PLazy` import and `from` function. A lazy promise defers execution of its thunk until `.then()` or `await` is called.
-
-In `packages/bones/src/streamable.tsx`, remove the `p-lazy` import (line 1) and replace the `from` function (lines 90-92):
-
-```tsx
-// Remove this line:
-// import PLazy from "p-lazy";
-
-// Replace the from function with:
-function from<T>(thunk: () => Promise<T>): Streamable<T> {
-  let promise: Promise<T> | undefined;
-
-  return {
-    then(onfulfilled, onrejected) {
-      promise ??= thunk();
-      return promise.then(onfulfilled, onrejected);
-    },
-    catch(onrejected) {
-      promise ??= thunk();
-      return promise.catch(onrejected);
-    },
-    [Symbol.toStringTag]: "LazyPromise",
-    finally(onfinally) {
-      promise ??= thunk();
-      return promise.finally(onfinally);
-    },
-  } satisfies Promise<T>;
-}
-```
-
-- [ ] **Step 4: Replace uuid with a counter-based key generator**
-
-The `stableKeys` IIFE uses `uuid()` to generate unique keys for objects in a WeakMap. A simple auto-incrementing counter is sufficient — keys just need to be unique within the process lifetime.
-
-In `packages/bones/src/streamable.tsx`, remove the `uuid` import (line 3) and replace the `getObjectKey` function:
-
-```tsx
-// Remove this line:
-// import { v4 as uuid } from "uuid";
-
-// Replace the stableKeys IIFE with:
-const stableKeys = (function () {
-  const cache = new WeakMap<object, string>();
-  let nextId = 0;
-
-  return {
-    get: (streamable: unknown): string => {
-      if (streamable != null && typeof streamable === "object") {
-        let key = cache.get(streamable);
-
-        if (key === undefined) {
-          key = String(nextId++);
-          cache.set(streamable, key);
-        }
-
-        return key;
-      }
-
-      return JSON.stringify(streamable);
-    },
-  };
-})();
-```
-
-- [ ] **Step 5: Run tests to verify they pass**
-
-Run: `cd packages/bones && vp test tests/streamable.test.tsx`
-Expected: PASS — all 3 tests pass.
-
-- [ ] **Step 6: Run full test suite to check for regressions**
-
-Run: `cd packages/bones && vp test`
-Expected: All existing tests pass.
-
-- [ ] **Step 7: Commit**
-
-```bash
-git add packages/bones/src/streamable.tsx packages/bones/tests/streamable.test.tsx
-git commit -m "refactor: replace p-lazy and uuid with inline implementations in streamable"
-```
-
----
-
-### Task 2: Rewrite BonesProps types as a discriminated union
-
-The current `BonesProps` is a single interface with `children: ReactNode`. The new `Bones` component has two modes (streaming and forced) with different `children` signatures. Define the discriminated union types.
+The current `BonesProps` is a single interface with `children: ReactNode`. The new `Bones` component has two modes (streaming and forced) with different `children` signatures. Define the discriminated union types and the `Streamable<T>` type.
 
 **Files:**
 - Modify: `packages/bones/src/types.ts`
@@ -173,7 +25,8 @@ Replace the contents of `packages/bones/src/types.ts`:
 
 ```ts
 import type { ReactNode } from "react";
-import type { Streamable } from "./streamable.tsx";
+
+export type Streamable<T> = T | Promise<T>;
 
 interface BonesThemeProps {
   baseColor?: string;
@@ -211,7 +64,7 @@ export type BonesProps<T = unknown> =
 - [ ] **Step 2: Run type check to verify**
 
 Run: `cd packages/bones && vp check`
-Expected: Type errors in `bones.tsx` and possibly `index.ts` because they reference the old `BonesProps` shape. This is expected — we fix those in the next tasks.
+Expected: Type errors in `bones.tsx` because it references the old `BonesProps` shape. This is expected — we fix it in the next task.
 
 - [ ] **Step 3: Commit**
 
@@ -222,16 +75,17 @@ git commit -m "refactor: rewrite BonesProps as discriminated union for streaming
 
 ---
 
-### Task 3: Rewrite the Bones component
+### Task 2: Rewrite the Bones component with streaming support
 
-Replace the current `Bones` component (which only does forced mode via context) with the new version that supports both streaming and forced modes.
+Replace the current `Bones` component (which only does forced mode via context) with the new version that supports both streaming and forced modes. All streamable infrastructure (promise caching, `Streamable.all`, lazy promises, `useStreamable`) is built directly into this file. The reference file `streamable.tsx` is deleted.
 
 **Files:**
-- Modify: `packages/bones/src/bones.tsx`
+- Rewrite: `packages/bones/src/bones.tsx`
+- Delete: `packages/bones/src/streamable.tsx`
 
-- [ ] **Step 1: Write the failing test for streaming mode**
+- [ ] **Step 1: Write the failing tests for Bones streaming mode and Streamable utilities**
 
-Add a new test file for the `Bones` component streaming behavior:
+Create a test file covering both the `Bones` component and the `Streamable` utilities it exports:
 
 ```tsx
 // packages/bones/tests/bones.test.tsx
@@ -349,27 +203,184 @@ describe("Bones forced mode", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+```tsx
+// packages/bones/tests/streamable.test.tsx
+import { afterEach, describe, expect, test } from "vite-plus/test";
+import { Streamable } from "../src/bones.tsx";
 
-Run: `cd packages/bones && vp test tests/bones.test.tsx`
-Expected: FAIL — `Bones` doesn't accept `value` prop yet.
+describe("Streamable.from", () => {
+  test("returns a lazy promise that does not execute until awaited", async () => {
+    let called = false;
+    const lazy = Streamable.from(() => {
+      called = true;
+      return Promise.resolve("result");
+    });
 
-- [ ] **Step 3: Rewrite the Bones component**
+    expect(called).toBe(false);
+    const result = await lazy;
+    expect(called).toBe(true);
+    expect(result).toBe("result");
+  });
+});
 
-Replace the contents of `packages/bones/src/bones.tsx`:
+describe("Streamable.all", () => {
+  test("returns resolved values directly when no promises", () => {
+    const result = Streamable.all([1, "two", 3]);
+    expect(result).toEqual([1, "two", 3]);
+  });
+
+  test("resolves array of promises", async () => {
+    const result = await Streamable.all([
+      Promise.resolve(1),
+      Promise.resolve("two"),
+    ]);
+    expect(result).toEqual([1, "two"]);
+  });
+
+  test("returns the same promise instance for identical inputs", () => {
+    const p1 = Promise.resolve(1);
+    const p2 = Promise.resolve(2);
+    const result1 = Streamable.all([p1, p2]);
+    const result2 = Streamable.all([p1, p2]);
+    expect(result1).toBe(result2);
+  });
+});
+```
+
+- [ ] **Step 2: Run tests to verify they fail**
+
+Run: `cd packages/bones && vp test tests/bones.test.tsx tests/streamable.test.tsx`
+Expected: FAIL — `Bones` doesn't accept `value` prop, `Streamable` not exported from `bones.tsx`.
+
+- [ ] **Step 3: Rewrite bones.tsx**
+
+Replace the contents of `packages/bones/src/bones.tsx` with the full implementation. This includes the streamable infrastructure (promise caching, `Streamable.all`, `Streamable.from`, `useStreamable`) and the `Bones` component with streaming and forced modes:
 
 ```tsx
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, use } from "react";
 import { BonesContext } from "./context.ts";
 import type {
+  Streamable,
   BonesProps,
   BonesForcedProps,
   BonesStreamingProps,
   BonesArrayProps,
 } from "./types.ts";
-import { Streamable, useStreamable } from "./streamable.tsx";
+
+// ---------------------------------------------------------------------------
+// Streamable utilities — promise caching, all(), from()
+// ---------------------------------------------------------------------------
+
+function isPromise<T>(value: Streamable<T>): value is Promise<T> {
+  return value instanceof Promise;
+}
+
+function useStreamable<T>(streamable: Streamable<T>): T {
+  return isPromise(streamable) ? use(streamable) : streamable;
+}
+
+// Stable identity keys for promise caching — prevents Suspense re-renders
+const stableKeys = (function () {
+  const cache = new WeakMap<object, string>();
+  let nextId = 0;
+
+  return {
+    get: (streamable: unknown): string => {
+      if (streamable != null && typeof streamable === "object") {
+        let key = cache.get(streamable);
+
+        if (key === undefined) {
+          key = String(nextId++);
+          cache.set(streamable, key);
+        }
+
+        return key;
+      }
+
+      return JSON.stringify(streamable);
+    },
+  };
+})();
+
+function getCompositeKey(streamables: readonly unknown[]): string {
+  return streamables.map(stableKeys.get).join(".");
+}
+
+function weakRefCache<K, T extends object>() {
+  const cache = new Map<K, WeakRef<T>>();
+
+  const registry = new FinalizationRegistry((key: K) => {
+    const valueRef = cache.get(key);
+
+    if (valueRef && !valueRef.deref()) cache.delete(key);
+  });
+
+  return {
+    get: (key: K) => cache.get(key)?.deref(),
+    set: (key: K, value: T) => {
+      cache.set(key, new WeakRef(value));
+      registry.register(value, key);
+    },
+  };
+}
+
+const promiseCache = weakRefCache<string, Promise<unknown>>();
+
+/**
+ * Suspense-friendly `Promise.all` with stable promise identity.
+ * Returns the same promise instance when called with identical inputs.
+ */
+function all<T extends readonly unknown[] | []>(
+  streamables: T,
+): Streamable<{ -readonly [P in keyof T]: Awaited<T[P]> }> {
+  if (!streamables.some(isPromise)) {
+    return streamables as { -readonly [P in keyof T]: Awaited<T[P]> };
+  }
+
+  const cacheKey = getCompositeKey(streamables);
+  const cached = promiseCache.get(cacheKey);
+
+  if (cached != null) return cached as { -readonly [P in keyof T]: Awaited<T[P]> };
+
+  const result = Promise.all(streamables);
+  promiseCache.set(cacheKey, result);
+
+  return result;
+}
+
+/**
+ * Creates a lazy promise that defers thunk execution until awaited.
+ */
+function from<T>(thunk: () => Promise<T>): Streamable<T> {
+  let promise: Promise<T> | undefined;
+
+  return {
+    then(onfulfilled, onrejected) {
+      promise ??= thunk();
+      return promise.then(onfulfilled, onrejected);
+    },
+    catch(onrejected) {
+      promise ??= thunk();
+      return promise.catch(onrejected);
+    },
+    [Symbol.toStringTag]: "LazyPromise",
+    finally(onfinally) {
+      promise ??= thunk();
+      return promise.finally(onfinally);
+    },
+  } satisfies Promise<T>;
+}
+
+export const Streamable = {
+  all,
+  from,
+};
+
+// ---------------------------------------------------------------------------
+// Bones component — streaming + forced modes
+// ---------------------------------------------------------------------------
 
 function Resolved<T>({
   value,
@@ -447,62 +458,50 @@ export function Bones(props: BonesProps): React.ReactNode {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 4: Delete the reference file**
 
-Run: `cd packages/bones && vp test tests/bones.test.tsx`
-Expected: PASS — all streaming and forced mode tests pass.
+```bash
+rm packages/bones/src/streamable.tsx
+```
 
-- [ ] **Step 5: Run full test suite**
+- [ ] **Step 5: Run tests to verify they pass**
+
+Run: `cd packages/bones && vp test tests/bones.test.tsx tests/streamable.test.tsx`
+Expected: PASS — all streaming, forced, and Streamable utility tests pass.
+
+- [ ] **Step 6: Run full test suite**
 
 Run: `cd packages/bones && vp test`
 Expected: Existing `use-bone.test.tsx` tests that use `<Bones>` (the forced provider) still pass because forced mode preserves the same behavior.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add packages/bones/src/bones.tsx packages/bones/tests/bones.test.tsx
+git add packages/bones/src/bones.tsx packages/bones/tests/bones.test.tsx packages/bones/tests/streamable.test.tsx
+git rm packages/bones/src/streamable.tsx
 git commit -m "feat: rewrite Bones component with streaming and forced modes"
 ```
 
 ---
 
-### Task 4: Remove Stream component and update exports
+### Task 3: Update exports
 
-Remove the now-replaced `Stream` and `UseStreamable` components from `streamable.tsx`. Update `index.ts` to export `Streamable` and the new `BonesProps` types.
+Update `index.ts` to export `Streamable` from the new `bones.tsx` and the new `BonesProps` types.
 
 **Files:**
-- Modify: `packages/bones/src/streamable.tsx`
 - Modify: `packages/bones/src/index.ts`
 
-- [ ] **Step 1: Remove Stream and UseStreamable from streamable.tsx**
-
-In `packages/bones/src/streamable.tsx`, remove the `UseStreamable` component (lines 103-111) and the `Stream` component (lines 113-127). Keep everything else: the `Streamable` type, `stableKeys`, `weakRefCache`, `promiseCache`, `isPromise`, `all`, `from`, `Streamable` object export, and `useStreamable`.
-
-The file should end after the `useStreamable` function:
-
-```tsx
-export function useStreamable<T>(streamable: Streamable<T>): T {
-  return isPromise(streamable) ? use(streamable) : streamable;
-}
-```
-
-Also remove the `Suspense` import from line 2 since it's no longer used in this file (only `use` is needed):
-
-```tsx
-import { use } from "react";
-```
-
-- [ ] **Step 2: Update index.ts exports**
+- [ ] **Step 1: Update index.ts exports**
 
 Replace the contents of `packages/bones/src/index.ts`:
 
 ```ts
-export { Bones } from "./bones.tsx";
+export { Bones, Streamable } from "./bones.tsx";
 export { useBone } from "./use-bone.ts";
 export { useBones } from "./use-bones.ts";
-export { Streamable } from "./streamable.tsx";
 export type { BoneType, BoneOptions, BoneFn, UseBoneReturn } from "./use-bone.ts";
 export type {
+  Streamable as StreamableType,
   BonesProps,
   BonesStreamingProps,
   BonesArrayProps,
@@ -510,21 +509,21 @@ export type {
 } from "./types.ts";
 ```
 
-- [ ] **Step 3: Run type check and tests**
+- [ ] **Step 2: Run type check and tests**
 
 Run: `cd packages/bones && vp check && vp test`
 Expected: All checks and tests pass.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add packages/bones/src/streamable.tsx packages/bones/src/index.ts
-git commit -m "refactor: remove Stream component, export Streamable from index"
+git add packages/bones/src/index.ts
+git commit -m "refactor: update exports for Streamable and new BonesProps types"
 ```
 
 ---
 
-### Task 5: Update existing tests for new Bones API
+### Task 4: Update existing tests for new Bones API
 
 The existing `use-bone.test.tsx` and `use-bones.test.tsx` tests use `<Bones>` as a forced provider without the `forced` prop. Update them to use `<Bones forced>`.
 
@@ -562,7 +561,7 @@ git commit -m "test: update existing tests to use Bones forced prop"
 
 ---
 
-### Task 6: Update demo app — SkeletonToggle and page.tsx
+### Task 5: Update demo app — SkeletonToggle and page.tsx
 
 The demo app uses `<Bones>` as a forced provider in several places. Update to use `<Bones forced>`. The `SkeletonToggle` component wraps children in `<Bones>` and the `page.tsx` uses `<Bones>` for theming demos.
 
@@ -629,9 +628,9 @@ git commit -m "refactor: update demo app to use Bones forced prop"
 
 ---
 
-### Task 7: Run full check and test suite
+### Task 6: Final verification
 
-Final verification that everything works together.
+Full verification that everything works together.
 
 **Files:** None — verification only.
 
@@ -649,6 +648,6 @@ Expected: All tests pass (use-bone, use-bones, css-skeleton, bones, streamable).
 
 Run: `cd apps/demo && vp dev`
 
-Verify all sections work as described in Task 6 Step 3.
+Verify all sections work as described in Task 5 Step 3.
 
 - [ ] **Step 4: Commit any remaining fixes if needed**
