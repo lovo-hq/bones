@@ -1,12 +1,19 @@
+import { createBones } from "bones";
 import { PokemonCard } from "./pokemon-card";
 import type { PokemonListItem } from "@/lib/pokeapi";
 
-export function PokemonGrid({ pokemon }: { pokemon?: PokemonListItem[] }) {
+export function PokemonGrid({
+  pokemon,
+}: {
+  pokemon?: PokemonListItem[] | Promise<PokemonListItem[]>;
+}) {
+  const { repeat, data } = createBones(pokemon);
+
   return (
     <div className="grid">
-      {pokemon
-        ? pokemon.map((p) => <PokemonCard key={p.id} pokemon={p} />)
-        : Array.from({ length: 12 }, (_, i) => <PokemonCard key={i} />)}
+      {repeat(data, 12).map((p, i) => (
+        <PokemonCard key={p?.id ?? i} pokemon={p} />
+      ))}
     </div>
   );
 }
