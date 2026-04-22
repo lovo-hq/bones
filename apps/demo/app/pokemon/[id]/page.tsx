@@ -2,20 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Bones } from "bones";
 import Link from "next/link";
 import { PokemonDetailView } from "@/components/pokemon-detail-view";
 import type { PokemonDetail } from "@/lib/pokeapi";
 
-/**
- * Client Component pattern:
- *
- * This page fetches data client-side using useEffect.
- * PokemonDetailView starts with no data — useBone returns skeleton
- * classes so placeholders render automatically. No Suspense needed.
- *
- * When data arrives, useBone returns empty props → content renders.
- */
 export default function PokemonPage() {
   const params = useParams<{ id: string }>();
   const [pokemon, setPokemon] = useState<PokemonDetail>();
@@ -56,8 +46,6 @@ export default function PokemonPage() {
     load();
   }, [params.id]);
 
-  const detail = <PokemonDetailView pokemon={pokemon} />;
-
   return (
     <main>
       <div className="detail-nav">
@@ -75,12 +63,11 @@ export default function PokemonPage() {
         <p className="section-desc">
           <strong>Client Component pattern:</strong> This page fetches data client-side. The same{" "}
           <code>PokemonDetailView</code> component renders skeletons when data is undefined, then
-          real content when it arrives. The <code>useBones()</code> hook drives custom stat bar
-          rendering.
+          real content when it arrives.
         </p>
       </div>
 
-      {showForced ? <Bones>{detail}</Bones> : detail}
+      <PokemonDetailView pokemon={showForced ? undefined : pokemon} />
     </main>
   );
 }
