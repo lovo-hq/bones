@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import styles from "./styles.module.css";
 
 export function SkeletonToggle({
   children,
@@ -13,7 +14,7 @@ export function SkeletonToggle({
 
   return (
     <div>
-      <button className="toggle-button" onClick={() => setForced((prev) => !prev)}>
+      <button className={styles.toggleButton} onClick={() => setForced((prev) => !prev)}>
         {forced ? "Show Content" : "Force Skeletons"}
       </button>
       {forced ? skeleton : children}

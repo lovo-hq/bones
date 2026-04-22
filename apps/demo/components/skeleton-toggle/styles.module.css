@@ -1,0 +1,19 @@
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--fg);
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background 0.15s ease;
+}
+
+.toggleButton:hover {
+  background: var(--border);
+}

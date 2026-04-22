@@ -1,0 +1,36 @@
+.statRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.statName {
+  width: 100px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.statValue {
+  width: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.statBarTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}

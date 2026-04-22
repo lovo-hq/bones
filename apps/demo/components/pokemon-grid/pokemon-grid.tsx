@@ -1,6 +1,7 @@
 import { createBones } from "bones";
-import { PokemonCard } from "./pokemon-card";
+import { PokemonCard } from "@/components/pokemon-card/pokemon-card";
 import type { PokemonListItem } from "@/lib/pokeapi";
+import styles from "./styles.module.css";
 
 export function PokemonGrid({
   pokemon,
@@ -10,7 +11,7 @@ export function PokemonGrid({
   const { repeat, data } = createBones(pokemon);
 
   return (
-    <div className="grid">
+    <div className={styles.grid}>
       {repeat(data, 12).map((p, i) => (
         <PokemonCard key={p?.id ?? i} pokemon={p} />
       ))}

@@ -1,4 +1,5 @@
 import { createBones } from "bones";
+import styles from "./styles.module.css";
 
 interface Article {
   title: string;
@@ -11,16 +12,16 @@ export function ArticlePreview({ article }: { article?: Article }) {
   const { bone } = createBones(article);
 
   return (
-    <div className="article-preview">
-      <h3 className="article-title" {...bone("text", { length: 24 })}>
+    <div className={styles.articlePreview}>
+      <h3 className={styles.articleTitle} {...bone("text", { length: 24 })}>
         {article?.title}
       </h3>
-      <p className="article-excerpt" {...bone("text", { lines: 4 })}>
+      <p className={styles.articleExcerpt} {...bone("text", { lines: 4 })}>
         {article?.excerpt}
       </p>
-      <div className="article-meta">
+      <div className={styles.articleMeta}>
         <span {...bone("text", { length: 12 })}>{article?.author}</span>
-        <span className="article-dot">&middot;</span>
+        <span className={styles.articleDot}>&middot;</span>
         <span {...bone("text", { length: 10 })}>{article?.date}</span>
       </div>
     </div>

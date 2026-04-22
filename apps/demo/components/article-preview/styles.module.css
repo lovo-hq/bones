@@ -1,0 +1,30 @@
+.articlePreview {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.articleTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.625rem;
+}
+
+.articleExcerpt {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+.articleMeta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.articleDot {
+  color: var(--border);
+}
