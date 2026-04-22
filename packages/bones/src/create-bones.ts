@@ -54,6 +54,29 @@ const TRANSPARENT_PIXEL =
 
 type BoneProps = Record<string, unknown>;
 
+function buildTextStyle(options?: BoneOptions): Record<string, unknown> | undefined {
+  const style: Record<string, unknown> = {};
+
+  if (options?.contained) {
+    style["--bone-contained"] = 1;
+  }
+  if (options?.length) {
+    style["--bone-length"] = options.length;
+  }
+  if (!options?.contained && options?.lines && options.lines > 1) {
+    style["--bone-lines"] = options.lines;
+    if (options.lines > 2) {
+      const shadows = [];
+      for (let i = 1; i < options.lines - 1; i++) {
+        shadows.push(`0 calc(1lh * ${i}) 0 0 var(--bone-base)`);
+      }
+      style["--bone-shadows"] = shadows.join(", ");
+    }
+  }
+
+  return Object.keys(style).length > 0 ? style : undefined;
+}
+
 export interface CreateBonesReturn<T> {
   bone: (type: BoneType, options?: BoneOptions) => BoneProps;
   data: T | undefined;
@@ -66,9 +89,7 @@ export function createBones<T>(data: T | Promise<T> | undefined | null): CreateB
   const isLoading = !resolved;
 
   const bone = (type: BoneType, options?: BoneOptions): BoneProps => {
-    if (!isLoading) {
-      return {};
-    }
+    if (!isLoading) return {};
 
     const props: BoneProps = {
       "data-bone": type,
@@ -76,26 +97,8 @@ export function createBones<T>(data: T | Promise<T> | undefined | null): CreateB
     };
 
     if (type === "text") {
-      const style: Record<string, unknown> = {};
-      if (options?.contained) {
-        style["--bone-contained"] = 1;
-      }
-      if (options?.length) {
-        style["--bone-length"] = options.length;
-      }
-      if (!options?.contained && options?.lines && options.lines > 1) {
-        style["--bone-lines"] = options.lines;
-        if (options.lines > 2) {
-          const shadows = [];
-          for (let i = 1; i < options.lines - 1; i++) {
-            shadows.push(`0 calc(1lh * ${i}) 0 0 var(--bone-base)`);
-          }
-          style["--bone-shadows"] = shadows.join(", ");
-        }
-      }
-      if (Object.keys(style).length > 0) {
-        props.style = style;
-      }
+      const style = buildTextStyle(options);
+      if (style) props.style = style;
     }
 
     if (type === "block") {
