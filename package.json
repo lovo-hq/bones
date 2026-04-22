@@ -6,7 +6,8 @@
     "dev": "vp run --filter bones dev",
     "build": "vp run --filter bones build",
     "demo": "vp run --filter bones-demo dev",
-    "test": "vp run --filter bones test"
+    "test": "vp run --filter bones test",
+    "health": "vp run --filter bones health"
   },
   "devDependencies": {
     "vite-plus": "^0.1.14"
