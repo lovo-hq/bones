@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { PokemonDetailView } from "@/components/pokemon-detail-view";
+import { fetchPokemonDetail } from "@/lib/pokeapi";
 import type { PokemonDetail } from "@/lib/pokeapi";
 
 export default function PokemonPage() {
@@ -12,38 +13,7 @@ export default function PokemonPage() {
   const [showForced, setShowForced] = useState(false);
 
   useEffect(() => {
-    async function load() {
-      const [pokemonRes, speciesRes] = await Promise.all([
-        fetch(`https://pokeapi.co/api/v2/pokemon/${params.id}`),
-        fetch(`https://pokeapi.co/api/v2/pokemon-species/${params.id}`),
-      ]);
-
-      const pokemonData = await pokemonRes.json();
-      const speciesData = await speciesRes.json();
-
-      const englishEntry = speciesData.flavor_text_entries.find(
-        (e: { language: { name: string } }) => e.language.name === "en",
-      );
-
-      setPokemon({
-        id: pokemonData.id,
-        name: pokemonData.name,
-        sprite:
-          pokemonData.sprites.other["official-artwork"].front_default ||
-          pokemonData.sprites.front_default,
-        artwork: pokemonData.sprites.other["official-artwork"].front_default,
-        types: pokemonData.types.map((t: { type: { name: string } }) => t.type.name),
-        height: pokemonData.height,
-        weight: pokemonData.weight,
-        description: englishEntry ? englishEntry.flavor_text.replace(/\f|\n/g, " ") : "",
-        stats: pokemonData.stats.map((s: { base_stat: number; stat: { name: string } }) => ({
-          name: s.stat.name,
-          value: s.base_stat,
-        })),
-      });
-    }
-
-    load();
+    fetchPokemonDetail(params.id).then(setPokemon);
   }, [params.id]);
 
   return (
