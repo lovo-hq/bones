@@ -3,6 +3,7 @@ dist
 *.log
 *.tsbuildinfo
 .DS_Store
+coverage
 .next
 .fallow
 docs/superpowers/*
