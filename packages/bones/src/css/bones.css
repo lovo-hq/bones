@@ -13,33 +13,94 @@
 }
 
 [data-bone="text"] {
-  display: inline-block;
-  min-width: 4ch;
-  height: 1ex;
   color: transparent;
+  position: relative;
+  min-width: 4ch;
+  min-height: 1lh;
+}
+
+[data-bone="text"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1ex;
+  transform: translateY(-50%);
   background-color: var(--bone-base);
   border-radius: var(--bone-radius);
+  pointer-events: none;
+}
+
+[data-bone="text"][style*="--bone-length"] {
+  width: calc(var(--bone-length) * 1ch);
 }
 
 [data-bone="text"][style*="--bone-lines"] {
-  height: auto;
   min-height: calc(var(--bone-lines) * 1lh);
-  background-color: transparent;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(1lh - 1ex),
-    var(--bone-base) calc(1lh - 1ex),
-    var(--bone-base) 1lh
-  );
-  background-size: 100% calc(var(--bone-lines) * 1lh);
-  background-repeat: no-repeat;
-  border-radius: 0;
+}
+
+[data-bone="text"][style*="--bone-lines"]::after {
+  top: calc(1lh / 2);
+  box-shadow: var(--bone-shadows, none);
+}
+
+[data-bone="text"][style*="--bone-lines"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 61%;
+  top: calc((var(--bone-lines) - 0.5) * 1lh);
+  height: 1ex;
+  transform: translateY(-50%);
+  background-color: var(--bone-base);
+  border-radius: var(--bone-radius);
+  pointer-events: none;
+}
+
+[data-bone="text"][style*="--bone-contained"] {
+  min-width: unset;
+  min-height: unset;
+  display: inline-flex;
+  align-items: center;
+}
+
+[data-bone="text"][style*="--bone-contained"]::after {
+  flex: 1;
+  position: static;
+  inset-inline: unset;
+  top: unset;
+  transform: none;
+}
+
+[data-bone="text"][style*="--bone-contained"][style*="--bone-length"] {
+  min-width: calc(var(--bone-length) * 1ch);
 }
 
 [data-bone="block"] {
   display: inline-block;
   background-color: var(--bone-base);
+}
+
+img[data-bone="block"],
+video[data-bone="block"] {
+  color: transparent;
+}
+
+[data-bone="container"] {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-bone="container"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--bone-base);
+  z-index: 1;
+}
+
+[data-bone="container"] > * {
+  visibility: hidden;
 }
 
 @keyframes bone-shimmer {
