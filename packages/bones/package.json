@@ -16,10 +16,16 @@
     "dist"
   ],
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json",
-    "./css": "./dist/css/bones.css"
+    "./css": {
+      "style": "./dist/css/bones.css",
+      "default": "./dist/css/bones.css"
+    }
   },
   "publishConfig": {
     "access": "public"
@@ -38,12 +44,10 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript/native-preview": "7.0.0-dev.20260328.1",
-    "bumpp": "^11.0.1",
+    "vite-plus": "^0.1.14",
     "jsdom": "^29.0.2",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "typescript": "^6.0.2",
-    "vite-plus": "^0.1.14"
+    "typescript": "^6.0.2"
   },
   "peerDependencies": {
     "react": ">=18",

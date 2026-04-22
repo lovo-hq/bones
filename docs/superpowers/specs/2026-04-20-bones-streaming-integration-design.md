@@ -39,9 +39,7 @@ Two mutually exclusive modes enforced by TypeScript discriminated unions:
 **Streaming mode** — resolves a `Streamable<T>` via Suspense, renders the component as its own skeleton fallback:
 
 ```tsx
-<Bones value={pokemonPromise}>
-  {(pokemon) => <PokemonCard pokemon={pokemon} />}
-</Bones>
+<Bones value={pokemonPromise}>{(pokemon) => <PokemonCard pokemon={pokemon} />}</Bones>
 ```
 
 Internally:
@@ -144,11 +142,7 @@ Server components can create promises and pass them to `Bones` (a client compone
 async function PokemonPage({ params }: { params: { id: string } }) {
   const pokemonPromise = fetchPokemon(params.id);
 
-  return (
-    <Bones value={pokemonPromise}>
-      {(pokemon) => <PokemonCard pokemon={pokemon} />}
-    </Bones>
-  );
+  return <Bones value={pokemonPromise}>{(pokemon) => <PokemonCard pokemon={pokemon} />}</Bones>;
 }
 ```
 
@@ -156,28 +150,28 @@ The server streams the unresolved promise to the client. `Bones` wraps it in Sus
 
 ## Public API
 
-| Export | Purpose | Used by |
-|--------|---------|---------|
-| `Bones` | Streaming orchestration + forced skeleton mode | Most consumers |
-| `useBone` | Skeleton prop generation inside components | Most consumers |
-| `useBones` | Read bones context (forced state) | Advanced consumers |
-| `Streamable` type | Type annotation for promise-or-value | Consumers typing props |
-| `Streamable.from()` | Lazy promise creation | Advanced consumers |
+| Export              | Purpose                                        | Used by                |
+| ------------------- | ---------------------------------------------- | ---------------------- |
+| `Bones`             | Streaming orchestration + forced skeleton mode | Most consumers         |
+| `useBone`           | Skeleton prop generation inside components     | Most consumers         |
+| `useBones`          | Read bones context (forced state)              | Advanced consumers     |
+| `Streamable` type   | Type annotation for promise-or-value           | Consumers typing props |
+| `Streamable.from()` | Lazy promise creation                          | Advanced consumers     |
 
 ## What Changes
 
-| Item | Change |
-|------|--------|
-| `Bones` component (`bones.tsx`) | Rewritten — streaming + forced modes, includes all streamable infrastructure |
-| `BonesProps` type (`types.ts`) | Rewritten — discriminated union with generics, includes `Streamable<T>` type |
-| `index.ts` exports | Updated — add `Streamable` export, new `BonesProps` types |
-| `streamable.tsx` | Deleted — was a reference file; useful parts absorbed into `bones.tsx` and `types.ts` |
+| Item                            | Change                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------- |
+| `Bones` component (`bones.tsx`) | Rewritten — streaming + forced modes, includes all streamable infrastructure          |
+| `BonesProps` type (`types.ts`)  | Rewritten — discriminated union with generics, includes `Streamable<T>` type          |
+| `index.ts` exports              | Updated — add `Streamable` export, new `BonesProps` types                             |
+| `streamable.tsx`                | Deleted — was a reference file; useful parts absorbed into `bones.tsx` and `types.ts` |
 
 ## What Does Not Change
 
-| Item | Reason |
-|------|--------|
-| `useBone` hook | Stays focused on prop generation |
-| `useBones` hook | Still reads context |
-| `BonesContext` | Still provides forced state |
-| CSS / skeleton styling | Unrelated to data flow |
+| Item                   | Reason                           |
+| ---------------------- | -------------------------------- |
+| `useBone` hook         | Stays focused on prop generation |
+| `useBones` hook        | Still reads context              |
+| `BonesContext`         | Still provides forced state      |
+| CSS / skeleton styling | Unrelated to data flow           |

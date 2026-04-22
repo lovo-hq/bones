@@ -3,13 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev:demo": "cd apps/demo && vp exec next dev",
-    "dev:lib": "cd packages/bones && vp pack --watch",
-    "build:demo": "vp run build --filter bones-demo",
-    "build:lib": "cd packages/bones && vp pack && node scripts/patch-exports.mjs",
-    "test:lib": "vp run test --filter bones",
-    "check:demo": "vp run check --filter bones-demo",
-    "check:lib": "vp run check --filter bones"
+    "dev": "vp run --filter bones dev",
+    "build": "vp run --filter bones build",
+    "demo": "vp run --filter bones-demo dev",
+    "test": "vp run --filter bones test"
   },
   "devDependencies": {
     "vite-plus": "^0.1.14"

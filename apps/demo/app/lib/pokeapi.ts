@@ -64,7 +64,7 @@ export async function fetchPokemonList(limit = 12, offset = 0): Promise<PokemonL
   return pokemon;
 }
 
-export async function fetchPokemonDetail(id: string): Promise<PokemonDetail> {
+async function fetchPokemonDetail(id: string): Promise<PokemonDetail> {
   const [pokemonRes, speciesRes] = await Promise.all([
     fetch(`${BASE}/pokemon/${id}`),
     fetch(`${BASE}/pokemon-species/${id}`),

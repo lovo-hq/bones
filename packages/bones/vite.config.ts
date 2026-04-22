@@ -13,7 +13,10 @@ export default defineConfig({
     },
     exports: {
       customExports: {
-        "./css": "./dist/css/bones.css",
+        "./css": {
+          style: "./dist/css/bones.css",
+          default: "./dist/css/bones.css",
+        },
       },
     },
     deps: {

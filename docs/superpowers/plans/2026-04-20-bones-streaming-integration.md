@@ -17,6 +17,7 @@
 The current `BonesProps` is a single interface with `children: ReactNode`. The new `Bones` component has two modes (streaming and forced) with different `children` signatures. Define the discriminated union types and the `Streamable<T>` type.
 
 **Files:**
+
 - Modify: `packages/bones/src/types.ts`
 
 - [ ] **Step 1: Write the new types**
@@ -40,12 +41,9 @@ export interface BonesStreamingProps<T> extends BonesThemeProps {
   forced?: never;
 }
 
-export interface BonesArrayProps<T extends readonly Streamable<unknown>[]>
-  extends BonesThemeProps {
+export interface BonesArrayProps<T extends readonly Streamable<unknown>[]> extends BonesThemeProps {
   value: T;
-  children: (
-    data: { -readonly [P in keyof T]: Awaited<T[P]> } | undefined,
-  ) => ReactNode;
+  children: (data: { -readonly [P in keyof T]: Awaited<T[P]> } | undefined) => ReactNode;
   forced?: never;
 }
 
@@ -80,6 +78,7 @@ git commit -m "refactor: rewrite BonesProps as discriminated union for streaming
 Replace the current `Bones` component (which only does forced mode via context) with the new version that supports both streaming and forced modes. All streamable infrastructure (promise caching, `Streamable.all`, lazy promises, `useStreamable`) is built directly into this file. The reference file `streamable.tsx` is deleted.
 
 **Files:**
+
 - Rewrite: `packages/bones/src/bones.tsx`
 - Delete: `packages/bones/src/streamable.tsx`
 
@@ -114,11 +113,7 @@ describe("Bones streaming mode", () => {
       resolve = r;
     });
 
-    render(
-      <Bones value={promise}>
-        {(data) => <TestCard data={data} />}
-      </Bones>,
-    );
+    render(<Bones value={promise}>{(data) => <TestCard data={data} />}</Bones>);
 
     // Fallback renders: children(undefined) → skeleton
     expect(screen.getByTestId("target").getAttribute("data-bone")).toBe("text");
@@ -135,11 +130,7 @@ describe("Bones streaming mode", () => {
   });
 
   test("renders content immediately when value is not a promise", () => {
-    render(
-      <Bones value={mockData}>
-        {(data) => <TestCard data={data} />}
-      </Bones>,
-    );
+    render(<Bones value={mockData}>{(data) => <TestCard data={data} />}</Bones>);
 
     expect(screen.getByTestId("target").getAttribute("data-bone")).toBeNull();
     expect(screen.getByTestId("target").textContent).toBe("Pikachu");
@@ -148,8 +139,12 @@ describe("Bones streaming mode", () => {
   test("handles array of streamables", async () => {
     let resolve1!: (v: { name: string }) => void;
     let resolve2!: (v: { type: string }) => void;
-    const p1 = new Promise<{ name: string }>((r) => { resolve1 = r; });
-    const p2 = new Promise<{ type: string }>((r) => { resolve2 = r; });
+    const p1 = new Promise<{ name: string }>((r) => {
+      resolve1 = r;
+    });
+    const p2 = new Promise<{ type: string }>((r) => {
+      resolve2 = r;
+    });
 
     function TestMulti({ data }: { data?: [{ name: string }, { type: string }] }) {
       const { bone, data: gated } = useBone(data);
@@ -160,11 +155,7 @@ describe("Bones streaming mode", () => {
       );
     }
 
-    render(
-      <Bones value={[p1, p2]}>
-        {(data) => <TestMulti data={data} />}
-      </Bones>,
-    );
+    render(<Bones value={[p1, p2]}>{(data) => <TestMulti data={data} />}</Bones>);
 
     expect(screen.getByTestId("multi").getAttribute("data-bone")).toBe("text");
 
@@ -230,10 +221,7 @@ describe("Streamable.all", () => {
   });
 
   test("resolves array of promises", async () => {
-    const result = await Streamable.all([
-      Promise.resolve(1),
-      Promise.resolve("two"),
-    ]);
+    const result = await Streamable.all([Promise.resolve(1), Promise.resolve("two")]);
     expect(result).toEqual([1, "two"]);
   });
 
@@ -430,11 +418,7 @@ export function Bones(props: BonesProps): React.ReactNode {
   if (isForced(props)) {
     return (
       <BonesContext.Provider value={{ forced: true }}>
-        <ThemeWrapper
-          baseColor={baseColor}
-          highlightColor={highlightColor}
-          duration={duration}
-        >
+        <ThemeWrapper baseColor={baseColor} highlightColor={highlightColor} duration={duration}>
           {props.children}
         </ThemeWrapper>
       </BonesContext.Provider>
@@ -445,11 +429,7 @@ export function Bones(props: BonesProps): React.ReactNode {
   const streamable = Array.isArray(value) ? Streamable.all(value) : value;
 
   return (
-    <ThemeWrapper
-      baseColor={baseColor}
-      highlightColor={highlightColor}
-      duration={duration}
-    >
+    <ThemeWrapper baseColor={baseColor} highlightColor={highlightColor} duration={duration}>
       <Suspense fallback={children(undefined)}>
         <Resolved value={streamable}>{children}</Resolved>
       </Suspense>
@@ -489,6 +469,7 @@ git commit -m "feat: rewrite Bones component with streaming and forced modes"
 Update `index.ts` to export `Streamable` from the new `bones.tsx` and the new `BonesProps` types.
 
 **Files:**
+
 - Modify: `packages/bones/src/index.ts`
 
 - [ ] **Step 1: Update index.ts exports**
@@ -528,6 +509,7 @@ git commit -m "refactor: update exports for Streamable and new BonesProps types"
 The existing `use-bone.test.tsx` and `use-bones.test.tsx` tests use `<Bones>` as a forced provider without the `forced` prop. Update them to use `<Bones forced>`.
 
 **Files:**
+
 - Modify: `packages/bones/tests/use-bone.test.tsx`
 - Modify: `packages/bones/tests/use-bones.test.tsx`
 
@@ -566,6 +548,7 @@ git commit -m "test: update existing tests to use Bones forced prop"
 The demo app uses `<Bones>` as a forced provider in several places. Update to use `<Bones forced>`. The `SkeletonToggle` component wraps children in `<Bones>` and the `page.tsx` uses `<Bones>` for theming demos.
 
 **Files:**
+
 - Modify: `apps/demo/app/components/skeleton-toggle.tsx`
 - Modify: `apps/demo/app/page.tsx`
 
@@ -586,6 +569,7 @@ const content = forced ? <Bones forced>{children}</Bones> : children;
 In `apps/demo/app/page.tsx`, update all `<Bones>` usages that are forced/theming mode:
 
 Line 76 — multi-line demo:
+
 ```tsx
 // Before:
 <Bones>
@@ -599,6 +583,7 @@ Line 76 — multi-line demo:
 ```
 
 Lines 104, 109, 114 — theming demos:
+
 ```tsx
 // Before:
 <Bones baseColor="#f5e6d3" highlightColor="#faf0e6">
@@ -614,6 +599,7 @@ Apply the same `forced` prop to the "Cool" and "Dark" theme demos.
 Run: `cd apps/demo && vp dev`
 
 Verify:
+
 - The Suspense + server component demo still shows skeleton → content transition on refresh
 - The SkeletonToggle button still toggles between content and skeleton states
 - The multi-line article demo shows skeleton on the left, content on the right
