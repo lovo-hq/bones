@@ -218,11 +218,13 @@ describe("createBones with promises", () => {
       await promise;
     });
 
-    render(
-      <Suspense fallback={<TestText />}>
-        <TestPromise promise={promise} />
-      </Suspense>,
-    );
+    await act(async () => {
+      render(
+        <Suspense fallback={<TestText />}>
+          <TestPromise promise={promise} />
+        </Suspense>,
+      );
+    });
 
     expect(screen.getByTestId("target").getAttribute("data-bone")).toBeNull();
     expect(screen.getByTestId("target").textContent).toBe("Pikachu");
