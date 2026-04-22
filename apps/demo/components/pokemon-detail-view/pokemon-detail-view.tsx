@@ -29,10 +29,10 @@ export function PokemonDetailView({ pokemon }: { pokemon?: PokemonDetail }) {
           </div>
           <div className={styles.detailMeta}>
             <span className={styles.metaItem} {...bone("text")}>
-              {pokemon ? `${pokemon.height / 10} m` : undefined}
+              {pokemon && `${pokemon.height / 10} m`}
             </span>
             <span className={styles.metaItem} {...bone("text")}>
-              {pokemon ? `${pokemon.weight / 10} kg` : undefined}
+              {pokemon && `${pokemon.weight / 10} kg`}
             </span>
           </div>
         </div>

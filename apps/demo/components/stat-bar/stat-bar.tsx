@@ -11,7 +11,7 @@ export function StatBar({ stat }: { stat?: { name: string; value: number } }) {
         {stat?.name}
       </span>
       <span className={styles.statValue} {...bone("text")}>
-        {stat ? String(stat.value) : undefined}
+        {stat && String(stat.value)}
       </span>
       <div className={styles.statBarTrack}>
         <div
