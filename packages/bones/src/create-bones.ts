@@ -41,3 +41,76 @@ export function readPromise<T>(promise: Promise<T>): T {
   if (tracked._status === "rejected") throw tracked._error;
   throw promise;
 }
+
+// ---------------------------------------------------------------------------
+// createBones — synchronous skeleton utility (no hooks required)
+//
+// Returns a `bone` prop-factory, the resolved `data`, and a `repeat` helper.
+// When `data` is a Promise it delegates to `readPromise` for Suspense support.
+// ---------------------------------------------------------------------------
+
+const TRANSPARENT_PIXEL =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+type BoneProps = Record<string, unknown>;
+
+export interface CreateBonesReturn<T> {
+  bone: (type: BoneType, options?: BoneOptions) => BoneProps;
+  data: T | undefined;
+  repeat: <U>(arr: U[] | undefined | null, count: number) => (U | undefined)[];
+}
+
+export function createBones<T>(data: T | Promise<T> | undefined | null): CreateBonesReturn<T> {
+  const resolved =
+    data != null && data instanceof Promise ? readPromise(data) : (data as T | undefined | null);
+  const isLoading = !resolved;
+
+  const bone = (type: BoneType, options?: BoneOptions): BoneProps => {
+    if (!isLoading) {
+      return {};
+    }
+
+    const props: BoneProps = {
+      "data-bone": type,
+      "aria-busy": true,
+    };
+
+    if (type === "text") {
+      const style: Record<string, unknown> = {};
+      if (options?.contained) {
+        style["--bone-contained"] = 1;
+      }
+      if (options?.length) {
+        style["--bone-length"] = options.length;
+      }
+      if (!options?.contained && options?.lines && options.lines > 1) {
+        style["--bone-lines"] = options.lines;
+        if (options.lines > 2) {
+          const shadows = [];
+          for (let i = 1; i < options.lines - 1; i++) {
+            shadows.push(`0 calc(1lh * ${i}) 0 0 var(--bone-base)`);
+          }
+          style["--bone-shadows"] = shadows.join(", ");
+        }
+      }
+      if (Object.keys(style).length > 0) {
+        props.style = style;
+      }
+    }
+
+    if (type === "block") {
+      props.src = TRANSPARENT_PIXEL;
+    }
+
+    return props;
+  };
+
+  const repeat = <U>(arr: U[] | undefined | null, count: number): (U | undefined)[] => {
+    if (isLoading) {
+      return Array.from({ length: count });
+    }
+    return arr ?? [];
+  };
+
+  return { bone, data: isLoading ? undefined : (resolved as T), repeat };
+}
