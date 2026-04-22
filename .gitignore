@@ -4,5 +4,5 @@ dist
 *.tsbuildinfo
 .DS_Store
 .next
-*.fallow
+.fallow
 docs/superpowers/*
