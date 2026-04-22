@@ -12,25 +12,29 @@ function ReadPromiseTest({ promise }: { promise: Promise<string> }) {
 
 afterEach(cleanup);
 
+function createDeferredPromise() {
+  let resolve!: (value: string) => void;
+  const promise = new Promise<string>((r) => {
+    resolve = r;
+  });
+  return { promise, resolve };
+}
+
+async function renderWithSuspense(promise: Promise<string>) {
+  await act(async () => {
+    render(
+      <Suspense fallback={<div data-testid="fallback">loading</div>}>
+        <ReadPromiseTest promise={promise} />
+      </Suspense>,
+    );
+  });
+}
+
 describe("readPromise", () => {
   test("returns resolved value after promise resolves", async () => {
-    let resolve!: (value: string) => void;
-    const promise = new Promise<string>((r) => {
-      resolve = r;
-    });
+    const promise = Promise.resolve("hello");
 
-    await act(async () => {
-      resolve("hello");
-      await promise;
-    });
-
-    await act(async () => {
-      render(
-        <Suspense fallback={<div data-testid="fallback">loading</div>}>
-          <ReadPromiseTest promise={promise} />
-        </Suspense>,
-      );
-    });
+    await renderWithSuspense(promise);
 
     expect(screen.getByTestId("result").textContent).toBe("hello");
   });
@@ -38,30 +42,15 @@ describe("readPromise", () => {
   test("throws pending promise to trigger Suspense fallback", async () => {
     const promise = new Promise<string>(() => {});
 
-    await act(async () => {
-      render(
-        <Suspense fallback={<div data-testid="fallback">loading</div>}>
-          <ReadPromiseTest promise={promise} />
-        </Suspense>,
-      );
-    });
+    await renderWithSuspense(promise);
 
     expect(screen.getByTestId("fallback").textContent).toBe("loading");
   });
 
   test("transitions from fallback to content when promise resolves", async () => {
-    let resolve!: (value: string) => void;
-    const promise = new Promise<string>((r) => {
-      resolve = r;
-    });
+    const { promise, resolve } = createDeferredPromise();
 
-    await act(async () => {
-      render(
-        <Suspense fallback={<div data-testid="fallback">loading</div>}>
-          <ReadPromiseTest promise={promise} />
-        </Suspense>,
-      );
-    });
+    await renderWithSuspense(promise);
 
     expect(screen.getByTestId("fallback").textContent).toBe("loading");
 

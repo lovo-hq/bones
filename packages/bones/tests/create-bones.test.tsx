@@ -186,19 +186,28 @@ describe("createBones with promises", () => {
     );
   }
 
-  test("shows skeleton then content when promise resolves", async () => {
-    let resolve!: (value: typeof mockData) => void;
-    const promise = new Promise<typeof mockData>((r) => {
-      resolve = r;
-    });
-
-    await act(async () => {
+  function renderWithSuspense(promise: Promise<typeof mockData>) {
+    return act(async () => {
       render(
         <Suspense fallback={<TestText />}>
           <TestPromise promise={promise} />
         </Suspense>,
       );
     });
+  }
+
+  function expectResolved() {
+    expect(screen.getByTestId("target").getAttribute("data-bone")).toBeNull();
+    expect(screen.getByTestId("target").textContent).toBe("Pikachu");
+  }
+
+  test("shows skeleton then content when promise resolves", async () => {
+    let resolve!: (value: typeof mockData) => void;
+    const promise = new Promise<typeof mockData>((r) => {
+      resolve = r;
+    });
+
+    await renderWithSuspense(promise);
 
     // Fallback renders skeleton
     expect(screen.getByTestId("target").getAttribute("data-bone")).toBe("text");
@@ -207,9 +216,7 @@ describe("createBones with promises", () => {
       resolve(mockData);
     });
 
-    // Resolved renders content
-    expect(screen.getByTestId("target").getAttribute("data-bone")).toBeNull();
-    expect(screen.getByTestId("target").textContent).toBe("Pikachu");
+    expectResolved();
   });
 
   test("renders content immediately for already-resolved promise", async () => {
@@ -218,15 +225,8 @@ describe("createBones with promises", () => {
       await promise;
     });
 
-    await act(async () => {
-      render(
-        <Suspense fallback={<TestText />}>
-          <TestPromise promise={promise} />
-        </Suspense>,
-      );
-    });
+    await renderWithSuspense(promise);
 
-    expect(screen.getByTestId("target").getAttribute("data-bone")).toBeNull();
-    expect(screen.getByTestId("target").textContent).toBe("Pikachu");
+    expectResolved();
   });
 });
