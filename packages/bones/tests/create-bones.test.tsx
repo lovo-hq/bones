@@ -39,6 +39,21 @@ function TestContained({ data }: { data?: typeof mockData }) {
   return <span data-testid="target" {...bone("text", { contained: true, length: 7 })} />;
 }
 
+function TestTwoLines({ data }: { data?: typeof mockData }) {
+  const { bone } = createBones(data);
+  return <p data-testid="target" {...bone("text", { lines: 2 })} />;
+}
+
+function TestOneLine({ data }: { data?: typeof mockData }) {
+  const { bone } = createBones(data);
+  return <p data-testid="target" {...bone("text", { lines: 1 })} />;
+}
+
+function TestContainedWithLines({ data }: { data?: typeof mockData }) {
+  const { bone } = createBones(data);
+  return <span data-testid="target" {...bone("text", { contained: true, lines: 3 })} />;
+}
+
 function TestData({ data }: { data?: typeof mockData }) {
   const { bone, data: resolved } = createBones(data);
   return (
@@ -138,6 +153,35 @@ describe("createBones", () => {
     const { getByTestId } = render(<TestContained />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.style.getPropertyValue("--bone-contained")).toBe("1");
+  });
+
+  test("lines: 2 sets --bone-lines but no --bone-shadows", () => {
+    const { getByTestId } = render(<TestTwoLines />);
+    const el = getByTestId("target") as HTMLElement;
+    expect(el.style.getPropertyValue("--bone-lines")).toBe("2");
+    expect(el.style.getPropertyValue("--bone-shadows")).toBe("");
+  });
+
+  test("lines: 1 does not set --bone-lines", () => {
+    const { getByTestId } = render(<TestOneLine />);
+    const el = getByTestId("target") as HTMLElement;
+    expect(el.getAttribute("style")).toBeNull();
+  });
+
+  test("contained with lines ignores --bone-lines", () => {
+    const { getByTestId } = render(<TestContainedWithLines />);
+    const el = getByTestId("target") as HTMLElement;
+    expect(el.style.getPropertyValue("--bone-contained")).toBe("1");
+    expect(el.style.getPropertyValue("--bone-lines")).toBe("");
+    expect(el.style.getPropertyValue("--bone-shadows")).toBe("");
+  });
+
+  test("block sets src to transparent pixel", () => {
+    const { getByTestId } = render(<TestBlock />);
+    const el = getByTestId("target") as HTMLElement;
+    expect(el.getAttribute("src")).toBe(
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+    );
   });
 
   test("data returns undefined when loading", () => {
