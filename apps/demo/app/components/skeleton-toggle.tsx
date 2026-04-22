@@ -1,23 +1,22 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Bones } from "bones";
 
-/**
- * Demonstrates the <Bones> provider — forces all nested
- * useBone hooks into skeleton mode, even when data is loaded.
- */
-export function SkeletonToggle({ children }: { children: ReactNode }) {
+export function SkeletonToggle({
+  children,
+  skeleton,
+}: {
+  children: ReactNode;
+  skeleton: ReactNode;
+}) {
   const [forced, setForced] = useState(false);
-
-  const content = forced ? <Bones forced>{children}</Bones> : children;
 
   return (
     <div>
       <button className="toggle-button" onClick={() => setForced((prev) => !prev)}>
         {forced ? "Show Content" : "Force Skeletons"}
       </button>
-      {content}
+      {forced ? skeleton : children}
     </div>
   );
 }
