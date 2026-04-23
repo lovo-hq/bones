@@ -1,0 +1,29 @@
+.sectionHeader {
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.sectionDesc {
+  color: var(--muted);
+  font-size: 0.925rem;
+  max-width: 600px;
+}
+
+.sectionDesc code {
+  background: var(--border);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.sectionHint {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  margin-top: 0.375rem;
+}
