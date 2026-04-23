@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { forceBones } from "bones";
+import { BonesForce } from "bones";
 import Link from "next/link";
 import { PokemonDetailView } from "@/components/pokemon-detail-view/pokemon-detail-view";
 import toggleStyles from "@/components/skeleton-toggle/styles.module.css";
@@ -18,6 +18,8 @@ export default function PokemonPage() {
   useEffect(() => {
     fetchPokemonDetail(params.id).then(setPokemon);
   }, [params.id]);
+
+  const detail = <PokemonDetailView pokemon={pokemon} />;
 
   return (
     <main>
@@ -43,7 +45,7 @@ export default function PokemonPage() {
         </p>
       </div>
 
-      <PokemonDetailView pokemon={!pokemon || showForced ? forceBones : pokemon} />
+      {!pokemon || showForced ? <BonesForce>{detail}</BonesForce> : detail}
     </main>
   );
 }

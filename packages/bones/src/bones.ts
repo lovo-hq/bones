@@ -38,6 +38,23 @@ function swapPromises(children: ReactNode): ReactNode {
 // flag set via cache() so all nested createBones calls show skeletons.
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// <BonesForce> — force skeleton mode for an entire subtree
+//
+// Sets the cache()-based loading flag around children so every nested
+// createBones call shows skeletons. Useful for demos, Storybook, and tests.
+// ---------------------------------------------------------------------------
+
+export function BonesForce({ children }: { children: ReactNode }): ReactNode {
+  return createElement(
+    Fragment,
+    null,
+    createElement(BonesStart),
+    children,
+    createElement(BonesEnd),
+  );
+}
+
 export function Bones({ children }: { children: ReactNode }): ReactNode {
   const fallback = createElement(
     Fragment,

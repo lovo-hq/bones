@@ -1,4 +1,4 @@
-import { forceBones } from "bones";
+import { BonesForce } from "bones";
 import { ArticlePreview } from "@/components/article-preview/article-preview";
 import { DemoSection } from "@/components/demo-section/demo-section";
 import styles from "./styles.module.css";
@@ -16,7 +16,9 @@ export function MultiLineTextDemo() {
       }
     >
       <div className={styles.articleDemos}>
-        <ArticlePreview article={forceBones} />
+        <BonesForce>
+          <ArticlePreview />
+        </BonesForce>
         <ArticlePreview
           article={{
             title: "Understanding React Server Components",

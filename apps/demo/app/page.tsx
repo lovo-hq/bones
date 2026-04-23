@@ -11,7 +11,7 @@ export default async function Home() {
   return (
     <main>
       <HeroSection />
-      <SuspenseDemo pokemon={pokemon} />
+      <SuspenseDemo pokemon={fetchPokemonList(12)} />
       <ForcedSkeletonsDemo pokemon={pokemon} />
       <MultiLineTextDemo />
       <ThemingDemo />

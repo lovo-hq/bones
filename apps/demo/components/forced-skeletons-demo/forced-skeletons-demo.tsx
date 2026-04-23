@@ -1,4 +1,4 @@
-import { forceBones } from "bones";
+import { BonesForce } from "bones";
 import type { PokemonListItem } from "@/lib/pokeapi";
 import { DemoSection } from "@/components/demo-section/demo-section";
 import { PokemonGrid } from "@/components/pokemon-grid/pokemon-grid";
@@ -8,9 +8,15 @@ export function ForcedSkeletonsDemo({ pokemon }: { pokemon: PokemonListItem[] })
   return (
     <DemoSection
       title="Forced Skeletons"
-      description="Pass forceBones to force skeleton mode. Toggle to see the same loaded cards switch to skeletons — no provider needed."
+      description="Wrap with BonesForce to force skeleton mode. Toggle to see the same loaded cards switch to skeletons — no provider needed."
     >
-      <SkeletonToggle skeleton={<PokemonGrid pokemon={forceBones} />}>
+      <SkeletonToggle
+        skeleton={
+          <BonesForce>
+            <PokemonGrid />
+          </BonesForce>
+        }
+      >
         <PokemonGrid pokemon={pokemon} />
       </SkeletonToggle>
     </DemoSection>
