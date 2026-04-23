@@ -31,16 +31,12 @@ describe("SectionHeader", () => {
   });
 
   test("renders hint when provided", () => {
-    render(
-      <SectionHeader title="Title" description="Desc" hint="Refresh the page" />,
-    );
+    render(<SectionHeader title="Title" description="Desc" hint="Refresh the page" />);
     expect(screen.getByText("Refresh the page")).toBeDefined();
   });
 
   test("does not render hint element when hint is omitted", () => {
-    const { container } = render(
-      <SectionHeader title="Title" description="Desc" />,
-    );
+    const { container } = render(<SectionHeader title="Title" description="Desc" />);
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs.length).toBe(1);
   });

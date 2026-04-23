@@ -8,9 +8,9 @@ export function MultiLineTextDemo() {
       title="Multi-Line Text"
       description={
         <>
-          Pass <code>{"{ lines: N }"}</code> to <code>bone("text")</code> to create
-          paragraph-sized placeholders. The skeleton automatically generates one bar per line
-          using a CSS repeating gradient — no extra DOM elements.
+          Pass <code>{"{ lines: N }"}</code> to <code>bone("text")</code> to create paragraph-sized
+          placeholders. The skeleton automatically generates one bar per line using a CSS repeating
+          gradient — no extra DOM elements.
         </>
       }
     >

@@ -68,9 +68,7 @@ const pokemon = [
 describe("SuspenseDemo", () => {
   test("renders the section title", () => {
     render(<SuspenseDemo pokemon={pokemon} />);
-    expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
-      "Streaming with Suspense",
-    );
+    expect(screen.getByRole("heading", { level: 2 }).textContent).toBe("Streaming with Suspense");
   });
 
   test("renders pokemon names", async () => {

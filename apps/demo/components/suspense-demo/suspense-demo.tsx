@@ -10,9 +10,9 @@ export function SuspenseDemo({ pokemon }: { pokemon: PokemonListItem[] }) {
       title="Streaming with Suspense"
       description={
         <>
-          Pass a promise to <code>PokemonGrid</code> inside a <code>{"<Suspense>"}</code>{" "}
-          boundary. The <strong>same component</strong> renders as skeletons in the fallback, then
-          swaps to content when data resolves.
+          Pass a promise to <code>PokemonGrid</code> inside a <code>{"<Suspense>"}</code> boundary.
+          The <strong>same component</strong> renders as skeletons in the fallback, then swaps to
+          content when data resolves.
         </>
       }
       hint="Refresh the page to see the skeleton → content transition."
