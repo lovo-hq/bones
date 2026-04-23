@@ -25,4 +25,9 @@ describe("delay", () => {
     await vi.advanceTimersByTimeAsync(499);
     expect(resolved).toBe(false);
   });
+
+  test("rejects when the input promise rejects", async () => {
+    const rejected = delay(Promise.reject(new Error("boom")), 500);
+    await expect(rejected).rejects.toThrow("boom");
+  });
 });

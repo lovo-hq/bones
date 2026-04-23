@@ -41,10 +41,9 @@ describe("ThemingDemo", () => {
     expect(screen.getByText("Dark")).toBeDefined();
   });
 
-  test("renders three theme containers", () => {
-    render(<ThemingDemo />);
-    expect(screen.getByText("Warm")).toBeDefined();
-    expect(screen.getByText("Cool")).toBeDefined();
-    expect(screen.getByText("Dark")).toBeDefined();
+  test("renders three PokemonCard skeletons", () => {
+    const { container } = render(<ThemingDemo />);
+    const images = container.querySelectorAll('img[alt="Pokemon"]');
+    expect(images.length).toBe(3);
   });
 });
