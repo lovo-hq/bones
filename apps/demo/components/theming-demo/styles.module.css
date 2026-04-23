@@ -1,0 +1,25 @@
+.themeDemos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.themeDemo {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.themeLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .themeDemos {
+    grid-template-columns: 1fr;
+  }
+}
