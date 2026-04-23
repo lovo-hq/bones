@@ -1,21 +1,21 @@
 import { cleanup, render, screen, act } from "@testing-library/react";
 import { Suspense } from "react";
 import { afterEach, describe, expect, test } from "vite-plus/test";
-import { createBones } from "../src/create-bones.ts";
+import { createBones, forceBones } from "../src/create-bones.ts";
 
 const mockData = { name: "Pikachu" };
 
-function TestText({ data }: { data?: typeof mockData }) {
+function TestText({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <span data-testid="target" {...bone("text")} />;
 }
 
-function TestBlock({ data }: { data?: typeof mockData }) {
+function TestBlock({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <div data-testid="target" {...bone("block")} />;
 }
 
-function TestContainer({ data }: { data?: typeof mockData }) {
+function TestContainer({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return (
     <div data-testid="target" {...bone("container")}>
@@ -24,37 +24,37 @@ function TestContainer({ data }: { data?: typeof mockData }) {
   );
 }
 
-function TestLength({ data }: { data?: typeof mockData }) {
+function TestLength({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <span data-testid="target" {...bone("text", { length: 12 })} />;
 }
 
-function TestMultiline({ data }: { data?: typeof mockData }) {
+function TestMultiline({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <p data-testid="target" {...bone("text", { lines: 3 })} />;
 }
 
-function TestContained({ data }: { data?: typeof mockData }) {
+function TestContained({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <span data-testid="target" {...bone("text", { contained: true, length: 7 })} />;
 }
 
-function TestTwoLines({ data }: { data?: typeof mockData }) {
+function TestTwoLines({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <p data-testid="target" {...bone("text", { lines: 2 })} />;
 }
 
-function TestOneLine({ data }: { data?: typeof mockData }) {
+function TestOneLine({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <p data-testid="target" {...bone("text", { lines: 1 })} />;
 }
 
-function TestContainedWithLines({ data }: { data?: typeof mockData }) {
+function TestContainedWithLines({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <span data-testid="target" {...bone("text", { contained: true, lines: 3 })} />;
 }
 
-function TestData({ data }: { data?: typeof mockData }) {
+function TestData({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone, data: resolved } = createBones(data);
   return (
     <span data-testid="target" {...bone("text")}>
@@ -65,12 +65,12 @@ function TestData({ data }: { data?: typeof mockData }) {
 
 const mockListData = { name: "Pikachu", types: ["electric"] };
 
-function TestRepeat({ data }: { data?: typeof mockListData }) {
-  const { bone, repeat } = createBones(data);
+function TestRepeat({ data }: { data?: typeof mockListData | Promise<typeof mockListData> }) {
+  const { bone, data: resolved, repeat } = createBones(data);
   return (
     <div data-testid="target">
-      {repeat(data?.types, 2).map((type, i) => (
-        <span key={type || i} {...bone("text")}>
+      {repeat(resolved?.types, 2).map((type, i) => (
+        <span key={type ?? i} {...bone("text")}>
           {type}
         </span>
       ))}
@@ -81,29 +81,29 @@ function TestRepeat({ data }: { data?: typeof mockListData }) {
 afterEach(cleanup);
 
 describe("createBones", () => {
-  test("returns data-bone=text and aria-busy when loading", () => {
-    const { getByTestId } = render(<TestText />);
+  test("returns data-bone=text and aria-busy with forceBones", () => {
+    const { getByTestId } = render(<TestText data={forceBones} />);
     const el = getByTestId("target");
     expect(el.getAttribute("data-bone")).toBe("text");
     expect(el.getAttribute("aria-busy")).toBe("true");
   });
 
-  test("returns data-bone=block and aria-busy when loading", () => {
-    const { getByTestId } = render(<TestBlock />);
+  test("returns data-bone=block and aria-busy with forceBones", () => {
+    const { getByTestId } = render(<TestBlock data={forceBones} />);
     const el = getByTestId("target");
     expect(el.getAttribute("data-bone")).toBe("block");
     expect(el.getAttribute("aria-busy")).toBe("true");
   });
 
-  test("returns data-bone=container and aria-busy when loading", () => {
-    const { getByTestId } = render(<TestContainer />);
+  test("returns data-bone=container and aria-busy with forceBones", () => {
+    const { getByTestId } = render(<TestContainer data={forceBones} />);
     const el = getByTestId("target");
     expect(el.getAttribute("data-bone")).toBe("container");
     expect(el.getAttribute("aria-busy")).toBe("true");
   });
 
   test("container does not set src", () => {
-    const { getByTestId } = render(<TestContainer />);
+    const { getByTestId } = render(<TestContainer data={forceBones} />);
     const el = getByTestId("target");
     expect(el.getAttribute("src")).toBeNull();
   });
@@ -115,8 +115,15 @@ describe("createBones", () => {
     expect(el.getAttribute("aria-busy")).toBeNull();
   });
 
+  test("returns empty props when data is undefined", () => {
+    const { getByTestId } = render(<TestText />);
+    const el = getByTestId("target");
+    expect(el.getAttribute("data-bone")).toBeNull();
+    expect(el.getAttribute("aria-busy")).toBeNull();
+  });
+
   test("sets --bone-length CSS variable for text with length", () => {
-    const { getByTestId } = render(<TestLength />);
+    const { getByTestId } = render(<TestLength data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.getAttribute("data-bone")).toBe("text");
     expect(el.style.getPropertyValue("--bone-length")).toBe("12");
@@ -129,14 +136,14 @@ describe("createBones", () => {
   });
 
   test("sets --bone-lines CSS variable for multiline text", () => {
-    const { getByTestId } = render(<TestMultiline />);
+    const { getByTestId } = render(<TestMultiline data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.getAttribute("data-bone")).toBe("text");
     expect(el.style.getPropertyValue("--bone-lines")).toBe("3");
   });
 
   test("sets --bone-shadows CSS variable for multiline text", () => {
-    const { getByTestId } = render(<TestMultiline />);
+    const { getByTestId } = render(<TestMultiline data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.style.getPropertyValue("--bone-shadows")).toBe(
       "0 calc(1lh * 1) 0 0 var(--bone-base)",
@@ -150,26 +157,26 @@ describe("createBones", () => {
   });
 
   test("sets --bone-contained CSS variable for contained text", () => {
-    const { getByTestId } = render(<TestContained />);
+    const { getByTestId } = render(<TestContained data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.style.getPropertyValue("--bone-contained")).toBe("1");
   });
 
   test("lines: 2 sets --bone-lines but no --bone-shadows", () => {
-    const { getByTestId } = render(<TestTwoLines />);
+    const { getByTestId } = render(<TestTwoLines data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.style.getPropertyValue("--bone-lines")).toBe("2");
     expect(el.style.getPropertyValue("--bone-shadows")).toBe("");
   });
 
   test("lines: 1 does not set --bone-lines", () => {
-    const { getByTestId } = render(<TestOneLine />);
+    const { getByTestId } = render(<TestOneLine data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.getAttribute("style")).toBeNull();
   });
 
   test("contained with lines ignores --bone-lines", () => {
-    const { getByTestId } = render(<TestContainedWithLines />);
+    const { getByTestId } = render(<TestContainedWithLines data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.style.getPropertyValue("--bone-contained")).toBe("1");
     expect(el.style.getPropertyValue("--bone-lines")).toBe("");
@@ -177,15 +184,15 @@ describe("createBones", () => {
   });
 
   test("block sets src to transparent pixel", () => {
-    const { getByTestId } = render(<TestBlock />);
+    const { getByTestId } = render(<TestBlock data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.getAttribute("src")).toBe(
       "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
     );
   });
 
-  test("data returns undefined when loading", () => {
-    const { getByTestId } = render(<TestData />);
+  test("data returns undefined with forceBones", () => {
+    const { getByTestId } = render(<TestData data={forceBones} />);
     const el = getByTestId("target");
     expect(el.textContent).toBe("");
   });
@@ -196,8 +203,8 @@ describe("createBones", () => {
     expect(el.textContent).toBe("Pikachu");
   });
 
-  test("repeat returns placeholder array when loading", () => {
-    const { getByTestId } = render(<TestRepeat />);
+  test("repeat returns placeholder array with forceBones", () => {
+    const { getByTestId } = render(<TestRepeat data={forceBones} />);
     const el = getByTestId("target");
     expect(el.children).toHaveLength(2);
     for (const child of el.children) {
@@ -233,7 +240,7 @@ describe("createBones with promises", () => {
   function renderWithSuspense(promise: Promise<typeof mockData>) {
     return act(async () => {
       render(
-        <Suspense fallback={<TestText />}>
+        <Suspense fallback={<TestText data={forceBones} />}>
           <TestPromise promise={promise} />
         </Suspense>,
       );

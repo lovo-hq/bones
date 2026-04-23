@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { forceBones } from "bones";
 import Link from "next/link";
 import { PokemonDetailView } from "@/components/pokemon-detail-view/pokemon-detail-view";
 import toggleStyles from "@/components/skeleton-toggle/styles.module.css";
@@ -42,7 +43,7 @@ export default function PokemonPage() {
         </p>
       </div>
 
-      <PokemonDetailView pokemon={showForced ? undefined : pokemon} />
+      <PokemonDetailView pokemon={!pokemon || showForced ? forceBones : pokemon} />
     </main>
   );
 }

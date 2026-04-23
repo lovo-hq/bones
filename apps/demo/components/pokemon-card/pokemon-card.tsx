@@ -4,26 +4,30 @@ import type { PokemonListItem } from "@/lib/pokeapi";
 import { TypeBadge } from "@/components/type-badge/type-badge";
 import styles from "./styles.module.css";
 
-export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem }) {
-  const { bone, repeat } = createBones(pokemon);
+export function PokemonCard({
+  pokemon,
+}: {
+  pokemon?: PokemonListItem | Promise<PokemonListItem>;
+}) {
+  const { bone, data, repeat } = createBones(pokemon);
 
   const card = (
     <div className={styles.card}>
       <img
         className={styles.cardImage}
-        src={pokemon?.sprite}
+        src={data?.sprite}
         width={120}
         height={120}
-        alt={pokemon?.name ?? "Pokemon"}
+        alt={data?.name ?? "Pokemon"}
         {...bone("block")}
       />
       <h3 className={styles.cardName} {...bone("text", { length: 9 })}>
-        {pokemon?.name}
+        {data?.name}
       </h3>
       <div className={styles.cardTypes}>
-        {repeat(pokemon?.types, 2).map((type, i) => (
+        {repeat(data?.types, 2).map((type, i) => (
           <TypeBadge
-            key={type || i}
+            key={type ?? i}
             type={type}
             {...bone("text", { contained: true, length: 7 })}
           />
@@ -32,9 +36,9 @@ export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem }) {
     </div>
   );
 
-  if (pokemon) {
+  if (data) {
     return (
-      <Link href={`/pokemon/${pokemon.id}`} className={styles.cardLink}>
+      <Link href={`/pokemon/${data.id}`} className={styles.cardLink}>
         {card}
       </Link>
     );

@@ -8,21 +8,25 @@ interface Article {
   date: string;
 }
 
-export function ArticlePreview({ article }: { article?: Article }) {
-  const { bone } = createBones(article);
+export function ArticlePreview({
+  article,
+}: {
+  article?: Article | Promise<Article>;
+}) {
+  const { bone, data } = createBones(article);
 
   return (
     <div className={styles.articlePreview}>
       <h3 className={styles.articleTitle} {...bone("text", { length: 24 })}>
-        {article?.title}
+        {data?.title}
       </h3>
       <p className={styles.articleExcerpt} {...bone("text", { lines: 4 })}>
-        {article?.excerpt}
+        {data?.excerpt}
       </p>
       <div className={styles.articleMeta}>
-        <span {...bone("text", { length: 12 })}>{article?.author}</span>
+        <span {...bone("text", { length: 12 })}>{data?.author}</span>
         <span className={styles.articleDot}>&middot;</span>
-        <span {...bone("text", { length: 10 })}>{article?.date}</span>
+        <span {...bone("text", { length: 10 })}>{data?.date}</span>
       </div>
     </div>
   );

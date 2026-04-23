@@ -1,3 +1,14 @@
+import { cache } from "react";
+
+// ---------------------------------------------------------------------------
+// Server-safe loading context via React.cache
+//
+// cache() returns the same value per request (server) or per render (client),
+// so a flag set by a parent is visible to all descendants in the same pass.
+// ---------------------------------------------------------------------------
+
+export const getBonesContext = cache(() => ({ loading: false }));
+
 export type BoneType = "text" | "block" | "container";
 
 export interface BoneOptions {
@@ -77,16 +88,41 @@ function buildTextStyle(options?: BoneOptions): Record<string, unknown> | undefi
   return Object.keys(style).length > 0 ? style : undefined;
 }
 
+// ---------------------------------------------------------------------------
+// forceBones — sentinel for forced skeleton mode
+//
+// A frozen object that createBones recognises by identity. Pass it as data
+// to force skeleton mode without a real promise or Suspense boundary.
+// Typed as Promise<never> so it's assignable to any Promise<T> prop.
+// ---------------------------------------------------------------------------
+
+export const forceBones = Object.freeze({}) as unknown as Promise<never>;
+
 export interface CreateBonesReturn<T> {
   bone: (type: BoneType, options?: BoneOptions) => BoneProps;
-  data: T | undefined;
+  data: T | null | undefined;
   repeat: <U>(arr: U[] | undefined | null, count: number) => (U | undefined)[];
 }
 
 export function createBones<T>(data: T | Promise<T> | undefined | null): CreateBonesReturn<T> {
-  const resolved =
-    data != null && data instanceof Promise ? readPromise(data) : (data as T | undefined | null);
-  const isLoading = !resolved;
+  let resolved: T | undefined | null;
+  let isLoading = false;
+
+  if (data != null && (data as unknown) === forceBones) {
+    // Explicit force — show skeletons regardless.
+    isLoading = true;
+    resolved = undefined;
+  } else if (getBonesContext().loading) {
+    // Inherited from a <Bones> boundary — show skeletons.
+    isLoading = true;
+    resolved = undefined;
+  } else if (data != null && data instanceof Promise) {
+    // Promise path — delegates to readPromise for Suspense integration.
+    // Throws for pending promises; returns data for fulfilled ones.
+    resolved = readPromise(data);
+  } else {
+    resolved = data as T | undefined | null;
+  }
 
   const bone = (type: BoneType, options?: BoneOptions): BoneProps => {
     if (!isLoading) return {};
