@@ -1,23 +1,24 @@
 import { Bones } from "bones";
-import type { PokemonListItem } from "@/lib/pokeapi";
+import { delay } from "@/lib/delay";
+import { fetchPokemonList } from "@/lib/pokeapi";
 import { DemoSection } from "@/components/demo-section/demo-section";
 import { PokemonGrid } from "@/components/pokemon-grid/pokemon-grid";
 
-export function SuspenseDemo({ pokemon }: { pokemon: Promise<PokemonListItem[]> }) {
+export function SuspenseDemo() {
   return (
     <DemoSection
       title="Streaming with Suspense"
       description={
         <>
-          Pass a promise to <code>PokemonGrid</code> inside a <code>{"<Bones>"}</code> boundary.
-          The <strong>same component</strong> renders as skeletons in the fallback, then swaps to
-          content when data resolves.
+          Wrap a component in <code>{"<Bones>"}</code> and pass a promise as data. The{" "}
+          <strong>same component</strong> renders as skeletons while the data streams in, then swaps
+          to content when it resolves.
         </>
       }
       hint="Refresh the page to see the skeleton → content transition."
     >
       <Bones>
-        <PokemonGrid pokemon={pokemon} />
+        <PokemonGrid pokemon={delay(fetchPokemonList(12), 3000)} />
       </Bones>
     </DemoSection>
   );

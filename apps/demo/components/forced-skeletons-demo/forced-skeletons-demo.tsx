@@ -1,10 +1,12 @@
 import { BonesForce } from "bones";
-import type { PokemonListItem } from "@/lib/pokeapi";
+import { fetchPokemonList } from "@/lib/pokeapi";
 import { DemoSection } from "@/components/demo-section/demo-section";
 import { PokemonGrid } from "@/components/pokemon-grid/pokemon-grid";
 import { SkeletonToggle } from "@/components/skeleton-toggle/skeleton-toggle";
 
-export function ForcedSkeletonsDemo({ pokemon }: { pokemon: PokemonListItem[] }) {
+export async function ForcedSkeletonsDemo() {
+  const pokemon = await fetchPokemonList(12);
+
   return (
     <DemoSection
       title="Forced Skeletons"

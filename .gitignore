@@ -4,6 +4,7 @@ dist
 *.tsbuildinfo
 .DS_Store
 coverage
+test-results
 .next
 .fallow
 docs/superpowers/*

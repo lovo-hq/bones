@@ -14,7 +14,11 @@ export function SkeletonToggle({
 
   return (
     <div>
-      <button className={styles.toggleButton} onClick={() => setForced((prev) => !prev)}>
+      <button
+        type="button"
+        className={styles.toggleButton}
+        onClick={() => setForced((prev) => !prev)}
+      >
         {forced ? "Show Content" : "Force Skeletons"}
       </button>
       {forced ? skeleton : children}
