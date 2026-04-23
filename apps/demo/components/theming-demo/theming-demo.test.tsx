@@ -2,29 +2,8 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import { ThemingDemo } from "./theming-demo";
 
-vi.mock("bones", () => ({
-  createBones: () => ({
-    bone: () => ({}),
-    repeat: <T,>(arr: T[] | undefined, count: number): (T | undefined)[] =>
-      arr ?? Array.from({ length: count }, () => undefined),
-  }),
-}));
-
-vi.mock("next/link", () => ({
-  default: ({
-    children,
-    href,
-    ...props
-  }: {
-    children: React.ReactNode;
-    href: string;
-    [key: string]: unknown;
-  }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock("bones", async () => (await import("@/test/mocks")).bonesMockFactory());
+vi.mock("next/link", async () => (await import("@/test/mocks")).nextLinkMockFactory());
 
 afterEach(cleanup);
 

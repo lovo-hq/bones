@@ -42,21 +42,7 @@ vi.mock("bones", () => ({
   },
 }));
 
-vi.mock("next/link", () => ({
-  default: ({
-    children,
-    href,
-    ...props
-  }: {
-    children: React.ReactNode;
-    href: string;
-    [key: string]: unknown;
-  }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock("next/link", async () => (await import("@/test/mocks")).nextLinkMockFactory());
 
 afterEach(cleanup);
 
