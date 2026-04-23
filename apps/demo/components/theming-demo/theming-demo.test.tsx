@@ -42,8 +42,9 @@ describe("ThemingDemo", () => {
   });
 
   test("renders three theme containers", () => {
-    const { container } = render(<ThemingDemo />);
-    const headings = container.querySelectorAll("h3");
-    expect(headings.length).toBe(3);
+    render(<ThemingDemo />);
+    expect(screen.getByText("Warm")).toBeDefined();
+    expect(screen.getByText("Cool")).toBeDefined();
+    expect(screen.getByText("Dark")).toBeDefined();
   });
 });
