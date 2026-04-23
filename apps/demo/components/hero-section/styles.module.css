@@ -1,0 +1,16 @@
+.hero {
+  text-align: center;
+  padding: 3rem 0 2rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  color: var(--muted);
+  font-size: 1.125rem;
+  margin-top: 0.5rem;
+}
