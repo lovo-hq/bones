@@ -104,3 +104,55 @@ function TagList({ pokemon }: { pokemon: Promise<Pokemon> }) {
 ```
 
 `repeat(data?.types, 2)` returns `[undefined, undefined]` while loading (rendering two skeleton pills), and the real `types` array once data arrives.
+
+## Skeleton animations
+
+By default, skeletons are static. Add the `data-bone-animate` attribute to any parent element to animate all skeletons inside it.
+
+### Shimmer
+
+A horizontal highlight sweep:
+
+```tsx
+<div data-bone-animate="shimmer">
+  <Bones>
+    <UserCard user={fetchUser()} />
+  </Bones>
+</div>
+```
+
+### Pulse
+
+A gentle opacity fade:
+
+```tsx
+<div data-bone-animate="pulse">
+  <Bones>
+    <UserCard user={fetchUser()} />
+  </Bones>
+</div>
+```
+
+Bones automatically applies `bone-pulse` when `prefers-reduced-motion: reduce` is active, so reduced-motion users get a comfortable fallback regardless of which animation you choose.
+
+### Global animation
+
+Set the attribute on `<body>` to animate every skeleton in your app:
+
+```tsx
+<body data-bone-animate="shimmer">
+```
+
+Individual sections can override the global animation:
+
+```tsx
+<body data-bone-animate="shimmer">
+  {/* These skeletons shimmer */}
+  <UserCard user={fetchUser()} />
+
+  {/* These skeletons pulse instead */}
+  <div data-bone-animate="pulse">
+    <Sidebar items={fetchItems()} />
+  </div>
+</body>
+```

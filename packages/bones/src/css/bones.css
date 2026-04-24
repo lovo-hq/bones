@@ -122,6 +122,24 @@ video[data-bone="block"] {
   }
 }
 
+[data-bone-animate="shimmer"] [data-bone="text"]::after,
+[data-bone-animate="shimmer"] [data-bone="text"]::before,
+[data-bone-animate="shimmer"] [data-bone="block"],
+[data-bone-animate="shimmer"] [data-bone="container"]::before {
+  animation: bone-shimmer var(--bone-duration) ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    var(--bone-base) 25%,
+    var(--bone-highlight) 50%,
+    var(--bone-base) 75%
+  );
+  background-size: 200% 100%;
+}
+
+[data-bone-animate="pulse"] [data-bone] {
+  animation: bone-pulse var(--bone-duration) ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [aria-busy="true"] {
     animation: bone-pulse 2s ease-in-out infinite;

@@ -54,24 +54,22 @@ Override these in your own dark mode styles if your app uses a class-based dark 
 
 ## Animations
 
-Two keyframe animations are defined in the bones CSS:
+Add the `data-bone-animate` attribute to any parent element to animate skeletons inside it. Two animations are available:
 
-- **`bone-shimmer`** — a horizontal highlight sweep. Not active by default. Enable it by adding the animation to your skeleton styles.
-- **`bone-pulse`** — a fade pulse. Automatically applied when `prefers-reduced-motion: reduce` is active.
+- **`shimmer`** — a horizontal highlight sweep
+- **`pulse`** — a gentle opacity fade (also applied automatically when `prefers-reduced-motion: reduce` is active)
 
-```css
-/* Enable shimmer globally */
-[data-bone] {
-  animation: bone-shimmer var(--bone-duration) ease-in-out infinite;
-  background: linear-gradient(
-    90deg,
-    var(--bone-base) 25%,
-    var(--bone-highlight) 50%,
-    var(--bone-base) 75%
-  );
-  background-size: 200% 100%;
-}
+```tsx
+{/* Animate a section */}
+<div data-bone-animate="shimmer">
+  <UserCard user={fetchUser()} />
+</div>
+
+{/* Animate the entire app */}
+<body data-bone-animate="shimmer">
 ```
+
+Animation speed is controlled by the `--bone-duration` custom property, and shimmer colors use `--bone-base` and `--bone-highlight`.
 
 ## Accessibility
 
