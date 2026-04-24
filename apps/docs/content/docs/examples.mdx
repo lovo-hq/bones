@@ -28,7 +28,7 @@ function UserCard({ user }: { user: Promise<User> }) {
 
   return (
     <div>
-      <img {...bone("block")} src={data?.avatar} width={64} height={64} />
+      <img src={data?.avatar} width={64} height={64} {...bone("block")} />
       <h2 {...bone("text", { length: 12 })}>{data?.name}</h2>
       <p {...bone("text", { lines: 2 })}>{data?.bio}</p>
     </div>

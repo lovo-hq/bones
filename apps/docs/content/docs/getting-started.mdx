@@ -29,7 +29,7 @@ function ProfileCard({ user }: { user: Promise<User> | User }) {
 
   return (
     <div>
-      <img {...bone("block")} src={data?.avatar} width={80} height={80} />
+      <img src={data?.avatar} width={80} height={80} {...bone("block")} />
       <h3 {...bone("text", { length: 10 })}>{data?.name}</h3>
       <p {...bone("text", { lines: 3 })}>{data?.bio}</p>
     </div>
@@ -60,5 +60,5 @@ When the promise is pending, `<Bones>` renders the same `<ProfileCard>` tree wit
 | Type | Use for | Example |
 |------|---------|---------|
 | `"text"` | Headings, paragraphs, labels | `<h2 {...bone("text")}>` |
-| `"block"` | Images, avatars, thumbnails | `<img {...bone("block")} src={…} />` |
+| `"block"` | Images, avatars, thumbnails | `<img src={…} {...bone("block")} />` |
 | `"container"` | Cards, wrappers with complex children | `<div {...bone("container")}>` |
