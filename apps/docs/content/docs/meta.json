@@ -1,0 +1,13 @@
+{
+  "title": "Bones",
+  "pages": [
+    "---Introduction---",
+    "index",
+    "getting-started",
+    "---Reference---",
+    "...api",
+    "---Guides---",
+    "styling",
+    "examples"
+  ]
+}

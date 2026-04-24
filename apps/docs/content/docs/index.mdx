@@ -1,0 +1,34 @@
+---
+title: Introduction
+description: Primitives for inline skeleton loaders in React.
+---
+
+Bones lets you write a single component that handles both its loaded and loading states. Instead of building separate skeleton components, you add a few attributes to your existing markup and Bones takes care of the rest.
+
+## How it works
+
+`createBones` accepts data that may or may not be resolved yet. When the data is still loading, its `bone` function returns HTML attributes that turn your elements into skeletons. When the data arrives, `bone` returns an empty object and your component renders normally.
+
+```tsx
+import { createBones } from "bones";
+
+function UserCard({ user }: { user: Promise<User> }) {
+  const { bone, data } = createBones(user);
+
+  return (
+    <div>
+      <img {...bone("block")} src={data?.avatar} alt="" />
+      <h2 {...bone("text", { length: 12 })}>{data?.name}</h2>
+      <p {...bone("text", { lines: 2 })}>{data?.bio}</p>
+    </div>
+  );
+}
+```
+
+## Key ideas
+
+- **Same component, both states** — one component definition, no separate skeleton.
+- **No hooks** — `createBones` is a plain function, not a hook.
+- **Promise-native** — works with React Suspense out of the box via `readPromise`.
+- **CSS-driven** — all skeleton visuals are pure CSS. Customize with CSS custom properties.
+- **Accessible** — sets `aria-busy="true"` on loading elements automatically.
