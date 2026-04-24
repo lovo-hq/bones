@@ -5,6 +5,7 @@ export function bonesMockFactory() {
       repeat: <T,>(arr: T[] | undefined, count: number): (T | undefined)[] =>
         arr ?? Array.from({ length: count }, () => undefined),
     }),
+    BonesForce: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   };
 }
 

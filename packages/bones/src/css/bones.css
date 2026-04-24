@@ -136,8 +136,22 @@ video[data-bone="block"] {
   background-size: 200% 100%;
 }
 
-[data-bone-animate="pulse"] [data-bone] {
+[data-bone-animate="pulse"] [data-bone="text"]::after,
+[data-bone-animate="pulse"] [data-bone="text"]::before,
+[data-bone-animate="pulse"] [data-bone="block"],
+[data-bone-animate="pulse"] [data-bone="container"]::before {
   animation: bone-pulse var(--bone-duration) ease-in-out infinite;
+  background: var(--bone-base);
+  background-size: auto;
+}
+
+[data-bone-animate="none"] [data-bone="text"]::after,
+[data-bone-animate="none"] [data-bone="text"]::before,
+[data-bone-animate="none"] [data-bone="block"],
+[data-bone-animate="none"] [data-bone="container"]::before {
+  animation: none;
+  background: var(--bone-base);
+  background-size: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
