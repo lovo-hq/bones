@@ -1,0 +1,78 @@
+---
+title: createBones
+description: The core function that powers skeleton loading states.
+---
+
+```ts
+import { createBones } from "bones";
+
+const { bone, data, repeat } = createBones(dataOrPromise);
+```
+
+`createBones` accepts data that may be a resolved value, a `Promise`, `null`, `undefined`, or the `forceBones` sentinel. It returns three things:
+
+## `bone(type, options?)`
+
+Returns HTML attributes that turn an element into a skeleton when loading, or an empty object when data is resolved. Spread the result onto your element.
+
+```tsx
+<h2 {...bone("text", { length: 12 })}>{data?.name}</h2>
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `type` | `"text" \| "block" \| "container"` | The skeleton visual style |
+| `options` | `BoneOptions` | Optional configuration |
+
+### BoneOptions
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `length` | `number` | — | Width in `ch` units for `text` bones |
+| `lines` | `number` | — | Number of lines for multi-line `text` bones |
+| `contained` | `boolean` | `false` | Use inline-flex sizing instead of full-width |
+
+### Bone types
+
+**`"text"`** — for text content like headings, paragraphs, and labels. Renders a bar at the text baseline. Respects `length`, `lines`, and `contained` options.
+
+**`"block"`** — for replaced elements like images and videos. Sets a solid background color and injects a transparent pixel as `src`.
+
+**`"container"`** — for wrapper elements with complex children. Overlays a solid background and hides children with `visibility: hidden`.
+
+## `data`
+
+The resolved value of the input. `undefined` while loading.
+
+```tsx
+const { bone, data } = createBones(userPromise);
+// data is User | undefined
+```
+
+## `repeat(array, count)`
+
+Returns a placeholder array of `count` `undefined` items during loading, or the real array when data is resolved. Useful for rendering lists with a known placeholder count.
+
+```tsx
+const { bone, data, repeat } = createBones(pokemon);
+
+{repeat(data?.types, 2).map((type, i) => (
+  <span key={type ?? i} {...bone("text")}>{type}</span>
+))}
+```
+
+## Type signature
+
+```ts
+function createBones<T>(
+  data: T | Promise<T> | undefined | null
+): CreateBonesReturn<T>;
+
+interface CreateBonesReturn<T> {
+  bone: (type: BoneType, options?: BoneOptions) => Record<string, unknown>;
+  data: T | null | undefined;
+  repeat: <U>(arr: U[] | undefined | null, count: number) => (U | undefined)[];
+}
+```

@@ -1,0 +1,39 @@
+---
+title: BonesForce
+description: Force skeleton mode for an entire subtree without Suspense.
+---
+
+```tsx
+import { BonesForce } from "bones";
+```
+
+`<BonesForce>` sets the loading flag for its entire subtree, causing all nested `createBones` calls to return skeleton attributes. Unlike `<Bones>`, it does not create a Suspense boundary — it simply forces the loading state.
+
+## Usage
+
+```tsx
+import { BonesForce } from "bones";
+
+function SkeletonPreview() {
+  return (
+    <BonesForce>
+      <UserCard />
+      <PostList />
+    </BonesForce>
+  );
+}
+```
+
+Every `createBones` call inside `<BonesForce>` will produce skeleton attributes, regardless of whether real data is passed.
+
+## When to use
+
+- **Storybook** — show the skeleton state of components in isolation.
+- **Testing** — verify skeleton markup without setting up real promises.
+- **Demos** — display skeleton states alongside loaded states for comparison.
+
+## Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `children` | `ReactNode` | Components to render in forced skeleton mode |

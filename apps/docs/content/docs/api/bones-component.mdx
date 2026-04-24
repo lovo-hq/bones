@@ -1,0 +1,44 @@
+---
+title: Bones
+description: Suspense wrapper that automatically renders skeletons as the fallback.
+---
+
+```tsx
+import { Bones } from "bones";
+```
+
+`<Bones>` wraps its children in a React `<Suspense>` boundary. The fallback is the same component tree with all `Promise` props replaced by the `forceBones` sentinel, and a loading flag set so that all nested `createBones` calls produce skeleton attributes.
+
+## Usage
+
+```tsx
+import { Bones } from "bones";
+
+export default function Page() {
+  return (
+    <Bones>
+      <UserCard user={fetchUser()} />
+    </Bones>
+  );
+}
+```
+
+When `fetchUser()` is pending, `<Bones>` renders `<UserCard>` with skeletons. When it resolves, the real content appears.
+
+## How the fallback works
+
+1. `<Bones>` reads the `children` element tree and clones each direct child.
+2. Any prop that is a `Promise` is swapped with the `forceBones` sentinel.
+3. The fallback subtree is wrapped in a loading context (`React.cache`-based) so all `createBones` calls within it return skeleton attributes.
+4. Once the real promises resolve, React swaps in the actual content.
+
+## Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `children` | `ReactNode` | Components that receive `Promise` data props |
+
+## Notes
+
+- `<Bones>` only swaps `Promise` props on **direct children**. Deeply nested promises still need their own `<Bones>` boundary or `<Suspense>`.
+- Each `<Bones>` boundary is independent — multiple boundaries on a page reveal content as their respective promises resolve.
