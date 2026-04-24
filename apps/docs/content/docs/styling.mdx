@@ -1,0 +1,80 @@
+---
+title: Styling
+description: Customize skeleton appearance with CSS custom properties.
+---
+
+Bones uses CSS custom properties for all visual aspects of skeletons. Override them globally or scope them to specific components.
+
+## CSS custom properties
+
+| Property | Default (light) | Default (dark) | Description |
+|----------|-----------------|----------------|-------------|
+| `--bone-base` | `#e0e0e0` | `#2a2a2a` | Skeleton background color |
+| `--bone-highlight` | `#f0f0f0` | `#3a3a3a` | Highlight color (for shimmer) |
+| `--bone-radius` | `4px` | `4px` | Border radius of skeleton bars |
+| `--bone-duration` | `1.5s` | `1.5s` | Animation duration |
+
+## Theming
+
+Override properties on any container to theme a section:
+
+```tsx
+<div style={{
+  "--bone-base": "#f5e6d3",
+  "--bone-highlight": "#faf0e6",
+  "--bone-radius": "8px",
+}}>
+  <UserCard user={forceBones} />
+</div>
+```
+
+Or use a CSS class:
+
+```css
+.warm-skeleton {
+  --bone-base: #f5e6d3;
+  --bone-highlight: #faf0e6;
+}
+```
+
+## Dark mode
+
+Bones includes built-in dark mode support via `prefers-color-scheme`:
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bone-base: #2a2a2a;
+    --bone-highlight: #3a3a3a;
+  }
+}
+```
+
+Override these in your own dark mode styles if your app uses a class-based dark mode toggle.
+
+## Animations
+
+Two keyframe animations are defined in the bones CSS:
+
+- **`bone-shimmer`** — a horizontal highlight sweep. Not active by default. Enable it by adding the animation to your skeleton styles.
+- **`bone-pulse`** — a fade pulse. Automatically applied when `prefers-reduced-motion: reduce` is active.
+
+```css
+/* Enable shimmer globally */
+[data-bone] {
+  animation: bone-shimmer var(--bone-duration) ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    var(--bone-base) 25%,
+    var(--bone-highlight) 50%,
+    var(--bone-base) 75%
+  );
+  background-size: 200% 100%;
+}
+```
+
+## Accessibility
+
+- All skeleton elements get `aria-busy="true"` automatically.
+- The `bone-pulse` animation activates for users who prefer reduced motion.
+- Skeleton elements are non-interactive (`pointer-events: none` on pseudo-elements).
