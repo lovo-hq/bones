@@ -1,0 +1,38 @@
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+}
+
+.label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--label-color);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  line-height: 2.1;
+}
+
+.rowLabel {
+  font-size: 0.6875rem;
+  color: var(--label-color);
+}
+
+.rowValue {
+  font-size: 0.6875rem;
+  color: var(--value-color);
+  text-transform: capitalize;
+}
