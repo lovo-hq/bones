@@ -1,0 +1,91 @@
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+}
+
+.label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--label-color);
+  font-weight: 600;
+  margin-bottom: 0.625rem;
+}
+
+.chains {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.branch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.stageGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--label-color);
+  font-size: 0.875rem;
+}
+
+.trigger {
+  font-size: 0.625rem;
+  text-transform: capitalize;
+}
+
+.stage {
+  text-align: center;
+}
+
+.stage[data-current="true"] .stageName {
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.sprite {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--stat-track);
+  border: 1px solid var(--card-border);
+  margin-bottom: 0.25rem;
+  display: block;
+  margin-inline: auto;
+}
+
+.stageName {
+  font-size: 0.6875rem;
+  color: var(--value-color);
+  text-transform: capitalize;
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.skeletonCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+}
+
+.skeletonArrow {
+  color: var(--label-color);
+}
