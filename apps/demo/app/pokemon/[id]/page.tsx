@@ -1,6 +1,9 @@
 import { Bones } from "bones";
 import Link from "next/link";
+import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { delay } from "@/lib/delay";
+import { getDelays } from "@/lib/demo-delays";
 import {
   fetchPokemon,
   fetchSpecies,
@@ -26,19 +29,21 @@ function formatGender(rate: number): string {
 }
 
 function formatEvYield(stats: PokemonData["stats"]): string {
-  return stats
-    .filter((s) => s.effort > 0)
-    .map((s) => {
-      const name = s.name
-        .replace("special-attack", "Sp. Atk")
-        .replace("special-defense", "Sp. Def")
-        .replace("attack", "Atk")
-        .replace("defense", "Def")
-        .replace("speed", "Speed")
-        .replace("hp", "HP");
-      return `${s.effort} ${name}`;
-    })
-    .join(", ") || "None";
+  return (
+    stats
+      .filter((s) => s.effort > 0)
+      .map((s) => {
+        const name = s.name
+          .replace("special-attack", "Sp. Atk")
+          .replace("special-defense", "Sp. Def")
+          .replace("attack", "Atk")
+          .replace("defense", "Def")
+          .replace("speed", "Speed")
+          .replace("hp", "HP");
+        return `${s.effort} ${name}`;
+      })
+      .join(", ") || "None"
+  );
 }
 
 function trainingRows(pokemon: PokemonData, species: SpeciesData) {
@@ -68,24 +73,54 @@ function pokedexRows(species: SpeciesData) {
   ];
 }
 
+async function TabsSectionData({
+  pokemonPromise,
+  speciesPromise,
+  encountersPromise,
+}: {
+  pokemonPromise: Promise<PokemonData>;
+  speciesPromise: Promise<SpeciesData>;
+  encountersPromise: Promise<EncounterLocation[]>;
+}) {
+  const [pokemon, species, encounters] = await Promise.all([
+    pokemonPromise,
+    speciesPromise,
+    encountersPromise,
+  ]);
+  const moveDetails = await fetchMoveDetails(pokemon.moves.map((m) => m.url));
+
+  return (
+    <TabsSection
+      moves={pokemon.moves}
+      moveDetails={moveDetails}
+      flavorTextEntries={species.flavorTextEntries}
+      encounters={encounters}
+    />
+  );
+}
+
 export default async function PokemonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const cookieStore = await cookies();
+  const delays = getDelays(cookieStore.get("bones-delays")?.value);
 
-  // Independent fetches — each powers different Suspense boundaries
-  const pokemonPromise = delay(fetchPokemon(id), 800);
-  const speciesPromise = delay(fetchSpecies(id), 1000);
-  const typeDefensePromise = pokemonPromise.then((p) => fetchTypeDefenses(p.types));
-  const evolutionPromise = speciesPromise.then((s) => fetchEvolutionChain(s.evolutionChainUrl));
-  const encountersPromise = fetchEncounters(id);
+  // Independent fetches — each powers a different Suspense boundary
+  const pokemonPromise = delay(fetchPokemon(id), delays.pokemon);
+  const speciesPromise = delay(fetchSpecies(id), delays.species);
+  const typeDefensePromise = pokemonPromise.then((p) =>
+    delay(fetchTypeDefenses(p.types), delays.typeDefense),
+  );
+  const evolutionPromise = speciesPromise.then((s) =>
+    delay(fetchEvolutionChain(s.evolutionChainUrl), delays.evolution),
+  );
+  const encountersPromise = delay(fetchEncounters(id), delays.encounters);
 
-  // Await pokemon + species for data transformations needed by InfoCards and TabsSection
-  const pokemon = await pokemonPromise;
-  const species = await speciesPromise;
-
-  // Fetch all move details in parallel
-  const moveUrls = pokemon.moves.map((m) => m.url);
-  const moveDetails = await fetchMoveDetails(moveUrls);
-  const encounters = await encountersPromise;
+  // Derived promises for InfoCard rows
+  const trainingPromise = Promise.all([pokemonPromise, speciesPromise]).then(([p, s]) =>
+    trainingRows(p, s),
+  );
+  const breedingPromise = speciesPromise.then((s) => breedingRows(s));
+  const pokedexPromise = speciesPromise.then((s) => pokedexRows(s));
 
   return (
     <main>
@@ -95,33 +130,44 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
         </Link>
       </div>
 
-      <PokemonHero pokemon={pokemon} species={species} />
+      <Bones>
+        <PokemonHero pokemon={pokemonPromise} species={speciesPromise} />
+      </Bones>
 
       <div className={styles.bentoGrid}>
         <div className={styles.bentoRow1}>
-          <BaseStatsCard pokemon={pokemon} />
+          <Bones>
+            <BaseStatsCard pokemon={pokemonPromise} />
+          </Bones>
           <Bones>
             <TypeDefenseCard typeDefense={typeDefensePromise} />
           </Bones>
         </div>
 
         <div className={styles.bentoRow2}>
-          <InfoCard title="Training" rows={trainingRows(pokemon, species)} />
-          <InfoCard title="Breeding" rows={breedingRows(species)} />
-          <InfoCard title="Pokedex Data" rows={pokedexRows(species)} />
+          <Bones>
+            <InfoCard title="Training" rows={trainingPromise} />
+          </Bones>
+          <Bones>
+            <InfoCard title="Breeding" rows={breedingPromise} />
+          </Bones>
+          <Bones>
+            <InfoCard title="Pokedex Data" rows={pokedexPromise} />
+          </Bones>
         </div>
 
         <Bones>
-          <EvolutionChainCard chain={evolutionPromise} currentName={pokemon.name} />
+          <EvolutionChainCard chain={evolutionPromise} currentName={id} />
         </Bones>
       </div>
 
-      <TabsSection
-        moves={pokemon.moves}
-        moveDetails={moveDetails}
-        flavorTextEntries={species.flavorTextEntries}
-        encounters={encounters}
-      />
+      <Suspense>
+        <TabsSectionData
+          pokemonPromise={pokemonPromise}
+          speciesPromise={speciesPromise}
+          encountersPromise={encountersPromise}
+        />
+      </Suspense>
     </main>
   );
 }
