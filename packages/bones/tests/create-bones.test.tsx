@@ -227,6 +227,56 @@ describe("createBones", () => {
   });
 });
 
+describe("createBones with loading option", () => {
+  function TestLoading({
+    data,
+    loading,
+  }: {
+    data?: typeof mockData;
+    loading?: boolean;
+  }) {
+    const { bone, data: resolved } = createBones(data, { loading });
+    return (
+      <span data-testid="target" {...bone("text")}>
+        {resolved?.name}
+      </span>
+    );
+  }
+
+  test("shows skeleton when loading is true, even with data", () => {
+    const { getByTestId } = render(
+      <TestLoading data={mockData} loading={true} />,
+    );
+    const el = getByTestId("target");
+    expect(el.getAttribute("data-bone")).toBe("text");
+    expect(el.getAttribute("aria-busy")).toBe("true");
+    expect(el.textContent).toBe("");
+  });
+
+  test("shows data when loading is false", () => {
+    const { getByTestId } = render(
+      <TestLoading data={mockData} loading={false} />,
+    );
+    const el = getByTestId("target");
+    expect(el.getAttribute("data-bone")).toBeNull();
+    expect(el.textContent).toBe("Pikachu");
+  });
+
+  test("shows data when loading is undefined", () => {
+    const { getByTestId } = render(<TestLoading data={mockData} />);
+    const el = getByTestId("target");
+    expect(el.getAttribute("data-bone")).toBeNull();
+    expect(el.textContent).toBe("Pikachu");
+  });
+
+  test("shows skeleton when loading is true and data is undefined", () => {
+    const { getByTestId } = render(<TestLoading loading={true} />);
+    const el = getByTestId("target");
+    expect(el.getAttribute("data-bone")).toBe("text");
+    expect(el.textContent).toBe("");
+  });
+});
+
 describe("createBones with promises", () => {
   function TestPromise({ promise }: { promise: Promise<typeof mockData> }) {
     const { bone, data } = createBones(promise);

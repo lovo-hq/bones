@@ -98,17 +98,28 @@ function buildTextStyle(options?: BoneOptions): Record<string, unknown> | undefi
 
 export const forceBones = Object.freeze({}) as unknown as Promise<never>;
 
+export interface CreateBonesOptions {
+  loading?: boolean;
+}
+
 export interface CreateBonesReturn<T> {
   bone: (type: BoneType, options?: BoneOptions) => BoneProps;
   data: T | null | undefined;
   repeat: <U>(arr: U[] | undefined | null, count: number) => (U | undefined)[];
 }
 
-export function createBones<T>(data: T | Promise<T> | undefined | null): CreateBonesReturn<T> {
+export function createBones<T>(
+  data: T | Promise<T> | undefined | null,
+  options?: CreateBonesOptions,
+): CreateBonesReturn<T> {
   let resolved: T | undefined | null;
   let isLoading = false;
 
-  if (data != null && (data as unknown) === forceBones) {
+  if (options?.loading) {
+    // Explicit loading flag — show skeletons regardless of data state.
+    isLoading = true;
+    resolved = undefined;
+  } else if (data != null && (data as unknown) === forceBones) {
     // Explicit force — show skeletons regardless.
     isLoading = true;
     resolved = undefined;
