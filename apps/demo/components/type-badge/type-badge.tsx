@@ -4,6 +4,7 @@ import styles from "./styles.module.css";
 export function TypeBadge({
   type,
   className,
+  children,
   ...props
 }: { type?: string } & ComponentProps<"span">) {
   return (
@@ -11,7 +12,7 @@ export function TypeBadge({
       className={`${styles.badge}${type ? ` ${styles[type]}` : ""}${className ? ` ${className}` : ""}`}
       {...props}
     >
-      {type}
+      {children ?? type}
     </span>
   );
 }
