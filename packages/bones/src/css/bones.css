@@ -59,7 +59,6 @@
 
 [data-bone="text"][style*="--bone-contained"] {
   min-width: unset;
-  min-height: unset;
   display: inline-flex;
   align-items: center;
 }
