@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Settings2, X } from "lucide-react";
 import { DEMO_DELAYS, type DelayKey } from "@/lib/demo-delays";
 import styles from "./styles.module.css";
 
@@ -104,7 +105,7 @@ export function BonesDevTool() {
         onClick={() => setOpen(true)}
         aria-label="Open Bones DevTool"
       >
-        🦴
+        <Settings2 size={20} />
       </button>
     );
   }
@@ -113,7 +114,7 @@ export function BonesDevTool() {
     <div ref={panelRef} className={styles.panel}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <span className={styles.titleIcon}>🦴</span>
+          <Settings2 size={16} className={styles.titleIcon} />
           <span className={styles.titleText}>BONES</span>
           <span className={styles.titleBadge}>DevTool</span>
         </div>
@@ -123,7 +124,7 @@ export function BonesDevTool() {
           onClick={() => setOpen(false)}
           aria-label="Close DevTool"
         >
-          ✕
+          <X size={14} />
         </button>
       </div>
 
