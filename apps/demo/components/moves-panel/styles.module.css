@@ -1,0 +1,106 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gamePills {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 0.2rem 0.625rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  font-size: 0.625rem;
+  color: var(--label-color);
+  cursor: pointer;
+  text-transform: capitalize;
+  font-family: inherit;
+}
+
+.pillActive {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.methodTabs {
+  display: flex;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.methodTab {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--label-color);
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.methodTabActive {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.6875rem;
+}
+
+.table th {
+  padding: 0.375rem 0.5rem;
+  color: var(--label-color);
+  font-weight: 500;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.thLeft {
+  text-align: left;
+}
+
+.thRight {
+  text-align: right;
+}
+
+.table td {
+  padding: 0.375rem 0.5rem;
+  border-bottom: 1px solid var(--stat-track);
+}
+
+.tdMuted {
+  color: var(--label-color);
+  text-transform: capitalize;
+}
+
+.tdName {
+  color: var(--fg);
+  text-transform: capitalize;
+}
+
+.tdRight {
+  text-align: right;
+  color: var(--value-color);
+}
+
+.moveType {
+  font-size: 0.5625rem;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+}
+
+.empty {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-style: italic;
+  padding: 1rem 0;
+}
