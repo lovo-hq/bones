@@ -6,10 +6,25 @@ description: The core function that powers skeleton loading states.
 ```ts
 import { createBones } from "bones";
 
-const { bone, data, repeat } = createBones(dataOrPromise);
+const { bone, data, repeat } = createBones(dataOrPromise, options?);
 ```
 
-`createBones` accepts data that may be a resolved value, a `Promise`, `null`, `undefined`, or the `forceBones` sentinel. It returns three things:
+`createBones` accepts data that may be a resolved value, a `Promise`, `null`, `undefined`, or the `forceBones` sentinel. An optional second argument controls behavior.
+
+## Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `loading` | `boolean` | — | When `true`, forces skeleton mode regardless of the data state. Useful for client-side data fetching with hooks that expose an `isLoading` flag. |
+
+```tsx
+const { data, isLoading } = useSWR("/api/user", fetcher);
+const { bone, data: user } = createBones(data, { loading: isLoading });
+```
+
+## Return value
+
+`createBones` returns three things:
 
 ## `bone(type, options?)`
 
@@ -67,8 +82,13 @@ const { bone, data, repeat } = createBones(pokemon);
 
 ```ts
 function createBones<T>(
-  data: T | Promise<T> | undefined | null
+  data: T | Promise<T> | undefined | null,
+  options?: CreateBonesOptions,
 ): CreateBonesReturn<T>;
+
+interface CreateBonesOptions {
+  loading?: boolean;
+}
 
 interface CreateBonesReturn<T> {
   bone: (type: BoneType, options?: BoneOptions) => Record<string, unknown>;

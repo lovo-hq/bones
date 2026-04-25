@@ -58,6 +58,30 @@ function SkeletonDemo() {
 }
 ```
 
+## Client-side data fetching
+
+When using hooks like React Query, SWR, or `useState` + `useEffect`, pass the `loading` option to control skeleton state:
+
+```tsx
+import { createBones } from "bones";
+import useSWR from "swr";
+
+function UserCard() {
+  const { data, isLoading } = useSWR("/api/user", fetcher);
+  const { bone, data: user } = createBones(data, { loading: isLoading });
+
+  return (
+    <div>
+      <img src={user?.avatar} width={64} height={64} {...bone("block")} />
+      <h2 {...bone("text", { length: 12 })}>{user?.name}</h2>
+      <p {...bone("text", { lines: 2 })}>{user?.bio}</p>
+    </div>
+  );
+}
+```
+
+The component renders skeletons while `isLoading` is `true`, then shows content once data arrives — no Suspense boundary required.
+
 ## Multi-line text
 
 Use the `lines` option for paragraphs and descriptions:
