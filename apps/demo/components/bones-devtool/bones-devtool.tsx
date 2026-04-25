@@ -23,6 +23,7 @@ const ANIMATION_OPTIONS = ["shimmer", "pulse", "none"] as const;
 export function BonesDevTool() {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const [open, setOpen] = useState(false);
   const [force, setForce] = useState(false);
   const [animate, setAnimate] = useState<string>("shimmer");
@@ -82,7 +83,8 @@ export function BonesDevTool() {
     const next = { ...delays, [key]: value };
     setDelays(next);
     setCookie("bones-delays", JSON.stringify(next));
-    router.refresh();
+    clearTimeout(refreshTimeoutRef.current);
+    refreshTimeoutRef.current = setTimeout(() => router.refresh(), 300);
   }
 
   function resetDelays() {
