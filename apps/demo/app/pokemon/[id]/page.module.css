@@ -16,19 +16,31 @@
   text-decoration: underline;
 }
 
-.sectionHeader {
-  margin-bottom: 1.5rem;
+.bentoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
 }
 
-.sectionDesc {
-  color: var(--muted);
-  font-size: 0.925rem;
-  max-width: 600px;
+.bentoRow1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
 }
 
-.sectionDesc code {
-  background: var(--border);
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-  font-size: 0.85em;
+.bentoRow2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .bentoRow1 {
+    grid-template-columns: 1fr;
+  }
+
+  .bentoRow2 {
+    grid-template-columns: 1fr;
+  }
 }
