@@ -252,6 +252,38 @@ export function BonesDevTool() {
         )}
       </div>
 
+      <div className={styles.divider} />
+
+      {/* Compare Bones */}
+      {comparing ? (
+        <div className={styles.compareSection}>
+          <div className={styles.compareHeader}>
+            <span className={styles.compareLabel}>Comparing</span>
+            <span className={styles.compareBadge}>esc to close</span>
+          </div>
+          <div className={styles.compareSlider}>
+            <span className={styles.compareEndLabel}>Loaded</span>
+            <input
+              type="range"
+              className={styles.slider}
+              min={0}
+              max={1}
+              step={0.01}
+              value={compareOpacity}
+              onChange={(e) => setCompareOpacity(Number(e.target.value))}
+            />
+            <span className={styles.compareEndLabel}>Bones</span>
+          </div>
+          <button type="button" className={styles.stopButton} onClick={stopCompare}>
+            Stop Comparing
+          </button>
+        </div>
+      ) : (
+        <button type="button" className={styles.compareButton} onClick={startCompare}>
+          Compare Bones
+        </button>
+      )}
+
       <div className={styles.footer}>Changes trigger a soft refresh</div>
     </div>
   );
