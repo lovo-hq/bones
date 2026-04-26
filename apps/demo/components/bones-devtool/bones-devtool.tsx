@@ -42,6 +42,8 @@ export function BonesDevTool() {
   const [comparing, setComparing] = useState(false);
   const [compareOpacity, setCompareOpacity] = useState(0.5);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const magnifierRef = useRef<HTMLDivElement | null>(null);
+  const magnifierIframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Sync state from cookies on mount
   useEffect(() => {
@@ -116,6 +118,66 @@ export function BonesDevTool() {
       iframeRef.current.style.opacity = String(compareOpacity);
     }
   }, [compareOpacity]);
+
+  // Magnifier: zoomed skeleton view that follows the cursor
+  useEffect(() => {
+    if (!comparing) return;
+
+    const DIAMETER = 200;
+    const RADIUS = DIAMETER / 2;
+    const ZOOM = 2;
+
+    const compareUrl = new URL(window.location.href);
+    compareUrl.pathname = `/compare${compareUrl.pathname}`;
+
+    // Magnifier container
+    const mag = document.createElement("div");
+    mag.style.cssText = `
+      position:fixed;width:${DIAMETER}px;height:${DIAMETER}px;border-radius:50%;
+      overflow:hidden;pointer-events:none;z-index:9999;border:3px solid oklch(100% 0 0 / 0.6);
+      box-shadow:0 4px 24px oklch(0% 0 0 / 0.4);display:none;
+    `;
+
+    // Inner iframe scaled 2x
+    const inner = document.createElement("iframe");
+    inner.src = compareUrl.toString();
+    inner.style.cssText = `
+      position:absolute;border:none;pointer-events:none;
+      width:${100 / ZOOM}vw;height:${100 / ZOOM}vh;
+      transform:scale(${ZOOM});transform-origin:top left;
+    `;
+    mag.appendChild(inner);
+    document.body.appendChild(mag);
+    magnifierRef.current = mag;
+    magnifierIframeRef.current = inner;
+
+    function onMouseMove(e: MouseEvent) {
+      mag.style.display = "block";
+      mag.style.left = `${e.clientX - RADIUS}px`;
+      mag.style.top = `${e.clientY - RADIUS}px`;
+
+      // Offset the inner iframe so the cursor point maps to the magnifier center
+      const scrollY = window.scrollY;
+      const offsetX = -(e.clientX * ZOOM - RADIUS);
+      const offsetY = -((e.clientY + scrollY) * ZOOM - RADIUS);
+      inner.style.left = `${offsetX}px`;
+      inner.style.top = `${offsetY}px`;
+    }
+
+    function onMouseLeave() {
+      mag.style.display = "none";
+    }
+
+    window.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseleave", onMouseLeave);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseleave", onMouseLeave);
+      mag.remove();
+      magnifierRef.current = null;
+      magnifierIframeRef.current = null;
+    };
+  }, [comparing]);
 
   // Handle iframe load failure
   useEffect(() => {
