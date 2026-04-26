@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { BonesForce } from "bones";
 import { BonesDevTool } from "@/components/bones-devtool/bones-devtool";
 import "bones/css";
@@ -12,14 +12,15 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
-  const forceSkeletons = cookieStore.get("bones-force")?.value === "1";
+  const headerStore = await headers();
   const animate = cookieStore.get("bones-animate")?.value ?? "shimmer";
+  const isCompareFrame = headerStore.get("x-bones-compare") === "1";
 
   return (
     <html lang="en">
       <body data-bone-animate={animate}>
-        {forceSkeletons ? <BonesForce>{children}</BonesForce> : children}
-        <BonesDevTool />
+        {isCompareFrame ? <BonesForce>{children}</BonesForce> : children}
+        {!isCompareFrame && <BonesDevTool />}
       </body>
     </html>
   );
