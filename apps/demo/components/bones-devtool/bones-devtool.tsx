@@ -142,6 +142,7 @@ export function BonesDevTool() {
       overflow:hidden;pointer-events:none;z-index:10000;
       border:3px solid oklch(100% 0 0 / 0.6);
       box-shadow:0 4px 24px oklch(0% 0 0 / 0.4);display:none;
+      background:var(--bg, #fff);
     `;
 
     // Inner wrapper — holds both layers, scaled 2x
@@ -182,6 +183,12 @@ export function BonesDevTool() {
     magnifierIframeRef.current = skeletonIframe;
 
     function onMouseMove(e: MouseEvent) {
+      // Hide magnifier when cursor is over the devtool panel
+      if (panelRef.current?.contains(e.target as Node)) {
+        mag.style.display = "none";
+        return;
+      }
+
       mag.style.display = "block";
       mag.style.left = `${e.clientX - RADIUS}px`;
       mag.style.top = `${e.clientY - RADIUS}px`;
