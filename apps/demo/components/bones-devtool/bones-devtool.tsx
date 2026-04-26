@@ -239,7 +239,7 @@ export function BonesDevTool() {
               <div className={styles.delayMeta}>
                 <span className={styles.delayName}>{config.label}</span>
                 <span className={styles.delayValue} data-zero={delays[key] === 0}>
-                  {delays[key]}ms
+                  {(delays[key] / 1000).toFixed(1)}s
                 </span>
               </div>
               <input
