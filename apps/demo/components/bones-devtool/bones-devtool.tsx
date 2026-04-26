@@ -69,39 +69,23 @@ export function BonesDevTool() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  // Sync scroll position to compare iframe
+  // Sync scroll position to compare iframe by offsetting the iframe itself.
+  // We shift the iframe up by the scroll amount and make it tall enough to
+  // cover the viewport from that offset. This avoids cross-frame scrollTo
+  // issues and works regardless of iframe content height.
   useEffect(() => {
     if (!comparing || !iframeRef.current) return;
     const iframe = iframeRef.current;
-    let ready = false;
-    let cancelled = false;
 
     function syncScroll() {
-      if (iframe.contentWindow) {
-        iframe.contentWindow.scrollTo(window.scrollX, window.scrollY);
-      }
+      const y = window.scrollY;
+      iframe.style.top = `-${y}px`;
+      iframe.style.height = `calc(100vh + ${y}px)`;
     }
 
-    iframe.addEventListener("load", () => {
-      ready = true;
-      // Retry scroll sync several times to account for hydration/layout shifts
-      const delays = [0, 100, 300, 600, 1000];
-      for (const ms of delays) {
-        setTimeout(() => {
-          if (!cancelled) syncScroll();
-        }, ms);
-      }
-    });
-
-    function onScroll() {
-      if (ready) syncScroll();
-    }
-
-    window.addEventListener("scroll", onScroll);
-    return () => {
-      cancelled = true;
-      window.removeEventListener("scroll", onScroll);
-    };
+    syncScroll();
+    window.addEventListener("scroll", syncScroll);
+    return () => window.removeEventListener("scroll", syncScroll);
   }, [comparing]);
 
   // Escape key closes compare mode
@@ -175,7 +159,7 @@ export function BonesDevTool() {
     const iframe = document.createElement("iframe");
     iframe.src = url.toString();
     iframe.style.cssText =
-      "position:fixed;inset:0;width:100%;height:100%;border:none;pointer-events:none;z-index:9998;";
+      "position:fixed;top:0;left:0;width:100%;height:100vh;border:none;pointer-events:none;z-index:9998;";
     iframe.style.opacity = String(compareOpacity);
     document.body.appendChild(iframe);
     iframeRef.current = iframe;
