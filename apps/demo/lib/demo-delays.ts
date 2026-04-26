@@ -12,12 +12,7 @@ export const DEMO_DELAYS = {
 
 export type DelayKey = keyof typeof DEMO_DELAYS;
 
-export function getDelays(cookieValue?: string, isCompare?: boolean): Record<DelayKey, number> {
-  if (isCompare) {
-    return Object.fromEntries(
-      Object.keys(DEMO_DELAYS).map((k) => [k, Infinity]),
-    ) as Record<DelayKey, number>;
-  }
+export function getDelays(cookieValue?: string): Record<DelayKey, number> {
   const defaults = Object.fromEntries(
     Object.entries(DEMO_DELAYS).map(([k, v]) => [k, v.default]),
   ) as Record<DelayKey, number>;

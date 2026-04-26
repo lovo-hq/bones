@@ -23,7 +23,7 @@ const ANIMATION_OPTIONS = ["shimmer", "pulse", "none"] as const;
 
 export function BonesDevTool() {
   // Don't render inside the compare iframe
-  if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("bones-compare") === "1") {
+  if (typeof window !== "undefined" && window.location.pathname.startsWith("/compare")) {
     return null;
   }
 
@@ -170,7 +170,7 @@ export function BonesDevTool() {
 
   function startCompare() {
     const url = new URL(window.location.href);
-    url.searchParams.set("bones-compare", "1");
+    url.pathname = `/compare${url.pathname}`;
 
     const iframe = document.createElement("iframe");
     iframe.src = url.toString();

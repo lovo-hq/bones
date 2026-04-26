@@ -101,18 +101,10 @@ async function TabsSectionData({
   );
 }
 
-export default async function PokemonPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function PokemonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const sp = await searchParams;
-  const isCompare = sp["bones-compare"] === "1";
   const cookieStore = await cookies();
-  const delays = getDelays(cookieStore.get("bones-delays")?.value, isCompare);
+  const delays = getDelays(cookieStore.get("bones-delays")?.value);
 
   // Independent fetches — each powers a different Suspense boundary
   const pokemonPromise = delay(fetchPokemon(id), delays.pokemon);
