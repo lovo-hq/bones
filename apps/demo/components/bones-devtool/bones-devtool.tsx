@@ -26,7 +26,6 @@ export function BonesDevTool() {
   const panelRef = useRef<HTMLDivElement>(null);
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const [open, setOpen] = useState(false);
-  const [force, setForce] = useState(false);
   const [animate, setAnimate] = useState<string>("shimmer");
   const [delays, setDelays] = useState<Record<DelayKey, number>>(
     () =>
@@ -35,10 +34,12 @@ export function BonesDevTool() {
         number
       >,
   );
+  const [comparing, setComparing] = useState(false);
+  const [compareOpacity, setCompareOpacity] = useState(0.5);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Sync state from cookies on mount
   useEffect(() => {
-    setForce(getCookie("bones-force") === "1");
     setAnimate(getCookie("bones-animate") ?? "shimmer");
     const raw = getCookie("bones-delays");
     if (raw) {
@@ -63,16 +64,66 @@ export function BonesDevTool() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  function toggleForce() {
-    const next = !force;
-    setForce(next);
-    if (next) {
-      setCookie("bones-force", "1");
-    } else {
-      removeCookie("bones-force");
+  // Sync scroll position to compare iframe
+  useEffect(() => {
+    if (!comparing || !iframeRef.current) return;
+    const iframe = iframeRef.current;
+    let ready = false;
+
+    iframe.addEventListener("load", () => {
+      ready = true;
+    });
+
+    function onScroll() {
+      if (ready && iframe.contentWindow) {
+        iframe.contentWindow.scrollTo(window.scrollX, window.scrollY);
+      }
     }
-    router.refresh();
-  }
+
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [comparing]);
+
+  // Escape key closes compare mode
+  useEffect(() => {
+    if (!comparing) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        stopCompare();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [comparing]);
+
+  // Tear down compare on navigation
+  useEffect(() => {
+    if (!comparing) return;
+    function onPopState() {
+      stopCompare();
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [comparing]);
+
+  // Sync opacity slider value to iframe
+  useEffect(() => {
+    if (iframeRef.current) {
+      iframeRef.current.style.opacity = String(compareOpacity);
+    }
+  }, [compareOpacity]);
+
+  // Handle iframe load failure
+  useEffect(() => {
+    if (!comparing || !iframeRef.current) return;
+    const iframe = iframeRef.current;
+    function onError() {
+      console.warn("[BonesDevTool] Compare iframe failed to load");
+      stopCompare();
+    }
+    iframe.addEventListener("error", onError);
+    return () => iframe.removeEventListener("error", onError);
+  }, [comparing]);
 
   function changeAnimate(value: string) {
     setAnimate(value);
@@ -97,6 +148,28 @@ export function BonesDevTool() {
     router.refresh();
   }
 
+  function startCompare() {
+    const url = new URL(window.location.href);
+    url.searchParams.set("bones-compare", "1");
+
+    const iframe = document.createElement("iframe");
+    iframe.src = url.toString();
+    iframe.style.cssText =
+      "position:fixed;inset:0;width:100%;height:100%;border:none;pointer-events:none;z-index:9998;";
+    iframe.style.opacity = String(compareOpacity);
+    document.body.appendChild(iframe);
+    iframeRef.current = iframe;
+    setComparing(true);
+  }
+
+  function stopCompare() {
+    if (iframeRef.current) {
+      iframeRef.current.remove();
+      iframeRef.current = null;
+    }
+    setComparing(false);
+  }
+
   if (!open) {
     return (
       <button
@@ -114,9 +187,7 @@ export function BonesDevTool() {
     <div ref={panelRef} className={styles.panel}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <Settings2 size={16} className={styles.titleIcon} />
-          <span className={styles.titleText}>BONES</span>
-          <span className={styles.titleBadge}>DevTool</span>
+          <span className={styles.titleText}>Bones DevTool</span>
         </div>
         <button
           type="button"
@@ -125,23 +196,6 @@ export function BonesDevTool() {
           aria-label="Close DevTool"
         >
           <X size={14} />
-        </button>
-      </div>
-
-      {/* Force Skeletons */}
-      <div className={styles.toggleRow}>
-        <div>
-          <div className={styles.toggleLabel}>Force Skeletons</div>
-          <div className={styles.toggleHint}>Override all components</div>
-        </div>
-        <button
-          type="button"
-          className={styles.toggle}
-          data-on={force}
-          onClick={toggleForce}
-          aria-label="Toggle force skeletons"
-        >
-          <span className={styles.toggleKnob} />
         </button>
       </div>
 
