@@ -112,14 +112,19 @@ export function BonesDevTool() {
     return () => window.removeEventListener("popstate", onPopState);
   }, [comparing]);
 
-  // Sync opacity slider value to iframe
+  // Sync opacity slider value to both the overlay iframe and magnifier skeleton layer
   useEffect(() => {
     if (iframeRef.current) {
       iframeRef.current.style.opacity = String(compareOpacity);
     }
+    if (magnifierIframeRef.current) {
+      magnifierIframeRef.current.style.opacity = String(compareOpacity);
+    }
   }, [compareOpacity]);
 
-  // Magnifier: zoomed skeleton view that follows the cursor
+  // Magnifier: zoomed view of the current screen that follows the cursor.
+  // Clones the page content once and layers a compare iframe on top at
+  // the current opacity, both scaled 2x inside a circular clip.
   useEffect(() => {
     if (!comparing) return;
 
@@ -130,38 +135,62 @@ export function BonesDevTool() {
     const compareUrl = new URL(window.location.href);
     compareUrl.pathname = `/compare${compareUrl.pathname}`;
 
-    // Magnifier container
+    // Magnifier container (the circular lens)
     const mag = document.createElement("div");
     mag.style.cssText = `
       position:fixed;width:${DIAMETER}px;height:${DIAMETER}px;border-radius:50%;
-      overflow:hidden;pointer-events:none;z-index:9999;border:3px solid oklch(100% 0 0 / 0.6);
+      overflow:hidden;pointer-events:none;z-index:10000;
+      border:3px solid oklch(100% 0 0 / 0.6);
       box-shadow:0 4px 24px oklch(0% 0 0 / 0.4);display:none;
     `;
 
-    // Inner iframe scaled 2x
-    const inner = document.createElement("iframe");
-    inner.src = compareUrl.toString();
-    inner.style.cssText = `
-      position:absolute;border:none;pointer-events:none;
-      width:${100 / ZOOM}vw;height:${100 / ZOOM}vh;
-      transform:scale(${ZOOM});transform-origin:top left;
+    // Inner wrapper — holds both layers, scaled 2x
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = `position:absolute;top:0;left:0;transform-origin:top left;`;
+
+    // Layer 1: snapshot of the loaded page
+    const pageClone = document.createElement("div");
+    pageClone.style.cssText = `position:absolute;top:0;left:0;width:100vw;`;
+    // Copy body attributes so CSS selectors (data-bone-animate, etc.) match
+    for (const attr of document.body.attributes) {
+      pageClone.setAttribute(attr.name, attr.value);
+    }
+    // Clone body children, excluding devtool and overlay iframe
+    for (const child of document.body.children) {
+      const el = child as HTMLElement;
+      if (el === iframeRef.current || el === mag) continue;
+      if (el.tagName === "IFRAME") continue;
+      if (panelRef.current && el.contains(panelRef.current)) continue;
+      if (el.classList?.contains(styles.fab)) continue;
+      if (el.classList?.contains(styles.panel)) continue;
+      pageClone.appendChild(child.cloneNode(true));
+    }
+    wrapper.appendChild(pageClone);
+
+    // Layer 2: skeleton overlay (compare iframe at current opacity)
+    const skeletonIframe = document.createElement("iframe");
+    skeletonIframe.src = compareUrl.toString();
+    skeletonIframe.style.cssText = `
+      position:absolute;top:0;left:0;width:100vw;height:100vh;
+      border:none;pointer-events:none;opacity:${compareOpacity};
     `;
-    mag.appendChild(inner);
+    wrapper.appendChild(skeletonIframe);
+
+    mag.appendChild(wrapper);
     document.body.appendChild(mag);
     magnifierRef.current = mag;
-    magnifierIframeRef.current = inner;
+    magnifierIframeRef.current = skeletonIframe;
 
     function onMouseMove(e: MouseEvent) {
       mag.style.display = "block";
       mag.style.left = `${e.clientX - RADIUS}px`;
       mag.style.top = `${e.clientY - RADIUS}px`;
 
-      // Offset the inner iframe so the cursor point maps to the magnifier center
+      // Offset the wrapper so the cursor position maps to the magnifier center
       const scrollY = window.scrollY;
-      const offsetX = -(e.clientX * ZOOM - RADIUS);
-      const offsetY = -((e.clientY + scrollY) * ZOOM - RADIUS);
-      inner.style.left = `${offsetX}px`;
-      inner.style.top = `${offsetY}px`;
+      const x = -(e.clientX * ZOOM - RADIUS);
+      const y = -((e.clientY + scrollY) * ZOOM - RADIUS);
+      wrapper.style.transform = `scale(${ZOOM}) translate(${x / ZOOM}px, ${y / ZOOM}px)`;
     }
 
     function onMouseLeave() {
