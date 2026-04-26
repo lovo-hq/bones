@@ -121,6 +121,11 @@
   margin: 12px 0;
 }
 
+.delaysScroll {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 .delaysHeader {
   display: flex;
   align-items: center;

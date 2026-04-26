@@ -224,7 +224,7 @@ export function BonesDevTool() {
       <div className={styles.divider} />
 
       {/* Delays */}
-      <div>
+      <div className={styles.delaysScroll}>
         <div className={styles.delaysHeader}>
           <div className={styles.sectionLabel} style={{ marginBottom: 0 }}>
             Delays
