@@ -1,7 +1,7 @@
 import { Bones } from "bones";
 import Link from "next/link";
 import { Suspense } from "react";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { delay } from "@/lib/delay";
 import { getDelays } from "@/lib/demo-delays";
 import {
@@ -101,11 +101,17 @@ async function TabsSectionData({
   );
 }
 
-export default async function PokemonPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PokemonPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { id } = await params;
+  const sp = await searchParams;
+  const isCompare = sp["bones-compare"] === "1";
   const cookieStore = await cookies();
-  const headerStore = await headers();
-  const isCompare = headerStore.get("x-bones-compare") === "1";
   const delays = getDelays(cookieStore.get("bones-delays")?.value, isCompare);
 
   // Independent fetches — each powers a different Suspense boundary

@@ -22,6 +22,11 @@ function removeCookie(name: string) {
 const ANIMATION_OPTIONS = ["shimmer", "pulse", "none"] as const;
 
 export function BonesDevTool() {
+  // Don't render inside the compare iframe
+  if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("bones-compare") === "1") {
+    return null;
+  }
+
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -69,23 +74,34 @@ export function BonesDevTool() {
     if (!comparing || !iframeRef.current) return;
     const iframe = iframeRef.current;
     let ready = false;
+    let cancelled = false;
 
-    iframe.addEventListener("load", () => {
-      ready = true;
-      // Sync initial scroll position when iframe finishes loading
+    function syncScroll() {
       if (iframe.contentWindow) {
-        iframe.contentWindow.scrollTo(window.scrollX, window.scrollY);
-      }
-    });
-
-    function onScroll() {
-      if (ready && iframe.contentWindow) {
         iframe.contentWindow.scrollTo(window.scrollX, window.scrollY);
       }
     }
 
+    iframe.addEventListener("load", () => {
+      ready = true;
+      // Retry scroll sync several times to account for hydration/layout shifts
+      const delays = [0, 100, 300, 600, 1000];
+      for (const ms of delays) {
+        setTimeout(() => {
+          if (!cancelled) syncScroll();
+        }, ms);
+      }
+    });
+
+    function onScroll() {
+      if (ready) syncScroll();
+    }
+
     window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [comparing]);
 
   // Escape key closes compare mode
