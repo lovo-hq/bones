@@ -182,22 +182,44 @@ export function BonesDevTool() {
     magnifierRef.current = mag;
     magnifierIframeRef.current = skeletonIframe;
 
-    function onMouseMove(e: MouseEvent) {
-      // Hide magnifier when cursor is over the devtool panel
-      if (panelRef.current?.contains(e.target as Node)) {
+    let zHeld = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    function updateMagnifier() {
+      if (!zHeld || panelRef.current?.contains(document.elementFromPoint(lastX, lastY) as Node)) {
         mag.style.display = "none";
         return;
       }
 
       mag.style.display = "block";
-      mag.style.left = `${e.clientX - RADIUS}px`;
-      mag.style.top = `${e.clientY - RADIUS}px`;
+      mag.style.left = `${lastX - RADIUS}px`;
+      mag.style.top = `${lastY - RADIUS}px`;
 
-      // Offset the wrapper so the cursor position maps to the magnifier center
       const scrollY = window.scrollY;
-      const x = -(e.clientX * ZOOM - RADIUS);
-      const y = -((e.clientY + scrollY) * ZOOM - RADIUS);
+      const x = -(lastX * ZOOM - RADIUS);
+      const y = -((lastY + scrollY) * ZOOM - RADIUS);
       wrapper.style.transform = `scale(${ZOOM}) translate(${x / ZOOM}px, ${y / ZOOM}px)`;
+    }
+
+    function onMouseMove(e: MouseEvent) {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      updateMagnifier();
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "z" || e.key === "Z") {
+        zHeld = true;
+        updateMagnifier();
+      }
+    }
+
+    function onKeyUp(e: KeyboardEvent) {
+      if (e.key === "z" || e.key === "Z") {
+        zHeld = false;
+        mag.style.display = "none";
+      }
     }
 
     function onMouseLeave() {
@@ -205,9 +227,13 @@ export function BonesDevTool() {
     }
 
     window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
     document.addEventListener("mouseleave", onMouseLeave);
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
       document.removeEventListener("mouseleave", onMouseLeave);
       mag.remove();
       magnifierRef.current = null;
@@ -361,7 +387,10 @@ export function BonesDevTool() {
         <div className={styles.compareSection}>
           <div className={styles.compareHeader}>
             <span className={styles.compareLabel}>Comparing</span>
-            <span className={styles.compareBadge}>esc to close</span>
+            <div className={styles.compareBadges}>
+              <span className={styles.compareBadge}>Z to magnify</span>
+              <span className={styles.compareBadge}>esc to close</span>
+            </div>
           </div>
           <div className={styles.compareSlider}>
             <span className={styles.compareEndLabel}>Loaded</span>
