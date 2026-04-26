@@ -72,6 +72,10 @@ export function BonesDevTool() {
 
     iframe.addEventListener("load", () => {
       ready = true;
+      // Sync initial scroll position when iframe finishes loading
+      if (iframe.contentWindow) {
+        iframe.contentWindow.scrollTo(window.scrollX, window.scrollY);
+      }
     });
 
     function onScroll() {

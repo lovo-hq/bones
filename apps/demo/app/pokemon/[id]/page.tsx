@@ -1,7 +1,7 @@
 import { Bones } from "bones";
 import Link from "next/link";
 import { Suspense } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { delay } from "@/lib/delay";
 import { getDelays } from "@/lib/demo-delays";
 import {
@@ -77,17 +77,19 @@ async function TabsSectionData({
   pokemonPromise,
   speciesPromise,
   encountersPromise,
+  movesDelay,
 }: {
   pokemonPromise: Promise<PokemonData>;
   speciesPromise: Promise<SpeciesData>;
   encountersPromise: Promise<EncounterLocation[]>;
+  movesDelay: number;
 }) {
   const [pokemon, species, encounters] = await Promise.all([
     pokemonPromise,
     speciesPromise,
     encountersPromise,
   ]);
-  const moveDetails = await fetchMoveDetails(pokemon.moves.map((m) => m.url));
+  const moveDetails = await delay(fetchMoveDetails(pokemon.moves.map((m) => m.url)), movesDelay);
 
   return (
     <TabsSection
@@ -102,7 +104,9 @@ async function TabsSectionData({
 export default async function PokemonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const cookieStore = await cookies();
-  const delays = getDelays(cookieStore.get("bones-delays")?.value);
+  const headerStore = await headers();
+  const isCompare = headerStore.get("x-bones-compare") === "1";
+  const delays = getDelays(cookieStore.get("bones-delays")?.value, isCompare);
 
   // Independent fetches — each powers a different Suspense boundary
   const pokemonPromise = delay(fetchPokemon(id), delays.pokemon);
@@ -117,10 +121,14 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
 
   // Derived promises for InfoCard rows
   const trainingPromise = Promise.all([pokemonPromise, speciesPromise]).then(([p, s]) =>
-    trainingRows(p, s),
+    delay(Promise.resolve(trainingRows(p, s)), delays.training),
   );
-  const breedingPromise = speciesPromise.then((s) => breedingRows(s));
-  const pokedexPromise = speciesPromise.then((s) => pokedexRows(s));
+  const breedingPromise = speciesPromise.then((s) =>
+    delay(Promise.resolve(breedingRows(s)), delays.breeding),
+  );
+  const pokedexPromise = speciesPromise.then((s) =>
+    delay(Promise.resolve(pokedexRows(s)), delays.pokedex),
+  );
 
   return (
     <main>
@@ -166,6 +174,7 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
           pokemonPromise={pokemonPromise}
           speciesPromise={speciesPromise}
           encountersPromise={encountersPromise}
+          movesDelay={delays.moves}
         />
       </Suspense>
     </main>
