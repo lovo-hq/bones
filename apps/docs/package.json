@@ -14,7 +14,9 @@
     "bones": "workspace:*",
     "fumadocs-core": "latest",
     "fumadocs-mdx": "latest",
+    "fumadocs-mermaid": "^1.3.1",
     "fumadocs-ui": "latest",
+    "mermaid": "^11.14.0",
     "next": "^16.2.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
