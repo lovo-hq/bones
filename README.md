@@ -48,7 +48,7 @@ flowchart TD
 
     F -- "'pending'" --> THROW["Throw promise\n(Suspense catches it)"]
     F -- "'fulfilled'" --> RETURN["Return resolved value"]
-    F -- "'rejected'" --> ERR["Throw error"]
+    F -- "'rejected'" --> ERR["Throw error\n(caught by Error Boundary)"]
 
     THROW --> FALLBACK
 
