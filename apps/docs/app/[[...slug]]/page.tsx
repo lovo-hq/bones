@@ -1,12 +1,8 @@
 import { source } from "@/lib/source";
-import {
-  DocsPage,
-  DocsBody,
-  DocsTitle,
-  DocsDescription,
-} from "fumadocs-ui/layouts/docs/page";
+import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page";
 import { notFound } from "next/navigation";
 import defaultMdxComponents from "fumadocs-ui/mdx";
+import { Mermaid } from "fumadocs-mermaid/ui";
 
 interface Props {
   params: Promise<{ slug?: string[] }>;
@@ -25,7 +21,7 @@ export default async function Page({ params }: Props) {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={defaultMdxComponents} />
+        <MDX components={{ ...defaultMdxComponents, Mermaid }} />
       </DocsBody>
     </DocsPage>
   );
