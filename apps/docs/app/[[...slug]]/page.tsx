@@ -1,7 +1,20 @@
 import { source } from "@/lib/source";
-import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page";
+import {
+  DocsPage,
+  DocsBody,
+  DocsTitle,
+  DocsDescription,
+} from "fumadocs-ui/layouts/docs/page";
 import { notFound } from "next/navigation";
 import defaultMdxComponents from "fumadocs-ui/mdx";
+import { Preview } from "@/components/preview";
+import { DemoUserCard } from "@/components/demo/user-card";
+
+const customMdxComponents = {
+  ...defaultMdxComponents,
+  Preview,
+  DemoUserCard,
+};
 
 interface Props {
   params: Promise<{ slug?: string[] }>;
@@ -20,7 +33,7 @@ export default async function Page({ params }: Props) {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={defaultMdxComponents} />
+        <MDX components={customMdxComponents} />
       </DocsBody>
     </DocsPage>
   );
