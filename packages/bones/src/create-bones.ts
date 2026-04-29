@@ -1,4 +1,4 @@
-import { cache, type ReactNode } from "react";
+import { cache, createElement, type ReactNode } from "react";
 
 // ---------------------------------------------------------------------------
 // Server-safe loading context via React.cache
@@ -147,7 +147,7 @@ export interface CreateBonesReturn<T> {
     (count: number, render: (item: undefined, index: number) => ReactNode): ReactNode[];
     <U>(arr: U[] | undefined | null, count: number, render: (item: U | undefined, index: number) => ReactNode): ReactNode[];
   };
-  lines: <V>(value: V | null | undefined, count: number, render: (item: V | undefined, index: number) => ReactNode) => ReactNode[];
+  lines: <V>(value: V | null | undefined, count: number, render: (item: V | ReactNode) => ReactNode) => ReactNode[];
 }
 
 export function createBones(options: CreateBonesOptions): CreateBonesReturn<never>;
@@ -255,13 +255,20 @@ export function createBones<T>(
   function lines<V>(
     value: V | null | undefined,
     count: number,
-    render: (item: V | undefined, index: number) => ReactNode,
+    render: (item: V | ReactNode) => ReactNode,
   ): ReactNode[] {
     if (isLoading) {
-      return Array.from({ length: count }, (_, i) => render(undefined, i));
+      const spans = Array.from({ length: count }, (_, i) =>
+        createElement("span", {
+          key: i,
+          ...bone("text"),
+          style: { display: "block", width: i === count - 1 ? "61%" : undefined },
+        }),
+      );
+      return [render(spans)];
     }
     if (value == null) return [];
-    return [render(value, 0)];
+    return [render(value)];
   }
 
   return { bone, data: isLoading ? undefined : (resolved as T), repeat, lines };
