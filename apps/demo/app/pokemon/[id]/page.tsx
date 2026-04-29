@@ -1,6 +1,5 @@
 import { Bones } from "bones";
 import Link from "next/link";
-import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { delay } from "@/lib/delay";
 import { getDelays } from "@/lib/demo-delays";
@@ -12,7 +11,8 @@ import {
   fetchEncounters,
   fetchMoveDetails,
 } from "@/lib/pokeapi";
-import type { PokemonData, SpeciesData, EncounterLocation } from "@/lib/pokeapi";
+import type { PokemonData, SpeciesData } from "@/lib/pokeapi";
+
 import { PokemonHero } from "@/components/pokemon-hero/pokemon-hero";
 import { BaseStatsCard } from "@/components/base-stats-card/base-stats-card";
 import { TypeDefenseCard } from "@/components/type-defense-card/type-defense-card";
@@ -73,34 +73,6 @@ function pokedexRows(species: SpeciesData) {
   ];
 }
 
-async function TabsSectionData({
-  pokemonPromise,
-  speciesPromise,
-  encountersPromise,
-  movesDelay,
-}: {
-  pokemonPromise: Promise<PokemonData>;
-  speciesPromise: Promise<SpeciesData>;
-  encountersPromise: Promise<EncounterLocation[]>;
-  movesDelay: number;
-}) {
-  const [pokemon, species, encounters] = await Promise.all([
-    pokemonPromise,
-    speciesPromise,
-    encountersPromise,
-  ]);
-  const moveDetails = await delay(fetchMoveDetails(pokemon.moves.map((m) => m.url)), movesDelay);
-
-  return (
-    <TabsSection
-      moves={pokemon.moves}
-      moveDetails={moveDetails}
-      flavorTextEntries={species.flavorTextEntries}
-      encounters={encounters}
-    />
-  );
-}
-
 export default async function PokemonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const cookieStore = await cookies();
@@ -116,6 +88,13 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
     delay(fetchEvolutionChain(s.evolutionChainUrl), delays.evolution),
   );
   const encountersPromise = delay(fetchEncounters(id), delays.encounters);
+
+  // Derived promises for TabsSection
+  const movesPromise = pokemonPromise.then((p) => p.moves);
+  const moveDetailsPromise = pokemonPromise.then((p) =>
+    delay(fetchMoveDetails(p.moves.map((m) => m.url)), delays.moves),
+  );
+  const flavorTextPromise = speciesPromise.then((s) => s.flavorTextEntries);
 
   // Derived promises for InfoCard rows
   const trainingPromise = Promise.all([pokemonPromise, speciesPromise]).then(([p, s]) =>
@@ -152,13 +131,13 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
 
         <div className={styles.bentoRow2}>
           <Bones>
-            <InfoCard title="Training" rows={trainingPromise} />
+            <InfoCard title="Training" labels={["EV Yield", "Catch Rate", "Base Exp", "Growth"]} rows={trainingPromise} />
           </Bones>
           <Bones>
-            <InfoCard title="Breeding" rows={breedingPromise} />
+            <InfoCard title="Breeding" labels={["Egg Groups", "Gender", "Egg Cycles", "Friendship"]} rows={breedingPromise} />
           </Bones>
           <Bones>
-            <InfoCard title="Pokedex Data" rows={pokedexPromise} />
+            <InfoCard title="Pokedex Data" labels={["Species", "Generation", "Habitat", "Shape"]} rows={pokedexPromise} />
           </Bones>
         </div>
 
@@ -167,14 +146,12 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
         </Bones>
       </div>
 
-      <Suspense>
-        <TabsSectionData
-          pokemonPromise={pokemonPromise}
-          speciesPromise={speciesPromise}
-          encountersPromise={encountersPromise}
-          movesDelay={delays.moves}
-        />
-      </Suspense>
+      <TabsSection
+        moves={movesPromise}
+        moveDetails={moveDetailsPromise}
+        flavorTextEntries={flavorTextPromise}
+        encounters={encountersPromise}
+      />
     </main>
   );
 }
