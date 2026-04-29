@@ -1,4 +1,4 @@
-import { cache, createElement, type ReactNode } from "react";
+import { cache, cloneElement, createElement, isValidElement, type ReactNode } from "react";
 
 // ---------------------------------------------------------------------------
 // Server-safe loading context via React.cache
@@ -33,6 +33,10 @@ export function minMax(min: number, max: number): MinMax {
 
 export function isMinMax(value: unknown): value is MinMax {
   return typeof value === "object" && value !== null && MIN_MAX_BRAND in value;
+}
+
+function withKey(node: ReactNode, key: string | number): ReactNode {
+  return isValidElement(node) ? cloneElement(node, { key }) : node;
 }
 
 export interface BoneOptions {
@@ -265,10 +269,10 @@ export function createBones<T>(
           ...bone("text"),
         }),
       );
-      return [render(spans)];
+      return [withKey(render(spans), 0)];
     }
     if (value == null) return [];
-    return [render(value)];
+    return [withKey(render(value), 0)];
   }
 
   return { bone, data: isLoading ? undefined : (resolved as T), repeat, lines };
