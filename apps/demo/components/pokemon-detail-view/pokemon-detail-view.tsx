@@ -1,4 +1,4 @@
-import { createBones } from "bones";
+import { createBones, minMax } from "bones";
 import type { PokemonDetail } from "@/lib/pokeapi";
 import { StatBar } from "@/components/stat-bar/stat-bar";
 import { TypeBadge } from "@/components/type-badge/type-badge";
@@ -9,7 +9,7 @@ export function PokemonDetailView({
 }: {
   pokemon?: PokemonDetail | Promise<PokemonDetail>;
 }) {
-  const { bone, data, repeat } = createBones(pokemon);
+  const { bone, data, repeat, lines } = createBones(pokemon);
 
   return (
     <div className={styles.detail}>
@@ -44,9 +44,9 @@ export function PokemonDetailView({
 
       <section className={styles.detailSection}>
         <h2>Description</h2>
-        <p className={styles.detailDescription} {...bone("text", { lines: 3 })}>
-          {data?.description}
-        </p>
+        {lines(data?.description, 3, (item, i) => (
+          <p key={i} className={styles.detailDescription} {...bone("text", { length: minMax(20, 35) })}>{item}</p>
+        ))}
       </section>
 
       <section className={styles.detailSection}>

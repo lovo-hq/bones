@@ -44,7 +44,7 @@ export function PokemonHero({
         <p className={styles.meta} {...specBone("text")}>
           {spec && poke && `${spec.genus} · ${poke.height / 10} m · ${poke.weight / 10} kg`}
         </p>
-        <p className={styles.description} {...specBone("text", { lines: 1 })}>
+        <p className={styles.description} {...specBone("text")}>
           {spec?.description}
         </p>
       </div>

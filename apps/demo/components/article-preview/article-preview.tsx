@@ -1,4 +1,4 @@
-import { createBones } from "bones";
+import { createBones, minMax } from "bones";
 import styles from "./styles.module.css";
 
 interface Article {
@@ -9,16 +9,16 @@ interface Article {
 }
 
 export function ArticlePreview({ article }: { article?: Article | Promise<Article> }) {
-  const { bone, data } = createBones(article);
+  const { bone, data, lines } = createBones(article);
 
   return (
     <div className={styles.articlePreview}>
       <h3 className={styles.articleTitle} {...bone("text", { length: 24 })}>
         {data?.title}
       </h3>
-      <p className={styles.articleExcerpt} {...bone("text", { lines: 4 })}>
-        {data?.excerpt}
-      </p>
+      {lines(data?.excerpt, 4, (item, i) => (
+        <p key={i} className={styles.articleExcerpt} {...bone("text", { length: minMax(20, 35) })}>{item}</p>
+      ))}
       <div className={styles.articleMeta}>
         <span {...bone("text", { length: 12 })}>{data?.author}</span>
         <span className={styles.articleDot}>&middot;</span>
