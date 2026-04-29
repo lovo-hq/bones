@@ -261,8 +261,8 @@ export function createBones<T>(
       const spans = Array.from({ length: count }, (_, i) =>
         createElement("span", {
           key: i,
+          "data-bone-line": true,
           ...bone("text"),
-          style: { display: "block", width: i === count - 1 ? "61%" : undefined },
         }),
       );
       return [render(spans)];

@@ -19,6 +19,14 @@
   min-height: 1lh;
 }
 
+[data-bone-line] {
+  display: block;
+}
+
+[data-bone-line]:last-child {
+  width: 61%;
+}
+
 [data-bone="text"]::before {
   content: "\200b";
 }
