@@ -5,6 +5,7 @@ import type {
   PokeAPIEvolutionChainResponse,
   PokeAPITypeResponse,
   PokeAPIMoveResponse,
+  PokeAPIMachineResponse,
   PokeAPIEncounterResponse,
   EvolutionChainLink,
 } from "./pokeapi-types";
@@ -365,8 +366,50 @@ export async function fetchMoveDetails(moveUrls: string[]): Promise<Record<strin
     }),
   );
 
+  // Collect all unique machine URLs across all moves
+  const machineUrlMap = new Map<string, string[]>(); // machineUrl -> [moveName+versionGroup, ...]
+  for (const move of moves) {
+    for (const entry of move.machines) {
+      const key = `${move.name}::${entry.version_group.name}`;
+      const existing = machineUrlMap.get(entry.machine.url);
+      if (existing) {
+        existing.push(key);
+      } else {
+        machineUrlMap.set(entry.machine.url, [key]);
+      }
+    }
+  }
+
+  // Batch-fetch machine details to get TM/HM item names
+  const machineEntries = [...machineUrlMap.entries()];
+  const machineResponses = await Promise.all(
+    machineEntries.map(async ([url]) => {
+      const res = await fetch(url);
+      const data: PokeAPIMachineResponse = await res.json();
+      return data;
+    }),
+  );
+
+  // Build move+versionGroup -> item name lookup
+  const machineLookup = new Map<string, string>();
+  for (let i = 0; i < machineEntries.length; i++) {
+    const keys = machineEntries[i][1];
+    const itemName = machineResponses[i].item.name.toUpperCase();
+    for (const key of keys) {
+      machineLookup.set(key, itemName);
+    }
+  }
+
   const result: Record<string, MoveDetail> = {};
   for (const move of moves) {
+    const machineNumbers: Record<string, string> = {};
+    for (const entry of move.machines) {
+      const label = machineLookup.get(`${move.name}::${entry.version_group.name}`);
+      if (label) {
+        machineNumbers[entry.version_group.name] = label;
+      }
+    }
+
     result[move.name] = {
       name: move.name,
       type: move.type.name,
@@ -374,6 +417,7 @@ export async function fetchMoveDetails(moveUrls: string[]): Promise<Record<strin
       accuracy: move.accuracy,
       pp: move.pp,
       damageClass: move.damage_class.name,
+      machineNumbers,
     };
   }
 

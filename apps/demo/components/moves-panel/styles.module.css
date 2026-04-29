@@ -77,6 +77,10 @@
   border-bottom: 1px solid var(--stat-track);
 }
 
+.table tr:last-child td {
+  border-bottom: none;
+}
+
 .tdMuted {
   color: var(--label-color);
   text-transform: capitalize;

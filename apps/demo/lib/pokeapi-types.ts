@@ -105,6 +105,15 @@ export interface PokeAPIMoveResponse {
   accuracy: number | null;
   pp: number | null;
   damage_class: { name: string; url: string };
+  machines: {
+    machine: { url: string };
+    version_group: { name: string };
+  }[];
+}
+
+export interface PokeAPIMachineResponse {
+  id: number;
+  item: { name: string };
 }
 
 export interface PokeAPIEncounterResponse {
@@ -206,6 +215,7 @@ export interface MoveDetail {
   accuracy: number | null;
   pp: number | null;
   damageClass: string;
+  machineNumbers: Record<string, string>;
 }
 
 export interface EncounterLocation {
