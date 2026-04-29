@@ -119,19 +119,19 @@ A count-only signature is also available when there is no array data to pass thr
 
 ## `lines(value, count, render)`
 
-Like `repeat`, but for scalar values instead of arrays. Renders `count` skeleton elements during loading, or a single element with the resolved value when loaded.
+Renders multi-line paragraph skeletons during loading, or the real content when loaded. The render callback provides the wrapper element — `lines` handles the skeleton content internally.
 
 ```tsx
-const { bone, data, lines } = createBones(species);
+const { data, lines } = createBones(species);
 
-{lines(data?.description, 4, (item, i) => (
-  <p key={i} {...bone("text", { length: minMax(20, 35) })}>{item}</p>
+{lines(data?.description, 4, (item) => (
+  <p className={styles.description}>{item}</p>
 ))}
 ```
 
-During loading, `lines` calls the render callback `count` times with `(undefined, index)` — producing multiple skeleton lines with individual shimmer animations. When data is resolved, it calls the render callback once with the actual value, returning a single-element array.
+During loading, `item` is an array of skeleton `<span>` elements — full-width lines with a shorter last line (61%). The render callback wraps them in your element, producing a single paragraph with skeleton lines inside. Each line has its own `::after` pseudo-element with proper shimmer animation.
 
-This is the recommended approach for multi-line text skeletons, as each line is a real element with its own `::after` pseudo-element, ensuring consistent shimmer animation on every line.
+When data is resolved, `item` is the real value (e.g. a string). The render callback wraps it the same way, producing a single paragraph with real text. No `bone()` call needed in the callback.
 
 ## Type signature
 
@@ -169,6 +169,6 @@ interface CreateBonesReturn<T> {
     (count: number, render: (item: undefined, index: number) => ReactNode): ReactNode[];
     <U>(arr: U[] | undefined | null, count: number, render: (item: U | undefined, index: number) => ReactNode): ReactNode[];
   };
-  lines: <V>(value: V | null | undefined, count: number, render: (item: V | undefined, index: number) => ReactNode) => ReactNode[];
+  lines: <V>(value: V | null | undefined, count: number, render: (item: V | ReactNode) => ReactNode) => ReactNode[];
 }
 ```
