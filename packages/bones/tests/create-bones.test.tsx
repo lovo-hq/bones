@@ -69,9 +69,9 @@ function TestRepeat({ data }: { data?: typeof mockListData | Promise<typeof mock
   const { bone, data: resolved, repeat } = createBones(data);
   return (
     <div data-testid="target">
-      {repeat(resolved?.types, 2).map((type, i) => (
-        <span key={type ?? i} {...bone("text")}>
-          {type}
+      {repeat(resolved?.types, 2, (item, i) => (
+        <span key={item ?? i} {...bone("text")}>
+          {item}
         </span>
       ))}
     </div>
@@ -228,13 +228,7 @@ describe("createBones", () => {
 });
 
 describe("createBones with loading option", () => {
-  function TestLoading({
-    data,
-    loading,
-  }: {
-    data?: typeof mockData;
-    loading?: boolean;
-  }) {
+  function TestLoading({ data, loading }: { data?: typeof mockData; loading?: boolean }) {
     const { bone, data: resolved } = createBones(data, { loading });
     return (
       <span data-testid="target" {...bone("text")}>
@@ -244,9 +238,7 @@ describe("createBones with loading option", () => {
   }
 
   test("shows skeleton when loading is true, even with data", () => {
-    const { getByTestId } = render(
-      <TestLoading data={mockData} loading={true} />,
-    );
+    const { getByTestId } = render(<TestLoading data={mockData} loading={true} />);
     const el = getByTestId("target");
     expect(el.getAttribute("data-bone")).toBe("text");
     expect(el.getAttribute("aria-busy")).toBe("true");
@@ -254,9 +246,7 @@ describe("createBones with loading option", () => {
   });
 
   test("shows data when loading is false", () => {
-    const { getByTestId } = render(
-      <TestLoading data={mockData} loading={false} />,
-    );
+    const { getByTestId } = render(<TestLoading data={mockData} loading={false} />);
     const el = getByTestId("target");
     expect(el.getAttribute("data-bone")).toBeNull();
     expect(el.textContent).toBe("Pikachu");

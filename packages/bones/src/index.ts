@@ -1,3 +1,9 @@
-export { createBones, readPromise, forceBones } from "./create-bones.ts";
+export { createBones, readPromise, forceBones, minMax, isMinMax } from "./create-bones.ts";
 export { Bones, BonesForce } from "./bones.ts";
-export type { BoneType, BoneOptions, CreateBonesOptions, CreateBonesReturn } from "./create-bones.ts";
+export type {
+  BoneType,
+  BoneOptions,
+  MinMax,
+  CreateBonesOptions,
+  CreateBonesReturn,
+} from "./create-bones.ts";
