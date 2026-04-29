@@ -4,11 +4,7 @@ import type { PokemonListItem } from "@/lib/pokeapi";
 import { TypeBadge } from "@/components/type-badge/type-badge";
 import styles from "./styles.module.css";
 
-export function PokemonCard({
-  pokemon,
-}: {
-  pokemon?: PokemonListItem | Promise<PokemonListItem>;
-}) {
+export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem | Promise<PokemonListItem> }) {
   const { bone, data, repeat } = createBones(pokemon);
 
   const card = (
@@ -25,10 +21,10 @@ export function PokemonCard({
         {data?.name}
       </h3>
       <div className={styles.cardTypes}>
-        {repeat(data?.types, 2).map((type, i) => (
+        {repeat(data?.types, 2, (item, i) => (
           <TypeBadge
-            key={type ?? i}
-            type={type}
+            key={item ?? i}
+            type={item}
             {...bone("text", { contained: true, length: 7 })}
           />
         ))}

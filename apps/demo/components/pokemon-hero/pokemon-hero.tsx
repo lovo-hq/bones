@@ -33,10 +33,10 @@ export function PokemonHero({
           </span>
         </h1>
         <div className={styles.types}>
-          {repeat(poke?.types, 2).map((type, i) => (
+          {repeat(poke?.types, 2, (item, i) => (
             <TypeBadge
-              key={type ?? i}
-              type={type}
+              key={item ?? i}
+              type={item}
               {...pokeBone("text", { contained: true, length: 7 })}
             />
           ))}
@@ -44,7 +44,7 @@ export function PokemonHero({
         <p className={styles.meta} {...specBone("text")}>
           {spec && poke && `${spec.genus} · ${poke.height / 10} m · ${poke.weight / 10} kg`}
         </p>
-        <p className={styles.description} {...specBone("text", { lines: 2 })}>
+        <p className={styles.description} {...specBone("text", { lines: 1 })}>
           {spec?.description}
         </p>
       </div>

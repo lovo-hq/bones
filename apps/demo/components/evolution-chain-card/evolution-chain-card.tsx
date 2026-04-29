@@ -9,50 +9,40 @@ export function EvolutionChainCard({
   chain?: EvolutionChain | Promise<EvolutionChain>;
   currentName?: string;
 }) {
-  const { bone, data } = createBones(chain);
+  const { bone, data, repeat } = createBones(chain);
 
   return (
     <div className={styles.card}>
       <div className={styles.label}>Evolution Chain</div>
-      {data ? (
-        <div className={styles.chains}>
-          {data.stages.map((branch, bi) => (
-            <div key={bi} className={styles.branch}>
-              {branch.map((stage, si) => (
-                <div key={stage.name} className={styles.stageGroup}>
-                  {si > 0 && stage.trigger && (
-                    <div className={styles.arrow}>
-                      <span>→</span>
-                      <span className={styles.trigger}>{stage.trigger}</span>
-                    </div>
-                  )}
-                  <div
-                    className={styles.stage}
-                    data-current={stage.name === currentName ? "true" : undefined}
-                  >
-                    <img
-                      className={styles.sprite}
-                      src={stage.spriteUrl}
-                      alt={stage.name}
-                      width={52}
-                      height={52}
-                    />
-                    <span className={styles.stageName}>{stage.name}</span>
+      <div className={styles.chains}>
+        {repeat(data?.stages, 1, (branch, bi) => (
+          <div key={bi} className={styles.branch}>
+            {repeat(branch, 3, (item, si) => (
+              <div key={item?.name ?? si} className={styles.stageGroup}>
+                {si > 0 && (
+                  <div className={styles.arrow}>
+                    <span>→</span>
+                    <span className={styles.trigger} {...bone("text")}>
+                      {item?.trigger}
+                    </span>
                   </div>
+                )}
+                <div
+                  className={styles.stage}
+                  data-current={item?.name === currentName ? "true" : undefined}
+                >
+                  <div className={styles.sprite} {...bone("block")}>
+                    {item && <img src={item.spriteUrl} alt={item.name} width={52} height={52} />}
+                  </div>
+                  <span className={styles.stageName} {...bone("text", { length: 6 })}>
+                    {item?.name}
+                  </span>
                 </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className={styles.skeletonRow}>
-          <div className={styles.skeletonCircle} {...bone("block")} />
-          <span className={styles.skeletonArrow}>→</span>
-          <div className={styles.skeletonCircle} {...bone("block")} />
-          <span className={styles.skeletonArrow}>→</span>
-          <div className={styles.skeletonCircle} {...bone("block")} />
-        </div>
-      )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

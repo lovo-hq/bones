@@ -27,8 +27,8 @@ export function PokemonDetailView({
             {data?.name}
           </h1>
           <div className={styles.detailTypes}>
-            {repeat(data?.types, 2).map((type, i) => (
-              <TypeBadge key={type ?? i} type={type} style={{ width: 56 }} {...bone("text")} />
+            {repeat(data?.types, 2, (item, i) => (
+              <TypeBadge key={item ?? i} type={item} style={{ width: 56 }} {...bone("text")} />
             ))}
           </div>
           <div className={styles.detailMeta}>
@@ -52,8 +52,8 @@ export function PokemonDetailView({
       <section className={styles.detailSection}>
         <h2>Base Stats</h2>
         <div className={styles.stats}>
-          {repeat(data?.stats, 6).map((stat, i) => (
-            <StatBar key={stat?.name ?? i} stat={stat} />
+          {repeat(data?.stats, 6, (item, i) => (
+            <StatBar key={item?.name ?? i} stat={item} />
           ))}
         </div>
       </section>

@@ -12,8 +12,8 @@ export function PokemonGrid({
 
   return (
     <div className={styles.grid}>
-      {repeat(data, 12).map((poke, i) => (
-        <PokemonCard key={poke?.id ?? i} pokemon={poke} />
+      {repeat(data, 12, (item, i) => (
+        <PokemonCard key={item?.id ?? i} pokemon={item} />
       ))}
     </div>
   );
