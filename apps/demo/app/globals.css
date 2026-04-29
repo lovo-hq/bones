@@ -34,10 +34,10 @@
     --accent: oklch(62.7% 0.194 149.214);
 
     --card-border: oklch(22.6% 0 0);
-    --label-color: oklch(39.1% 0 0);
+    --label-color: oklch(52% 0 0);
     --value-color: oklch(73% 0 0);
     --stat-fill: oklch(94.5% 0 0);
-    --stat-track: oklch(15.2% 0 0);
+    --stat-track: oklch(25% 0 0);
   }
 }
 

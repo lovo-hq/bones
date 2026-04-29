@@ -57,8 +57,32 @@ When the promise is pending, `<Bones>` renders the same `<ProfileCard>` tree wit
 
 ## Bone types
 
-| Type | Use for | Example |
-|------|---------|---------|
-| `"text"` | Headings, paragraphs, labels | `<h2 {...bone("text")}>` |
-| `"block"` | Images, avatars, thumbnails | `<img src={…} {...bone("block")} />` |
-| `"container"` | Cards, wrappers with complex children | `<div {...bone("container")}>` |
+| Type          | Use for                               | Example                              |
+| ------------- | ------------------------------------- | ------------------------------------ |
+| `"text"`      | Headings, paragraphs, labels          | `<h2 {...bone("text")}>`             |
+| `"block"`     | Images, avatars, thumbnails           | `<img src={…} {...bone("block")} />` |
+| `"container"` | Cards, wrappers with complex children | `<div {...bone("container")}>`       |
+
+## Previewing skeletons during development
+
+Use `forceBones` to see what a component's skeleton looks like without waiting for a real loading state:
+
+```tsx
+import { createBones, forceBones } from "bones";
+
+// Pass forceBones in place of any promise prop:
+<ProfileCard user={forceBones} />
+```
+
+To force an entire subtree into skeleton mode at once, wrap it with `<BonesForce>`:
+
+```tsx
+import { BonesForce } from "bones";
+
+<BonesForce>
+  <ProfileCard />
+  <PostList />
+</BonesForce>
+```
+
+Both approaches work without any Suspense boundaries or async data — just render and see the skeletons immediately. This is useful for tweaking styles, building out new components, or demoing loading states in Storybook.

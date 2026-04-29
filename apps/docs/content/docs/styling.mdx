@@ -7,23 +7,25 @@ Bones uses CSS custom properties for all visual aspects of skeletons. Override t
 
 ## CSS custom properties
 
-| Property | Default (light) | Default (dark) | Description |
-|----------|-----------------|----------------|-------------|
-| `--bone-base` | `#e0e0e0` | `#2a2a2a` | Skeleton background color |
-| `--bone-highlight` | `#f0f0f0` | `#3a3a3a` | Highlight color (for shimmer) |
-| `--bone-radius` | `4px` | `4px` | Border radius of skeleton bars |
-| `--bone-duration` | `1.5s` | `1.5s` | Animation duration |
+| Property           | Default (light) | Default (dark) | Description                    |
+| ------------------ | --------------- | -------------- | ------------------------------ |
+| `--bone-base`      | `#e0e0e0`       | `#2a2a2a`      | Skeleton background color      |
+| `--bone-highlight` | `#f0f0f0`       | `#3a3a3a`      | Highlight color (for shimmer)  |
+| `--bone-radius`    | `4px`           | `4px`          | Border radius of skeleton bars |
+| `--bone-duration`  | `1.5s`          | `1.5s`         | Animation duration             |
 
 ## Theming
 
 Override properties on any container to theme a section:
 
 ```tsx
-<div style={{
-  "--bone-base": "#f5e6d3",
-  "--bone-highlight": "#faf0e6",
-  "--bone-radius": "8px",
-}}>
+<div
+  style={{
+    "--bone-base": "#f5e6d3",
+    "--bone-highlight": "#faf0e6",
+    "--bone-radius": "8px",
+  }}
+>
   <UserCard user={forceBones} />
 </div>
 ```

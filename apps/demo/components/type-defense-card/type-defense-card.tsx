@@ -16,67 +16,40 @@ export function TypeDefenseCard({
 }) {
   const { bone, data } = createBones(typeDefense);
 
+  type PillItem = { type: string; text: string };
+  const groups: { label: string; items: (PillItem | undefined)[] }[] = data
+    ? [
+        { label: "Weak to", items: data.weakTo.map((w) => ({ type: w.type, text: `${w.type} ${formatMultiplier(w.multiplier)}` })) },
+        { label: "Resistant to", items: data.resistantTo.map((r) => ({ type: r.type, text: `${r.type} ${formatMultiplier(r.multiplier)}` })) },
+        { label: "Immune to", items: data.immuneTo.map((t) => ({ type: t, text: `${t} 0x` })) },
+        { label: "Neutral", items: data.neutral.map((t) => ({ type: t, text: t })) },
+      ].filter((g) => g.items.length > 0)
+    : [
+        { label: "Weak to", items: Array.from({ length: 3 }) },
+        { label: "Resistant to", items: Array.from({ length: 4 }) },
+        { label: "Neutral", items: Array.from({ length: 5 }) },
+      ];
+
   return (
     <div className={styles.card}>
       <div className={styles.label}>Type Defense</div>
-
-      {data ? (
-        <>
-          {data.weakTo.length > 0 && (
-            <div className={styles.group}>
-              <div className={styles.groupLabel}>Weak to</div>
-              <div className={styles.pills}>
-                {data.weakTo.map((w) => (
-                  <TypeBadge key={w.type} type={w.type} className={styles.pill}>
-                    {w.type} {formatMultiplier(w.multiplier)}
-                  </TypeBadge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {data.resistantTo.length > 0 && (
-            <div className={styles.group}>
-              <div className={styles.groupLabel}>Resistant to</div>
-              <div className={styles.pills}>
-                {data.resistantTo.map((r) => (
-                  <TypeBadge key={r.type} type={r.type} className={styles.pill}>
-                    {r.type} {formatMultiplier(r.multiplier)}
-                  </TypeBadge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {data.immuneTo.length > 0 && (
-            <div className={styles.group}>
-              <div className={styles.groupLabel}>Immune to</div>
-              <div className={styles.pills}>
-                {data.immuneTo.map((t) => (
-                  <TypeBadge key={t} type={t} className={styles.pill}>
-                    {t} 0x
-                  </TypeBadge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {data.neutral.length > 0 && (
-            <div className={styles.group}>
-              <div className={styles.groupLabel}>Neutral</div>
-              <div className={styles.pills}>
-                {data.neutral.map((t) => (
-                  <TypeBadge key={t} type={t} className={styles.pill} />
-                ))}
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <div className={styles.skeleton}>
-          <div {...bone("text", { lines: 3 })} />
+      {groups.map((group) => (
+        <div key={group.label} className={styles.group}>
+          <div className={styles.groupLabel}>{group.label}</div>
+          <div className={styles.pills}>
+            {group.items.map((item, i) => (
+              <TypeBadge
+                key={item?.type ?? i}
+                type={item?.type}
+                className={styles.pill}
+                {...bone("text", { contained: true, length: 7 })}
+              >
+                {item?.text}
+              </TypeBadge>
+            ))}
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }

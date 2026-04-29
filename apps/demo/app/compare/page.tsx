@@ -38,7 +38,7 @@ export default function CompareHomePage() {
         {/* ForcedSkeletonsDemo skeleton equivalent */}
         <DemoSection
           title="Forced Skeletons"
-          description="Wrap with BonesForce to force skeleton mode. Toggle to see the same loaded cards switch to skeletons — no provider needed."
+          description="Wrap with BonesForce to force skeleton mode. Toggle to see the same loaded cards switch to skeletons."
         >
           <SkeletonToggle skeleton={<PokemonGrid />}>
             <PokemonGrid />

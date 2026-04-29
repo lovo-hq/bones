@@ -8,11 +8,7 @@ interface Article {
   date: string;
 }
 
-export function ArticlePreview({
-  article,
-}: {
-  article?: Article | Promise<Article>;
-}) {
+export function ArticlePreview({ article }: { article?: Article | Promise<Article> }) {
   const { bone, data } = createBones(article);
 
   return (

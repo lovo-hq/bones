@@ -25,9 +25,7 @@ export function DetailTabs({ tabs }: { tabs: Tab[] }) {
           </button>
         ))}
       </div>
-      <div className={styles.tabContent}>
-        {tabs.find((t) => t.id === activeTab)?.content}
-      </div>
+      <div className={styles.tabContent}>{tabs.find((t) => t.id === activeTab)?.content}</div>
     </div>
   );
 }

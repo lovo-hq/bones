@@ -1,14 +1,14 @@
 :root {
-  --bone-base: #e0e0e0;
-  --bone-highlight: #f0f0f0;
+  --bone-base: rgba(0, 0, 0, 0.12);
+  --bone-highlight: rgba(0, 0, 0, 0.06);
   --bone-radius: 4px;
   --bone-duration: 1.5s;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bone-base: #2a2a2a;
-    --bone-highlight: #3a3a3a;
+    --bone-base: rgba(255, 255, 255, 0.12);
+    --bone-highlight: rgba(255, 255, 255, 0.06);
   }
 }
 
@@ -19,13 +19,16 @@
   min-height: 1lh;
 }
 
+[data-bone="text"]::before {
+  content: "\200b";
+}
+
 [data-bone="text"]::after {
   content: "";
   position: absolute;
   inset-inline: 0;
-  top: 50%;
+  top: calc((1lh + 1cap) / 2 - 1ex);
   height: 1ex;
-  transform: translateY(-50%);
   background-color: var(--bone-base);
   border-radius: var(--bone-radius);
   pointer-events: none;
@@ -40,7 +43,6 @@
 }
 
 [data-bone="text"][style*="--bone-lines"]::after {
-  top: calc(1lh / 2);
   box-shadow: var(--bone-shadows, none);
 }
 
@@ -49,9 +51,8 @@
   position: absolute;
   left: 0;
   width: 61%;
-  top: calc((var(--bone-lines) - 0.5) * 1lh);
+  top: calc((var(--bone-lines) - 1) * 1lh + (1lh + 1cap) / 2 - 1ex);
   height: 1ex;
-  transform: translateY(-50%);
   background-color: var(--bone-base);
   border-radius: var(--bone-radius);
   pointer-events: none;
@@ -61,6 +62,7 @@
   min-width: unset;
   display: inline-flex;
   align-items: center;
+  box-sizing: content-box;
 }
 
 [data-bone="text"][style*="--bone-contained"]::after {
@@ -121,36 +123,42 @@ video[data-bone="block"] {
   }
 }
 
-[data-bone-animate="shimmer"] [data-bone="text"]::after,
-[data-bone-animate="shimmer"] [data-bone="text"]::before,
-[data-bone-animate="shimmer"] [data-bone="block"],
-[data-bone-animate="shimmer"] [data-bone="container"]::before {
-  animation: bone-shimmer var(--bone-duration) ease-in-out infinite;
-  background: linear-gradient(
-    90deg,
-    var(--bone-base) 25%,
-    var(--bone-highlight) 50%,
-    var(--bone-base) 75%
-  );
-  background-size: 200% 100%;
+@scope ([data-bone-animate="shimmer"]) to ([data-bone-animate]:not([data-bone-animate="shimmer"])) {
+  [data-bone="text"]::after,
+  [data-bone="text"]::before,
+  [data-bone="block"],
+  [data-bone="container"]::before {
+    animation: bone-shimmer var(--bone-duration) ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      var(--bone-base) 25%,
+      var(--bone-highlight) 50%,
+      var(--bone-base) 75%
+    );
+    background-size: 200% 100%;
+  }
 }
 
-[data-bone-animate="pulse"] [data-bone="text"]::after,
-[data-bone-animate="pulse"] [data-bone="text"]::before,
-[data-bone-animate="pulse"] [data-bone="block"],
-[data-bone-animate="pulse"] [data-bone="container"]::before {
-  animation: bone-pulse var(--bone-duration) ease-in-out infinite;
-  background: var(--bone-base);
-  background-size: auto;
+@scope ([data-bone-animate="pulse"]) to ([data-bone-animate]:not([data-bone-animate="pulse"])) {
+  [data-bone="text"]::after,
+  [data-bone="text"]::before,
+  [data-bone="block"],
+  [data-bone="container"]::before {
+    animation: bone-pulse var(--bone-duration) ease-in-out infinite;
+    background: var(--bone-base);
+    background-size: auto;
+  }
 }
 
-[data-bone-animate="none"] [data-bone="text"]::after,
-[data-bone-animate="none"] [data-bone="text"]::before,
-[data-bone-animate="none"] [data-bone="block"],
-[data-bone-animate="none"] [data-bone="container"]::before {
-  animation: none;
-  background: var(--bone-base);
-  background-size: auto;
+@scope ([data-bone-animate="none"]) to ([data-bone-animate]:not([data-bone-animate="none"])) {
+  [data-bone="text"]::after,
+  [data-bone="text"]::before,
+  [data-bone="block"],
+  [data-bone="container"]::before {
+    animation: none;
+    background: var(--bone-base);
+    background-size: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

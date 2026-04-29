@@ -10,8 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Bones",
     default: "Bones — Skeleton Loaders for React",
   },
-  description:
-    "Primitives for inline skeleton loaders in React. Same component, both states.",
+  description: "Primitives for inline skeleton loaders in React. One component, both states.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -19,10 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
         <RootProvider>
-          <DocsLayout
-            tree={source.getPageTree()}
-            nav={{ title: "Bones" }}
-          >
+          <DocsLayout tree={source.getPageTree()} nav={{ title: "Bones" }}>
             {children}
           </DocsLayout>
         </RootProvider>

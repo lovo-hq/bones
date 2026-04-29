@@ -7,7 +7,7 @@ export function HeroSection() {
       <p className={styles.heroSubtitle}>
         Primitives for inline skeleton loaders in React.
         <br />
-        Same component, both states.
+        One component, both states.
       </p>
     </section>
   );

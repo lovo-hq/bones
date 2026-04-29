@@ -65,27 +65,12 @@
   margin-bottom: 0.25rem;
   display: block;
   margin-inline: auto;
+  overflow: hidden;
 }
 
 .stageName {
+  display: inline-block;
   font-size: 0.6875rem;
   color: var(--value-color);
   text-transform: capitalize;
-}
-
-.skeletonRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-}
-
-.skeletonCircle {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-}
-
-.skeletonArrow {
-  color: var(--label-color);
 }

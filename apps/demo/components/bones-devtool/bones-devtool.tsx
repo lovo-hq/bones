@@ -42,8 +42,6 @@ export function BonesDevTool() {
   const [comparing, setComparing] = useState(false);
   const [compareOpacity, setCompareOpacity] = useState(0.5);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const magnifierRef = useRef<HTMLDivElement | null>(null);
-  const magnifierIframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Sync state from cookies on mount
   useEffect(() => {
@@ -112,134 +110,12 @@ export function BonesDevTool() {
     return () => window.removeEventListener("popstate", onPopState);
   }, [comparing]);
 
-  // Sync opacity slider value to both the overlay iframe and magnifier skeleton layer
+  // Sync opacity slider value to the overlay iframe
   useEffect(() => {
     if (iframeRef.current) {
       iframeRef.current.style.opacity = String(compareOpacity);
     }
-    if (magnifierIframeRef.current) {
-      magnifierIframeRef.current.style.opacity = String(compareOpacity);
-    }
   }, [compareOpacity]);
-
-  // Magnifier: zoomed view of the current screen that follows the cursor.
-  // Clones the page content once and layers a compare iframe on top at
-  // the current opacity, both scaled 2x inside a circular clip.
-  useEffect(() => {
-    if (!comparing) return;
-
-    const DIAMETER = 200;
-    const RADIUS = DIAMETER / 2;
-    const ZOOM = 2;
-
-    const compareUrl = new URL(window.location.href);
-    compareUrl.pathname = `/compare${compareUrl.pathname}`;
-
-    // Magnifier container (the circular lens)
-    const mag = document.createElement("div");
-    mag.style.cssText = `
-      position:fixed;width:${DIAMETER}px;height:${DIAMETER}px;border-radius:50%;
-      overflow:hidden;pointer-events:none;z-index:10000;
-      border:3px solid oklch(100% 0 0 / 0.6);
-      box-shadow:0 4px 24px oklch(0% 0 0 / 0.4);display:none;
-      background:var(--bg, #fff);
-    `;
-
-    // Inner wrapper — holds both layers, scaled 2x
-    const wrapper = document.createElement("div");
-    wrapper.style.cssText = `position:absolute;top:0;left:0;transform-origin:top left;`;
-
-    // Layer 1: snapshot of the loaded page
-    const pageClone = document.createElement("div");
-    pageClone.style.cssText = `position:absolute;top:0;left:0;width:100vw;`;
-    // Copy body attributes so CSS selectors (data-bone-animate, etc.) match
-    for (const attr of document.body.attributes) {
-      pageClone.setAttribute(attr.name, attr.value);
-    }
-    // Clone body children, excluding devtool and overlay iframe
-    for (const child of document.body.children) {
-      const el = child as HTMLElement;
-      if (el === iframeRef.current || el === mag) continue;
-      if (el.tagName === "IFRAME") continue;
-      if (panelRef.current && el.contains(panelRef.current)) continue;
-      if (el.classList?.contains(styles.fab)) continue;
-      if (el.classList?.contains(styles.panel)) continue;
-      pageClone.appendChild(child.cloneNode(true));
-    }
-    wrapper.appendChild(pageClone);
-
-    // Layer 2: skeleton overlay (compare iframe at current opacity)
-    const skeletonIframe = document.createElement("iframe");
-    skeletonIframe.src = compareUrl.toString();
-    skeletonIframe.style.cssText = `
-      position:absolute;top:0;left:0;width:100vw;height:100vh;
-      border:none;pointer-events:none;opacity:${compareOpacity};
-    `;
-    wrapper.appendChild(skeletonIframe);
-
-    mag.appendChild(wrapper);
-    document.body.appendChild(mag);
-    magnifierRef.current = mag;
-    magnifierIframeRef.current = skeletonIframe;
-
-    let zHeld = false;
-    let lastX = 0;
-    let lastY = 0;
-
-    function updateMagnifier() {
-      if (!zHeld || panelRef.current?.contains(document.elementFromPoint(lastX, lastY) as Node)) {
-        mag.style.display = "none";
-        return;
-      }
-
-      mag.style.display = "block";
-      mag.style.left = `${lastX - RADIUS}px`;
-      mag.style.top = `${lastY - RADIUS}px`;
-
-      const scrollY = window.scrollY;
-      const x = -(lastX * ZOOM - RADIUS);
-      const y = -((lastY + scrollY) * ZOOM - RADIUS);
-      wrapper.style.transform = `scale(${ZOOM}) translate(${x / ZOOM}px, ${y / ZOOM}px)`;
-    }
-
-    function onMouseMove(e: MouseEvent) {
-      lastX = e.clientX;
-      lastY = e.clientY;
-      updateMagnifier();
-    }
-
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "z" || e.key === "Z") {
-        zHeld = true;
-        updateMagnifier();
-      }
-    }
-
-    function onKeyUp(e: KeyboardEvent) {
-      if (e.key === "z" || e.key === "Z") {
-        zHeld = false;
-        mag.style.display = "none";
-      }
-    }
-
-    function onMouseLeave() {
-      mag.style.display = "none";
-    }
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    document.addEventListener("mouseleave", onMouseLeave);
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-      document.removeEventListener("mouseleave", onMouseLeave);
-      mag.remove();
-      magnifierRef.current = null;
-      magnifierIframeRef.current = null;
-    };
-  }, [comparing]);
 
   // Handle iframe load failure
   useEffect(() => {
@@ -387,10 +263,7 @@ export function BonesDevTool() {
         <div className={styles.compareSection}>
           <div className={styles.compareHeader}>
             <span className={styles.compareLabel}>Comparing</span>
-            <div className={styles.compareBadges}>
-              <span className={styles.compareBadge}>Z to magnify</span>
-              <span className={styles.compareBadge}>esc to close</span>
-            </div>
+            <span className={styles.compareBadge}>esc to close</span>
           </div>
           <div className={styles.compareSlider}>
             <span className={styles.compareEndLabel}>Loaded</span>

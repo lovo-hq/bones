@@ -2,26 +2,32 @@ import { createBones } from "bones";
 import type { PokemonData } from "@/lib/pokeapi";
 import styles from "./styles.module.css";
 
-export function BaseStatsCard({
-  pokemon,
-}: {
-  pokemon?: PokemonData | Promise<PokemonData>;
-}) {
-  const { bone, data, repeat } = createBones(pokemon);
-  const stats = repeat(data?.stats, 6);
+const STAT_KEYS = ["hp", "attack", "defense", "special-attack", "special-defense", "speed"];
+
+const STAT_LABELS: Record<string, string> = {
+  hp: "HP",
+  attack: "Attack",
+  defense: "Defense",
+  "special-attack": "Sp. Attack",
+  "special-defense": "Sp. Defense",
+  speed: "Speed",
+};
+
+export function BaseStatsCard({ pokemon }: { pokemon?: PokemonData | Promise<PokemonData> }) {
+  const { bone, data } = createBones(pokemon);
   const total = data?.stats.reduce((sum, s) => sum + s.value, 0) ?? 0;
+  const statsByName = data ? Object.fromEntries(data.stats.map((s) => [s.name, s])) : null;
 
   return (
     <div className={styles.card}>
       <div className={styles.label}>Base Stats</div>
       <div className={styles.stats}>
-        {stats.map((stat, i) => {
+        {STAT_KEYS.map((key) => {
+          const stat = statsByName?.[key];
           const pct = stat ? (stat.value / 255) * 100 : 0;
           return (
-            <div key={stat?.name ?? i} className={styles.row}>
-              <span className={styles.name} {...bone("text")}>
-                {stat?.name}
-              </span>
+            <div key={key} className={styles.row}>
+              <span className={styles.name}>{STAT_LABELS[key]}</span>
               <div className={styles.track}>
                 <div
                   className={styles.fill}
@@ -29,7 +35,7 @@ export function BaseStatsCard({
                   {...bone("block")}
                 />
               </div>
-              <span className={styles.value} {...bone("text")}>
+              <span className={styles.value} {...bone("text", { length: 2 })}>
                 {stat && String(stat.value)}
               </span>
             </div>
@@ -38,7 +44,7 @@ export function BaseStatsCard({
       </div>
       <div className={styles.total}>
         <span>Total</span>
-        <span {...bone("text")}>{data && String(total)}</span>
+        <span {...bone("text", { length: 3 })}>{data && String(total)}</span>
       </div>
     </div>
   );
