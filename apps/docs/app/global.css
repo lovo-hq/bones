@@ -4,3 +4,9 @@
 @import "bones/css";
 
 @source "../node_modules/fumadocs-ui/dist/**/*.js";
+
+@media (max-width: 768px) {
+  .preview-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
