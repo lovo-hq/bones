@@ -46,26 +46,6 @@
   width: calc(var(--bone-length) * 1ch);
 }
 
-[data-bone="text"][style*="--bone-lines"] {
-  min-height: calc(var(--bone-lines) * 1lh);
-}
-
-[data-bone="text"][style*="--bone-lines"]::after {
-  box-shadow: var(--bone-shadows, none);
-}
-
-[data-bone="text"][style*="--bone-lines"]::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  width: 61%;
-  top: calc((var(--bone-lines) - 1) * 1lh + (1lh + 1cap) / 2 - 1ex);
-  height: 1ex;
-  background-color: var(--bone-base);
-  border-radius: var(--bone-radius);
-  pointer-events: none;
-}
-
 [data-bone="text"][style*="--bone-contained"] {
   min-width: unset;
   display: inline-flex;

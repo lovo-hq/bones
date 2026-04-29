@@ -51,11 +51,10 @@ Returns HTML attributes that turn an element into a skeleton when loading, or an
 
 These options only apply to `"text"` bones. They are ignored for `"block"` and `"container"` types.
 
-| Option      | Type      | Default | Description                                  |
-| ----------- | --------- | ------- | -------------------------------------------- |
-| `length`    | `number \| MinMax`  | —       | Width in `ch` units. Pass a `minMax(min, max)` value for variable-length skeletons. |
-| `lines`     | `number`  | —       | Number of lines for multi-line skeletons (CSS-only approach via box-shadow). For per-line shimmer animation, use the `lines()` or `repeat()` helpers instead. |
-| `contained` | `boolean` | `false` | Use inline-flex sizing instead of full-width |
+| Option      | Type               | Default | Description                                                                         |
+| ----------- | ------------------ | ------- | ----------------------------------------------------------------------------------- |
+| `length`    | `number \| MinMax` | —       | Width in `ch` units. Pass a `minMax(min, max)` value for variable-length skeletons. |
+| `contained` | `boolean`          | `false` | Use inline-flex sizing instead of full-width                                        |
 
 ### `minMax(min, max)`
 
@@ -66,21 +65,23 @@ import { createBones, minMax } from "bones";
 
 const { bone, data, repeat } = createBones(pokemon);
 
-{repeat(data?.moves, 6, (item, i) => (
-  <span key={item ?? i} {...bone("text", { length: minMax(4, 12), contained: true })}>
-    {item}
-  </span>
-))}
+{
+  repeat(data?.moves, 6, (item, i) => (
+    <span key={item ?? i} {...bone("text", { length: minMax(4, 12), contained: true })}>
+      {item}
+    </span>
+  ));
+}
 ```
 
-| Parameter | Type     | Description       |
-| --------- | -------- | ----------------- |
+| Parameter | Type     | Description                 |
+| --------- | -------- | --------------------------- |
 | `min`     | `number` | Minimum width in `ch` units |
 | `max`     | `number` | Maximum width in `ch` units |
 
 ### Bone types
 
-**`"text"`** — for text content like headings, paragraphs, and labels. Renders a bar at the text baseline. Respects `length`, `lines`, and `contained` options.
+**`"text"`** — for text content like headings, paragraphs, and labels. Renders a bar at the text baseline. Respects `length` and `contained` options. For multi-line text, use the `lines()` helper.
 
 **`"block"`** — for replaced elements like images and videos. Sets a solid background color and injects a transparent pixel as `src`.
 
@@ -102,9 +103,11 @@ Renders a list with skeleton placeholders during loading, or the real data when 
 ```tsx
 const { bone, data, repeat } = createBones(pokemon);
 
-{repeat(data?.types, 2, (item, i) => (
-  <TypeBadge key={item ?? i} type={item} {...bone("text", { contained: true, length: 7 })} />
-))}
+{
+  repeat(data?.types, 2, (item, i) => (
+    <TypeBadge key={item ?? i} type={item} {...bone("text", { contained: true, length: 7 })} />
+  ));
+}
 ```
 
 During loading, `repeat` calls the render callback `count` times with `(undefined, index)`. When data is resolved, it maps over the real array — the `count` argument is ignored.
@@ -112,9 +115,9 @@ During loading, `repeat` calls the render callback `count` times with `(undefine
 A count-only signature is also available when there is no array data to pass through:
 
 ```tsx
-{repeat(3, (_, i) => (
-  <div key={i} {...bone("text", { length: minMax(10, 20) })} />
-))}
+{
+  repeat(3, (_, i) => <div key={i} {...bone("text", { length: minMax(10, 20) })} />);
+}
 ```
 
 ## `lines(value, count, render)`
@@ -124,12 +127,12 @@ Renders multi-line paragraph skeletons during loading, or the real content when 
 ```tsx
 const { data, lines } = createBones(species);
 
-{lines(data?.description, 4, (item) => (
-  <p className={styles.description}>{item}</p>
-))}
+{
+  lines(data?.description, 4, (item) => <p className={styles.description}>{item}</p>);
+}
 ```
 
-During loading, `item` is an array of skeleton `<span>` elements — full-width lines with a shorter last line (61%). The render callback wraps them in your element, producing a single paragraph with skeleton lines inside. Each line has its own `::after` pseudo-element with proper shimmer animation.
+During loading, `item` is an array of skeleton `<span>` elements — full-width lines with a shorter last line. The render callback wraps them in your element, producing a single paragraph with skeleton lines inside. Each line has its own `::after` pseudo-element with proper shimmer animation.
 
 When data is resolved, `item` is the real value (e.g. a string). The render callback wraps it the same way, producing a single paragraph with real text. No `bone()` call needed in the callback.
 
@@ -155,7 +158,6 @@ interface CreateBonesOptions {
 
 interface BoneOptions {
   length?: number | MinMax;
-  lines?: number;
   contained?: boolean;
 }
 
@@ -167,8 +169,16 @@ interface CreateBonesReturn<T> {
   data: T | null | undefined;
   repeat: {
     (count: number, render: (item: undefined, index: number) => ReactNode): ReactNode[];
-    <U>(arr: U[] | undefined | null, count: number, render: (item: U | undefined, index: number) => ReactNode): ReactNode[];
+    <U>(
+      arr: U[] | undefined | null,
+      count: number,
+      render: (item: U | undefined, index: number) => ReactNode,
+    ): ReactNode[];
   };
-  lines: <V>(value: V | null | undefined, count: number, render: (item: V | ReactNode) => ReactNode) => ReactNode[];
+  lines: <V>(
+    value: V | null | undefined,
+    count: number,
+    render: (item: V | ReactNode) => ReactNode,
+  ) => ReactNode[];
 }
 ```

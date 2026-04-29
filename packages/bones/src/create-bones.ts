@@ -41,7 +41,6 @@ function withKey(node: ReactNode, key: string | number): ReactNode {
 
 export interface BoneOptions {
   length?: number | MinMax;
-  lines?: number;
   contained?: boolean;
 }
 
@@ -113,16 +112,6 @@ function buildTextStyle(
   if (resolvedLength) {
     style["--bone-length"] = resolvedLength;
   }
-  if (!options?.contained && options?.lines && options.lines > 1) {
-    style["--bone-lines"] = options.lines;
-    if (options.lines > 2) {
-      const shadows = [];
-      for (let i = 1; i < options.lines - 1; i++) {
-        shadows.push(`0 calc(1lh * ${i}) 0 0 var(--bone-base)`);
-      }
-      style["--bone-shadows"] = shadows.join(", ");
-    }
-  }
 
   return Object.keys(style).length > 0 ? style : undefined;
 }
@@ -149,9 +138,17 @@ export interface CreateBonesReturn<T> {
   data: T | null | undefined;
   repeat: {
     (count: number, render: (item: undefined, index: number) => ReactNode): ReactNode[];
-    <U>(arr: U[] | undefined | null, count: number, render: (item: U | undefined, index: number) => ReactNode): ReactNode[];
+    <U>(
+      arr: U[] | undefined | null,
+      count: number,
+      render: (item: U | undefined, index: number) => ReactNode,
+    ): ReactNode[];
   };
-  lines: <V>(value: V | null | undefined, count: number, render: (item: V | ReactNode) => ReactNode) => ReactNode[];
+  lines: <V>(
+    value: V | null | undefined,
+    count: number,
+    render: (item: V | ReactNode) => ReactNode,
+  ) => ReactNode[];
 }
 
 export function createBones(options: CreateBonesOptions): CreateBonesReturn<never>;
@@ -160,7 +157,7 @@ export function createBones<T>(
   options?: CreateBonesOptions,
 ): CreateBonesReturn<T>;
 export function createBones<T>(
-  dataOrOptions?: T | Promise<T> | undefined | null | CreateBonesOptions,
+  dataOrOptions?: T | Promise<T> | null | CreateBonesOptions,
   maybeOptions?: CreateBonesOptions,
 ): CreateBonesReturn<T> {
   let data: T | Promise<T> | undefined | null;
@@ -228,8 +225,15 @@ export function createBones<T>(
     return props;
   };
 
-  function repeat(count: number, render: (item: undefined, index: number) => ReactNode): ReactNode[];
-  function repeat<U>(arr: U[] | undefined | null, count: number, render: (item: U | undefined, index: number) => ReactNode): ReactNode[];
+  function repeat(
+    count: number,
+    render: (item: undefined, index: number) => ReactNode,
+  ): ReactNode[];
+  function repeat<U>(
+    arr: U[] | undefined | null,
+    count: number,
+    render: (item: U | undefined, index: number) => ReactNode,
+  ): ReactNode[];
   function repeat<U>(
     arrOrCount: U[] | undefined | null | number,
     countOrRender: number | ((item: U | undefined, index: number) => ReactNode),
@@ -249,9 +253,7 @@ export function createBones<T>(
       render = maybeRender!;
     }
 
-    const items: (U | undefined)[] = isLoading
-      ? Array.from({ length: count })
-      : (arr ?? []);
+    const items: (U | undefined)[] = isLoading ? Array.from({ length: count }) : (arr ?? []);
 
     return items.map(render);
   }

@@ -29,29 +29,9 @@ function TestLength({ data }: { data?: typeof mockData | Promise<typeof mockData
   return <span data-testid="target" {...bone("text", { length: 12 })} />;
 }
 
-function TestMultiline({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
-  const { bone } = createBones(data);
-  return <p data-testid="target" {...bone("text", { lines: 3 })} />;
-}
-
 function TestContained({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
   const { bone } = createBones(data);
   return <span data-testid="target" {...bone("text", { contained: true, length: 7 })} />;
-}
-
-function TestTwoLines({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
-  const { bone } = createBones(data);
-  return <p data-testid="target" {...bone("text", { lines: 2 })} />;
-}
-
-function TestOneLine({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
-  const { bone } = createBones(data);
-  return <p data-testid="target" {...bone("text", { lines: 1 })} />;
-}
-
-function TestContainedWithLines({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
-  const { bone } = createBones(data);
-  return <span data-testid="target" {...bone("text", { contained: true, lines: 3 })} />;
 }
 
 function TestData({ data }: { data?: typeof mockData | Promise<typeof mockData> }) {
@@ -135,52 +115,10 @@ describe("createBones", () => {
     expect(el.style.getPropertyValue("--bone-length")).toBe("");
   });
 
-  test("sets --bone-lines CSS variable for multiline text", () => {
-    const { getByTestId } = render(<TestMultiline data={forceBones} />);
-    const el = getByTestId("target") as HTMLElement;
-    expect(el.getAttribute("data-bone")).toBe("text");
-    expect(el.style.getPropertyValue("--bone-lines")).toBe("3");
-  });
-
-  test("sets --bone-shadows CSS variable for multiline text", () => {
-    const { getByTestId } = render(<TestMultiline data={forceBones} />);
-    const el = getByTestId("target") as HTMLElement;
-    expect(el.style.getPropertyValue("--bone-shadows")).toBe(
-      "0 calc(1lh * 1) 0 0 var(--bone-base)",
-    );
-  });
-
-  test("does not set --bone-lines when data is available", () => {
-    const { getByTestId } = render(<TestMultiline data={mockData} />);
-    const el = getByTestId("target") as HTMLElement;
-    expect(el.style.getPropertyValue("--bone-lines")).toBe("");
-  });
-
   test("sets --bone-contained CSS variable for contained text", () => {
     const { getByTestId } = render(<TestContained data={forceBones} />);
     const el = getByTestId("target") as HTMLElement;
     expect(el.style.getPropertyValue("--bone-contained")).toBe("1");
-  });
-
-  test("lines: 2 sets --bone-lines but no --bone-shadows", () => {
-    const { getByTestId } = render(<TestTwoLines data={forceBones} />);
-    const el = getByTestId("target") as HTMLElement;
-    expect(el.style.getPropertyValue("--bone-lines")).toBe("2");
-    expect(el.style.getPropertyValue("--bone-shadows")).toBe("");
-  });
-
-  test("lines: 1 does not set --bone-lines", () => {
-    const { getByTestId } = render(<TestOneLine data={forceBones} />);
-    const el = getByTestId("target") as HTMLElement;
-    expect(el.getAttribute("style")).toBeNull();
-  });
-
-  test("contained with lines ignores --bone-lines", () => {
-    const { getByTestId } = render(<TestContainedWithLines data={forceBones} />);
-    const el = getByTestId("target") as HTMLElement;
-    expect(el.style.getPropertyValue("--bone-contained")).toBe("1");
-    expect(el.style.getPropertyValue("--bone-lines")).toBe("");
-    expect(el.style.getPropertyValue("--bone-shadows")).toBe("");
   });
 
   test("block sets src to transparent pixel", () => {

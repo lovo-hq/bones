@@ -13,13 +13,15 @@ Bones lets you write a single component that handles both its loaded and loading
 import { createBones } from "bones";
 
 function UserCard({ user }: { user: Promise<User> }) {
-  const { bone, data } = createBones(user);
+  const { bone, data, lines } = createBones(user);
 
   return (
     <div>
       <img src={data?.avatar} alt="" {...bone("block")} />
       <h2 {...bone("text", { length: 12 })}>{data?.name}</h2>
-      <p {...bone("text", { lines: 2 })}>{data?.bio}</p>
+      {lines(data?.bio, 2, (item) => (
+        <p>{item}</p>
+      ))}
     </div>
   );
 }

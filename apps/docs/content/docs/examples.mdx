@@ -24,13 +24,15 @@ export default function Page() {
 }
 
 function UserCard({ user }: { user: Promise<User> }) {
-  const { bone, data } = createBones(user);
+  const { bone, data, lines } = createBones(user);
 
   return (
     <div>
       <img src={data?.avatar} width={64} height={64} {...bone("block")} />
       <h2 {...bone("text", { length: 12 })}>{data?.name}</h2>
-      <p {...bone("text", { lines: 2 })}>{data?.bio}</p>
+      {lines(data?.bio, 2, (item) => (
+        <p>{item}</p>
+      ))}
     </div>
   );
 }
@@ -68,13 +70,15 @@ import useSWR from "swr";
 
 function UserCard() {
   const { data, isLoading } = useSWR("/api/user", fetcher);
-  const { bone, data: user } = createBones(data, { loading: isLoading });
+  const { bone, data: user, lines } = createBones(data, { loading: isLoading });
 
   return (
     <div>
       <img src={user?.avatar} width={64} height={64} {...bone("block")} />
       <h2 {...bone("text", { length: 12 })}>{user?.name}</h2>
-      <p {...bone("text", { lines: 2 })}>{user?.bio}</p>
+      {lines(user?.bio, 2, (item) => (
+        <p>{item}</p>
+      ))}
     </div>
   );
 }
