@@ -12,8 +12,8 @@ const mockUser: User = {
   bio: "Design engineer who loves building UI primitives.",
 };
 
-export function DemoUserCard({ user }: { user?: Promise<User> }) {
-  const { bone, data, lines } = createBones(user ?? Promise.resolve(mockUser));
+export function DemoUserCard() {
+  const { bone, data, lines } = createBones(mockUser);
 
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>

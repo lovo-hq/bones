@@ -1,4 +1,3 @@
-import { highlight } from "fumadocs-core/highlight";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import { PreviewToggle } from "./preview-toggle";
 import type { ReactNode } from "react";
@@ -16,6 +15,7 @@ export async function Preview({
   title,
   children,
 }: PreviewProps) {
+  const { highlight } = await import("fumadocs-core/highlight");
   const highlighted = await highlight(code, { lang });
 
   return (
