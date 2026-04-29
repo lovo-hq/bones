@@ -90,10 +90,10 @@ const { bone, repeat } = createBones({ loading: !moveDetails });
 
 ## Multi-line text with `lines()`
 
-Use the `lines` helper for paragraphs and descriptions. Each skeleton line is a real element with its own shimmer animation:
+Use the `lines` helper for paragraphs and descriptions. It generates skeleton `<span>` elements inside your wrapper — full-width lines with a shorter last line, each with its own shimmer animation:
 
 ```tsx
-import { createBones, minMax } from "bones";
+import { createBones } from "bones";
 
 function ArticleCard({ article }: { article: Promise<Article> }) {
   const { bone, data, lines } = createBones(article);
@@ -101,8 +101,8 @@ function ArticleCard({ article }: { article: Promise<Article> }) {
   return (
     <article>
       <h3 {...bone("text", { length: 20 })}>{data?.title}</h3>
-      {lines(data?.excerpt, 3, (item, i) => (
-        <p key={i} {...bone("text", { length: minMax(20, 35) })}>{item}</p>
+      {lines(data?.excerpt, 3, (item) => (
+        <p>{item}</p>
       ))}
       <span {...bone("text", { length: 8, contained: true })}>{data?.readTime}</span>
     </article>
@@ -110,7 +110,7 @@ function ArticleCard({ article }: { article: Promise<Article> }) {
 }
 ```
 
-During loading, `lines` calls the render callback 3 times with `(undefined, index)`, producing 3 skeleton `<p>` elements. When data resolves, it calls the callback once with the real excerpt text, rendering a single `<p>`.
+During loading, `item` is an array of skeleton spans that render inside the `<p>`. When data resolves, `item` is the real excerpt string. No `bone()` call needed in the callback — `lines` handles the skeleton content internally.
 
 ## List placeholders with `repeat()`
 
