@@ -60,7 +60,7 @@ function SkeletonDemo() {
 
 ## Client-side data fetching
 
-When using hooks like React Query, SWR, or `useState` + `useEffect`, pass the `loading` option to control skeleton state:
+When using hooks like React Query, SWR, or `useState` + `useEffect`, pass the `loading` option to control skeleton state. The options-only overload means you don't need to pass data as the first argument:
 
 ```tsx
 import { createBones } from "bones";
@@ -82,33 +82,43 @@ function UserCard() {
 
 The component renders skeletons while `isLoading` is `true`, then shows content once data arrives — no Suspense boundary required.
 
-## Multi-line text
-
-Use the `lines` option for paragraphs and descriptions:
+When you only need `bone` and `repeat` helpers (no data to resolve), use the options-only signature:
 
 ```tsx
+const { bone, repeat } = createBones({ loading: !moveDetails });
+```
+
+## Multi-line text with `lines()`
+
+Use the `lines` helper for paragraphs and descriptions. Each skeleton line is a real element with its own shimmer animation:
+
+```tsx
+import { createBones, minMax } from "bones";
+
 function ArticleCard({ article }: { article: Promise<Article> }) {
-  const { bone, data } = createBones(article);
+  const { bone, data, lines } = createBones(article);
 
   return (
     <article>
       <h3 {...bone("text", { length: 20 })}>{data?.title}</h3>
-      <p {...bone("text", { lines: 3 })}>{data?.excerpt}</p>
-      <span {...bone("text", { length: 8, contained: true })}>
-        {data?.readTime}
-      </span>
+      {lines(data?.excerpt, 3, (item, i) => (
+        <p key={i} {...bone("text", { length: minMax(20, 35) })}>{item}</p>
+      ))}
+      <span {...bone("text", { length: 8, contained: true })}>{data?.readTime}</span>
     </article>
   );
 }
 ```
 
-The last line of a multi-line skeleton is automatically shorter (61% width) to look more natural.
+During loading, `lines` calls the render callback 3 times with `(undefined, index)`, producing 3 skeleton `<p>` elements. When data resolves, it calls the callback once with the real excerpt text, rendering a single `<p>`.
 
-## List placeholders with repeat
+## List placeholders with `repeat()`
 
-Use `repeat` to render a fixed number of placeholder items while data loads:
+Use `repeat` to render a fixed number of placeholder items while data loads. The render callback receives each item (or `undefined` during loading) and its index:
 
 ```tsx
+import { createBones, minMax } from "bones";
+
 function TagList({ pokemon }: { pokemon: Promise<Pokemon> }) {
   const { bone, data, repeat } = createBones(pokemon);
 
@@ -116,9 +126,9 @@ function TagList({ pokemon }: { pokemon: Promise<Pokemon> }) {
     <div>
       <h3 {...bone("text", { length: 9 })}>{data?.name}</h3>
       <div style={{ display: "flex", gap: 4 }}>
-        {repeat(data?.types, 2).map((type, i) => (
-          <span key={type ?? i} {...bone("text", { contained: true })}>
-            {type}
+        {repeat(data?.types, 2, (item, i) => (
+          <span key={item ?? i} {...bone("text", { contained: true, length: 7 })}>
+            {item}
           </span>
         ))}
       </div>
@@ -127,7 +137,25 @@ function TagList({ pokemon }: { pokemon: Promise<Pokemon> }) {
 }
 ```
 
-`repeat(data?.types, 2)` returns `[undefined, undefined]` while loading (rendering two skeleton pills), and the real `types` array once data arrives.
+`repeat(data?.types, 2, render)` calls the render callback twice with `(undefined, index)` while loading (rendering two skeleton pills), then maps over the real `types` array once data arrives — the count is ignored when loaded.
+
+Use `minMax` for natural-looking varied widths in skeleton lists:
+
+```tsx
+{repeat(data?.moves, 10, (item, i) => (
+  <span key={item ?? i} {...bone("text", { length: minMax(5, 12), contained: true })}>
+    {item}
+  </span>
+))}
+```
+
+A count-only signature is available when there's no array to pass through:
+
+```tsx
+{repeat(3, (_, i) => (
+  <div key={i} className={styles.row} {...bone("text", { length: minMax(10, 20) })} />
+))}
+```
 
 ## Skeleton animations
 

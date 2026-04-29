@@ -4,18 +4,24 @@ description: The core function that powers skeleton loading states.
 ---
 
 ```ts
-import { createBones } from "bones";
+import { createBones, minMax } from "bones";
 
-const { bone, data, repeat } = createBones(dataOrPromise, options?);
+const { bone, data, repeat, lines } = createBones(dataOrPromise, options?);
 ```
 
 `createBones` accepts data that may be a resolved value, a `Promise`, `null`, `undefined`, or the `forceBones` sentinel. An optional second argument controls behavior.
 
+When only options are needed (no data to resolve), pass them as the sole argument:
+
+```tsx
+const { bone, repeat } = createBones({ loading: !moveDetails });
+```
+
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `loading` | `boolean` | — | When `true`, forces skeleton mode regardless of the data state. Useful for client-side data fetching with hooks that expose an `isLoading` flag. |
+| Option    | Type      | Default | Description                                                                                                                                      |
+| --------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `loading` | `boolean` | —       | When `true`, forces skeleton mode regardless of the data state. Useful for client-side data fetching with hooks that expose an `isLoading` flag. |
 
 ```tsx
 const { data, isLoading } = useSWR("/api/user", fetcher);
@@ -24,7 +30,7 @@ const { bone, data: user } = createBones(data, { loading: isLoading });
 
 ## Return value
 
-`createBones` returns three things:
+`createBones` returns four things:
 
 ## `bone(type, options?)`
 
@@ -36,18 +42,41 @@ Returns HTML attributes that turn an element into a skeleton when loading, or an
 
 ### Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `type` | `"text" \| "block" \| "container"` | The skeleton visual style |
-| `options` | `BoneOptions` | Optional configuration |
+| Parameter | Type                               | Description                                       |
+| --------- | ---------------------------------- | ------------------------------------------------- |
+| `type`    | `"text" \| "block" \| "container"` | The skeleton visual style                         |
+| `options` | `BoneOptions`                      | Optional configuration (only accepted for `text`) |
 
 ### BoneOptions
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `length` | `number` | — | Width in `ch` units for `text` bones |
-| `lines` | `number` | — | Number of lines for multi-line `text` bones |
+These options only apply to `"text"` bones. They are ignored for `"block"` and `"container"` types.
+
+| Option      | Type      | Default | Description                                  |
+| ----------- | --------- | ------- | -------------------------------------------- |
+| `length`    | `number \| MinMax`  | —       | Width in `ch` units. Pass a `minMax(min, max)` value for variable-length skeletons. |
+| `lines`     | `number`  | —       | Number of lines for multi-line skeletons (CSS-only approach via box-shadow). For per-line shimmer animation, use the `lines()` or `repeat()` helpers instead. |
 | `contained` | `boolean` | `false` | Use inline-flex sizing instead of full-width |
+
+### `minMax(min, max)`
+
+Creates a variable-length descriptor for the `length` option. Each `bone()` call within a `createBones` instance resolves to a different deterministic width between `min` and `max` (inclusive). This produces natural-looking skeleton lists when used inside `repeat()` or `lines()`.
+
+```tsx
+import { createBones, minMax } from "bones";
+
+const { bone, data, repeat } = createBones(pokemon);
+
+{repeat(data?.moves, 6, (item, i) => (
+  <span key={item ?? i} {...bone("text", { length: minMax(4, 12), contained: true })}>
+    {item}
+  </span>
+))}
+```
+
+| Parameter | Type     | Description       |
+| --------- | -------- | ----------------- |
+| `min`     | `number` | Minimum width in `ch` units |
+| `max`     | `number` | Maximum width in `ch` units |
 
 ### Bone types
 
@@ -66,33 +95,80 @@ const { bone, data } = createBones(userPromise);
 // data is User | undefined
 ```
 
-## `repeat(array, count)`
+## `repeat(array, count, render)`
 
-Returns a placeholder array of `count` `undefined` items during loading, or the real array when data is resolved. Useful for rendering lists with a known placeholder count.
+Renders a list with skeleton placeholders during loading, or the real data when resolved. The render callback receives each item (or `undefined` during loading) and its index.
 
 ```tsx
 const { bone, data, repeat } = createBones(pokemon);
 
-{repeat(data?.types, 2).map((type, i) => (
-  <span key={type ?? i} {...bone("text")}>{type}</span>
+{repeat(data?.types, 2, (item, i) => (
+  <TypeBadge key={item ?? i} type={item} {...bone("text", { contained: true, length: 7 })} />
 ))}
 ```
+
+During loading, `repeat` calls the render callback `count` times with `(undefined, index)`. When data is resolved, it maps over the real array — the `count` argument is ignored.
+
+A count-only signature is also available when there is no array data to pass through:
+
+```tsx
+{repeat(3, (_, i) => (
+  <div key={i} {...bone("text", { length: minMax(10, 20) })} />
+))}
+```
+
+## `lines(value, count, render)`
+
+Like `repeat`, but for scalar values instead of arrays. Renders `count` skeleton elements during loading, or a single element with the resolved value when loaded.
+
+```tsx
+const { bone, data, lines } = createBones(species);
+
+{lines(data?.description, 4, (item, i) => (
+  <p key={i} {...bone("text", { length: minMax(20, 35) })}>{item}</p>
+))}
+```
+
+During loading, `lines` calls the render callback `count` times with `(undefined, index)` — producing multiple skeleton lines with individual shimmer animations. When data is resolved, it calls the render callback once with the actual value, returning a single-element array.
+
+This is the recommended approach for multi-line text skeletons, as each line is a real element with its own `::after` pseudo-element, ensuring consistent shimmer animation on every line.
 
 ## Type signature
 
 ```ts
+function createBones(options: CreateBonesOptions): CreateBonesReturn<never>;
 function createBones<T>(
   data: T | Promise<T> | undefined | null,
   options?: CreateBonesOptions,
 ): CreateBonesReturn<T>;
 
+function minMax(min: number, max: number): MinMax;
+
+interface MinMax {
+  readonly min: number;
+  readonly max: number;
+}
+
 interface CreateBonesOptions {
   loading?: boolean;
 }
 
+interface BoneOptions {
+  length?: number | MinMax;
+  lines?: number;
+  contained?: boolean;
+}
+
 interface CreateBonesReturn<T> {
-  bone: (type: BoneType, options?: BoneOptions) => Record<string, unknown>;
+  bone: {
+    (type: "text", options?: BoneOptions): Record<string, unknown>;
+    (type: "block" | "container"): Record<string, unknown>;
+  };
   data: T | null | undefined;
-  repeat: <U>(arr: U[] | undefined | null, count: number) => (U | undefined)[];
+  repeat: {
+    (count: number, render: (item: undefined, index: number) => ReactNode): ReactNode[];
+    <U>(arr: U[] | undefined | null, count: number, render: (item: U | undefined, index: number) => ReactNode): ReactNode[];
+  };
+  lines: <V>(value: V | null | undefined, count: number, render: (item: V | undefined, index: number) => ReactNode) => ReactNode[];
 }
 ```
