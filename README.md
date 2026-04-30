@@ -1,75 +1,104 @@
-# vite-plus-starter
+# Bones
 
-A starter for creating a Vite Plus project.
+Skeleton loaders designed for React Server Components and streaming. ~2.7 kB gzipped, 0 dependencies.
+
+With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so `{data || <Skeleton />}` doesn't work anymore. The typical workaround is writing a separate skeleton component for every piece of UI and passing it as a Suspense fallback.
+
+Bones skips the duplication. You write your markup once and it handles both states. The skeleton and the real UI are the same component, so they can't drift apart.
+
+## How it works
+
+`createBones` accepts data or a promise of data. While loading, its `bone` function returns HTML attributes that style elements as skeletons via CSS. Once the data resolves, `bone` returns an empty object and your component renders normally. There are no hooks and no context providers.
+
+- Works in Server Components. No hooks, no context, no `'use client'`.
+- One component handles both loading and loaded states.
+- Pass a promise as a prop. Bones wires up Suspense for you.
+- Skeletons are pure CSS, themed with custom properties.
+- Loading elements get `aria-busy="true"` automatically.
+
+## Installation
+
+```bash
+npm install @lovo/bones
+```
+
+Import the CSS once in your root layout or entry point:
+
+```tsx
+import "@lovo/bones/css";
+```
+
+## Basic usage
+
+Pass data (or a promise of data) to `createBones`. Spread the `bone` function's return value onto elements that should show skeletons while loading.
+
+```tsx
+import { createBones } from "@lovo/bones";
+
+function ProfileCard({ user }: { user: Promise<User> | User }) {
+  const { bone, data, lines } = createBones(user);
+
+  return (
+    <div>
+      <img src={data?.avatar} width={80} height={80} {...bone("block")} />
+      <h3 {...bone("text", { length: 10 })}>{data?.name}</h3>
+      {lines(data?.bio, 3, (item) => (
+        <p>{item}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+Wrap components that receive promises in `<Bones>`. It creates a Suspense boundary and generates the skeleton fallback for you:
+
+```tsx
+import { Bones } from "@lovo/bones";
+
+export default function Page() {
+  return (
+    <Bones>
+      <ProfileCard user={fetchUser()} />
+    </Bones>
+  );
+}
+```
+
+While the promise is pending, `<Bones>` renders the same `<ProfileCard>` tree with skeletons visible. Once it resolves, the real content swaps in.
+
+## Bone types
+
+| Type | Use for | Example |
+| --- | --- | --- |
+| `"text"` | Headings, paragraphs, labels | `<h2 {...bone("text")}>` |
+| `"block"` | Images, avatars, thumbnails | `<img src={…} {...bone("block")} />` |
+| `"container"` | Wrappers with complex children | `<div {...bone("container")}>` |
+
+## Previewing skeletons
+
+Use `forceBones` to see a component's skeleton state without setting up real data:
+
+```tsx
+import { createBones, forceBones } from "@lovo/bones";
+
+<ProfileCard user={forceBones} />;
+```
+
+To force an entire subtree into skeleton mode at once, wrap it with `<BonesForce>`:
+
+```tsx
+import { BonesForce } from "@lovo/bones";
+
+<BonesForce>
+  <ProfileCard />
+  <PostList />
+</BonesForce>;
+```
 
 ## Development
 
-- Install dependencies:
-
 ```bash
-vp install
-```
-
-- Run the unit tests:
-
-```bash
-vp test
-```
-
-- Build the library:
-
-```bash
-vp pack
-```
-
-## How It Works
-
-The diagram below shows the full data lifecycle through the bones library — from `createBones` input to rendered output.
-
-```mermaid
-flowchart TD
-    A["Component calls createBones(data)"] --> B{"options.loading\n=== true?"}
-
-    B -- Yes --> SKEL[Skeleton mode]
-    B -- No --> C{"data === forceBones?"}
-
-    C -- Yes --> SKEL
-    C -- No --> D{"getBonesContext()\n.loading === true?"}
-
-    D -- Yes --> SKEL
-    D -- No --> E{"data instanceof\nPromise?"}
-
-    E -- No --> RESOLVED["Use data as-is"]
-    E -- Yes --> RP["readPromise(promise)"]
-
-    RP --> F{"promise._status?"}
-
-    F -- undefined --> ATTACH["First call: attach .then() handlers\nSet _status = 'pending'"] --> THROW
-
-    F -- "'pending'" --> THROW["Throw promise\n(Suspense catches it)"]
-    F -- "'fulfilled'" --> RETURN["Return resolved value"]
-    F -- "'rejected'" --> ERR["Throw error\n(caught by Error Boundary)"]
-
-    THROW --> FALLBACK
-
-    subgraph FALLBACK ["Suspense Fallback (via Bones component)"]
-        direction TB
-        BS["BonesStart renders:\nmutates shared React.cache() object\nsets .loading = true"] --> CHILDREN["Children render\n— all createBones() calls\nsee loading === true"]
-        CHILDREN --> BE["BonesEnd renders:\nsets .loading = false\non same cached object"]
-    end
-
-    FALLBACK --> SKEL
-
-    RETURN --> DATA["resolved data available"]
-    RESOLVED --> DATA
-
-    SKEL --> BONE_LOAD["bone(type) returns\n{ data-bone: type, aria-busy: true }\n+ CSS custom property styles"]
-    DATA --> BONE_DATA["bone(type) returns {}\n(empty object)"]
-
-    BONE_LOAD --> CSS["CSS activates:\n[data-bone] pseudo-elements\nrender skeleton bars/blocks/overlays\nshimmer or pulse animation"]
-
-    CSS --> RESOLVE_EVENT["Promise resolves\n→ React re-renders"]
-    RESOLVE_EVENT --> BONE_DATA
-
-    BONE_DATA --> DONE["Real content visible\nSame DOM structure\nNo layout shift"]
+vp install   # install dependencies
+vp test      # run tests
+vp pack      # build the library
 ```
