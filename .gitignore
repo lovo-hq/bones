@@ -7,6 +7,6 @@ coverage
 test-results
 .next
 .fallow
-docs/superpowers/*
+docs/superpowers/
 .superpowers
 .worktrees
