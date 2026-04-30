@@ -29,7 +29,7 @@ export function BonesDevTool() {
 
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
-  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState<string>("shimmer");
   const [delays, setDelays] = useState<Record<DelayKey, number>>(

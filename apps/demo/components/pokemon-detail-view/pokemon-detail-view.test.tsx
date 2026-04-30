@@ -68,6 +68,7 @@ describe("PokemonDetailView", () => {
   test("renders skeleton state when no pokemon provided", () => {
     const { container } = render(<PokemonDetailView />);
     expect(container.querySelector("h1")?.textContent).toBe("");
-    expect(container.querySelector("p")?.textContent).toBe("");
+    // lines() returns empty when data is undefined, so no <p> is rendered
+    expect(container.querySelectorAll("p").length).toBe(0);
   });
 });

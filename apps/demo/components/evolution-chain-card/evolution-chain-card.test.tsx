@@ -11,7 +11,7 @@ describe("EvolutionChainCard", () => {
     const chain = {
       stages: [
         [
-          { name: "bulbasaur", spriteUrl: "https://example.com/1.png", trigger: null },
+          { name: "bulbasaur", spriteUrl: "https://example.com/1.png", trigger: "" },
           { name: "ivysaur", spriteUrl: "https://example.com/2.png", trigger: "Lv 16" },
           { name: "venusaur", spriteUrl: "https://example.com/3.png", trigger: "Lv 32" },
         ],
@@ -29,7 +29,7 @@ describe("EvolutionChainCard", () => {
     const chain = {
       stages: [
         [
-          { name: "bulbasaur", spriteUrl: "", trigger: null },
+          { name: "bulbasaur", spriteUrl: "", trigger: "" },
           { name: "ivysaur", spriteUrl: "", trigger: "Lv 16" },
         ],
       ],
@@ -41,7 +41,7 @@ describe("EvolutionChainCard", () => {
 
   test("renders single-stage pokemon without arrows", () => {
     const chain = {
-      stages: [[{ name: "ditto", spriteUrl: "", trigger: null }]],
+      stages: [[{ name: "ditto", spriteUrl: "", trigger: "" }]],
     };
     render(<EvolutionChainCard chain={chain} currentName="ditto" />);
     expect(screen.getByText("ditto")).toBeDefined();

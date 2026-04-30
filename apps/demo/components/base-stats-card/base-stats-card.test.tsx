@@ -29,19 +29,19 @@ const pokemon = {
 describe("BaseStatsCard", () => {
   test("renders all 6 stat names", () => {
     render(<BaseStatsCard pokemon={pokemon} />);
-    expect(screen.getByText("hp")).toBeDefined();
-    expect(screen.getByText("attack")).toBeDefined();
-    expect(screen.getByText("defense")).toBeDefined();
-    expect(screen.getByText("special-attack")).toBeDefined();
-    expect(screen.getByText("special-defense")).toBeDefined();
-    expect(screen.getByText("speed")).toBeDefined();
+    expect(screen.getByText("HP")).toBeDefined();
+    expect(screen.getByText("Attack")).toBeDefined();
+    expect(screen.getByText("Defense")).toBeDefined();
+    expect(screen.getByText("Sp. Attack")).toBeDefined();
+    expect(screen.getByText("Sp. Defense")).toBeDefined();
+    expect(screen.getByText("Speed")).toBeDefined();
   });
 
   test("renders stat values", () => {
     render(<BaseStatsCard pokemon={pokemon} />);
-    expect(screen.getByText("45")).toBeDefined();
-    expect(screen.getByText("49")).toBeDefined();
-    expect(screen.getByText("65")).toBeDefined();
+    expect(screen.getAllByText("45").length).toBe(2); // hp and speed
+    expect(screen.getAllByText("49").length).toBe(2); // attack and defense
+    expect(screen.getAllByText("65").length).toBe(2); // sp. attack and sp. defense
   });
 
   test("renders total", () => {
