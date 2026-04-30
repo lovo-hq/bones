@@ -1,6 +1,8 @@
 # Bones
 
-Skeleton loaders designed for React Server Components and streaming. ~2.7 kB gzipped, 0 dependencies.
+[![Bundle Size](https://deno.bundlejs.com/badge?q=@lovo/bones)](https://bundlejs.com/?q=%40lovo%2Fbones)
+
+Skeleton loaders designed for React Server Components and streaming.
 
 With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so `{data || <Skeleton />}` doesn't work anymore. The typical workaround is writing a separate skeleton component for every piece of UI and passing it as a Suspense fallback.
 
@@ -68,11 +70,11 @@ While the promise is pending, `<Bones>` renders the same `<ProfileCard>` tree wi
 
 ## Bone types
 
-| Type | Use for | Example |
-| --- | --- | --- |
-| `"text"` | Headings, paragraphs, labels | `<h2 {...bone("text")}>` |
-| `"block"` | Images, avatars, thumbnails | `<img src={…} {...bone("block")} />` |
-| `"container"` | Wrappers with complex children | `<div {...bone("container")}>` |
+| Type          | Use for                        | Example                              |
+| ------------- | ------------------------------ | ------------------------------------ |
+| `"text"`      | Headings, paragraphs, labels   | `<h2 {...bone("text")}>`             |
+| `"block"`     | Images, avatars, thumbnails    | `<img src={…} {...bone("block")} />` |
+| `"container"` | Wrappers with complex children | `<div {...bone("container")}>`       |
 
 ## Previewing skeletons
 
