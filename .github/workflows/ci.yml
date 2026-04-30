@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ── Bones library ──────────────────────────────────────────
+  bones-check:
+    name: "Bones: Lint, Format & Types"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Run lint, format, and type checks
+        run: vp run --filter bones check
+
+  bones-build:
+    name: "Bones: Build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Build library
+        run: vp run --filter bones build
+
+  bones-test:
+    name: "Bones: Test"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Run tests
+        run: vp run --filter bones test -- --run
+
+  # ── Demo app ───────────────────────────────────────────────
+  demo-check:
+    name: "Demo: Lint & Types"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Build bones library
+        run: vp run --filter bones build
+
+      - name: Run type check
+        run: vp run --filter bones-demo check
+
+  demo-build:
+    name: "Demo: Build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Build bones library
+        run: vp run --filter bones build
+
+      - name: Build demo app
+        run: vp run --filter bones-demo build
+
+  demo-test:
+    name: "Demo: Test"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Build bones library
+        run: vp run --filter bones build
+
+      - name: Run tests
+        run: vp run --filter bones-demo test -- --run
+
+  # ── Docs site ──────────────────────────────────────────────
+  docs-check:
+    name: "Docs: Types"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Build bones library
+        run: vp run --filter bones build
+
+      - name: Run type check
+        run: vp run --filter bones-docs check
+
+  docs-build:
+    name: "Docs: Build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Build bones library
+        run: vp run --filter bones build
+
+      - name: Build docs site
+        run: vp run --filter bones-docs build

@@ -7,11 +7,11 @@ afterEach(cleanup);
 describe("HeroSection", () => {
   test("renders the Bones heading", () => {
     render(<HeroSection />);
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Bones");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("bones");
   });
 
   test("renders the subtitle text", () => {
     render(<HeroSection />);
-    expect(screen.getByText(/Primitives for inline skeleton loaders/)).toBeDefined();
+    expect(screen.getByText(/Skeleton loaders designed for React Server Components/)).toBeDefined();
   });
 });

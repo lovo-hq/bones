@@ -12,7 +12,7 @@ describe("InfoCard", () => {
       { label: "Catch Rate", value: "45" },
       { label: "Base Exp", value: "64" },
     ];
-    render(<InfoCard title="Training" rows={rows} />);
+    render(<InfoCard title="Training" labels={["Catch Rate", "Base Exp"]} rows={rows} />);
     expect(screen.getByText("Training")).toBeDefined();
     expect(screen.getByText("Catch Rate")).toBeDefined();
     expect(screen.getByText("45")).toBeDefined();
