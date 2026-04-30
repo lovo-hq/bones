@@ -99,6 +99,9 @@ jobs:
         with:
           cache: true
 
+      - name: Build bones library
+        run: vp run --filter bones build
+
       - name: Run tests
         run: vp run --filter bones-demo test -- --run
 
