@@ -13,10 +13,8 @@ import type {
 export type { PokemonListItem } from "./pokeapi-types";
 export type {
   PokemonData,
-  PokemonStat,
   SpeciesData,
   EvolutionChain,
-  EvolutionStage,
   TypeDefenseMap,
   MoveDetail,
   PokemonMoveEntry,
@@ -91,34 +89,6 @@ export async function fetchPokemonList(limit = 12, offset = 0): Promise<PokemonL
   );
 
   return pokemon;
-}
-
-export async function fetchPokemonDetail(id: string): Promise<PokemonDetail> {
-  const [pokemonRes, speciesRes] = await Promise.all([
-    fetch(`${BASE}/pokemon/${id}`),
-    fetch(`${BASE}/pokemon-species/${id}`),
-  ]);
-
-  const pokemon: PokeAPIPokemonResponse = await pokemonRes.json();
-  const species: PokeAPISpeciesResponse = await speciesRes.json();
-
-  const englishEntry = species.flavor_text_entries.find((e) => e.language.name === "en");
-
-  return {
-    id: pokemon.id,
-    name: pokemon.name,
-    sprite:
-      pokemon.sprites.other["official-artwork"].front_default || pokemon.sprites.front_default,
-    artwork: pokemon.sprites.other["official-artwork"].front_default,
-    types: pokemon.types.map((t) => t.type.name),
-    height: pokemon.height,
-    weight: pokemon.weight,
-    description: englishEntry ? englishEntry.flavor_text.replace(/\f|\n/g, " ") : "",
-    stats: pokemon.stats.map((s) => ({
-      name: s.stat.name,
-      value: s.base_stat,
-    })),
-  };
 }
 
 // ============================================================
@@ -270,7 +240,7 @@ export async function fetchEvolutionChain(url: string): Promise<EvolutionChain> 
 }
 
 // ============================================================
-// Type defenses (inline calculation — will be extracted in Task 3)
+// Type defenses (inline calculation. Will be extracted in Task 3)
 // ============================================================
 
 export async function fetchTypeDefenses(types: string[]): Promise<TypeDefenseMap> {
