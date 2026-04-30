@@ -2,15 +2,15 @@
   "name": "bones",
   "version": "0.0.0",
   "description": "Primitives for inline skeleton loaders in React. One component, both states.",
-  "homepage": "https://github.com/author/library#readme",
+  "homepage": "https://github.com/lovo-hq/bones#readme",
   "bugs": {
-    "url": "https://github.com/author/library/issues"
+    "url": "https://github.com/lovo-hq/bones/issues"
   },
   "license": "MIT",
-  "author": "Author Name <author.name@mail.com>",
+  "author": "Hunter Garrett",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/author/library.git"
+    "url": "git+https://github.com/lovo-hq/bones.git"
   },
   "files": [
     "dist"
