@@ -1,15 +1,15 @@
 ---
 title: createBones
-description: The core function that powers skeleton loading states.
+description: Accepts data (or a promise) and returns skeleton helpers.
 ---
 
 ```ts
-import { createBones, minMax } from "bones";
+import { createBones, minMax } from "@lovo/bones";
 
 const { bone, data, repeat, lines } = createBones(dataOrPromise, options?);
 ```
 
-`createBones` accepts data that may be a resolved value, a `Promise`, `null`, `undefined`, or the `forceBones` sentinel. An optional second argument controls behavior.
+`createBones` accepts a resolved value, a `Promise`, `null`, `undefined`, or the `forceBones` sentinel. An optional second argument controls behavior.
 
 When only options are needed (no data to resolve), pass them as the sole argument:
 
@@ -34,7 +34,7 @@ const { bone, data: user } = createBones(data, { loading: isLoading });
 
 ## `bone(type, options?)`
 
-Returns HTML attributes that turn an element into a skeleton when loading, or an empty object when data is resolved. Spread the result onto your element.
+Returns HTML attributes that style an element as a skeleton while loading, or an empty object once data resolves. Spread the result onto your element.
 
 ```tsx
 <h2 {...bone("text", { length: 12 })}>{data?.name}</h2>
@@ -58,10 +58,10 @@ These options only apply to `"text"` bones. They are ignored for `"block"` and `
 
 ### `minMax(min, max)`
 
-Creates a variable-length descriptor for the `length` option. Each `bone()` call within a `createBones` instance resolves to a different deterministic width between `min` and `max` (inclusive). This produces natural-looking skeleton lists when used inside `repeat()` or `lines()`.
+Creates a variable-length descriptor for the `length` option. Each `bone()` call within a `createBones` instance gets a different deterministic width between `min` and `max` (inclusive). Useful inside `repeat()` so skeleton lists don't all look the same.
 
 ```tsx
-import { createBones, minMax } from "bones";
+import { createBones, minMax } from "@lovo/bones";
 
 const { bone, data, repeat } = createBones(pokemon);
 
@@ -81,11 +81,11 @@ const { bone, data, repeat } = createBones(pokemon);
 
 ### Bone types
 
-**`"text"`** — for text content like headings, paragraphs, and labels. Renders a bar at the text baseline. Respects `length` and `contained` options. For multi-line text, use the `lines()` helper.
+`"text"` - Headings, paragraphs, labels. Renders a bar at the text baseline. Respects `length` and `contained` options. For multi-line text, use `lines()`.
 
-**`"block"`** — for replaced elements like images and videos. Sets a solid background color and injects a transparent pixel as `src`.
+`"block"` - Images and videos. Sets a solid background and injects a transparent pixel as `src`.
 
-**`"container"`** — for wrapper elements with complex children. Overlays a solid background and hides children with `visibility: hidden`.
+`"container"` - Wrappers with complex children. Overlays a solid background and hides children with `visibility: hidden`.
 
 ## `data`
 
@@ -98,7 +98,7 @@ const { bone, data } = createBones(userPromise);
 
 ## `repeat(array, count, render)`
 
-Renders a list with skeleton placeholders during loading, or the real data when resolved. The render callback receives each item (or `undefined` during loading) and its index.
+Renders `count` placeholder items while loading, then maps over the real array once resolved. The callback receives each item (or `undefined` during loading) and its index.
 
 ```tsx
 const { bone, data, repeat } = createBones(pokemon);
@@ -110,9 +110,9 @@ const { bone, data, repeat } = createBones(pokemon);
 }
 ```
 
-During loading, `repeat` calls the render callback `count` times with `(undefined, index)`. When data is resolved, it maps over the real array — the `count` argument is ignored.
+During loading, `repeat` calls the callback `count` times with `(undefined, index)`. Once resolved, it maps over the real array and ignores `count`.
 
-A count-only signature is also available when there is no array data to pass through:
+A count-only signature is also available:
 
 ```tsx
 {
@@ -122,7 +122,7 @@ A count-only signature is also available when there is no array data to pass thr
 
 ## `lines(value, count, render)`
 
-Renders multi-line paragraph skeletons during loading, or the real content when loaded. The render callback provides the wrapper element — `lines` handles the skeleton content internally.
+Renders multi-line skeleton paragraphs during loading, or the real content once loaded. Your callback provides the wrapper element; `lines` handles the skeleton spans internally.
 
 ```tsx
 const { data, lines } = createBones(species);
@@ -132,9 +132,9 @@ const { data, lines } = createBones(species);
 }
 ```
 
-During loading, `item` is an array of skeleton `<span>` elements — full-width lines with a shorter last line. The render callback wraps them in your element, producing a single paragraph with skeleton lines inside. Each line has its own `::after` pseudo-element with proper shimmer animation.
+During loading, `item` is an array of skeleton `<span>` elements (full-width lines with a shorter last line). Your callback wraps them, producing a paragraph with skeleton lines inside. Each line gets its own shimmer animation.
 
-When data is resolved, `item` is the real value (e.g. a string). The render callback wraps it the same way, producing a single paragraph with real text. No `bone()` call needed in the callback.
+Once resolved, `item` is the real value (e.g. a string). Same callback, real text. No `bone()` call needed.
 
 ## Type signature
 

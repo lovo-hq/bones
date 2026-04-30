@@ -1,14 +1,14 @@
 ---
 title: Examples
-description: Common patterns for using bones in real components.
+description: Common patterns for using bones.
 ---
 
 ## Suspense streaming
 
-The most common pattern: pass a promise to a component wrapped in `<Bones>`.
+Pass a promise to a component wrapped in `<Bones>`.
 
 ```tsx
-import { Bones } from "bones";
+import { Bones } from "@lovo/bones";
 
 async function fetchUser(): Promise<User> {
   const res = await fetch("/api/user");
@@ -38,12 +38,12 @@ function UserCard({ user }: { user: Promise<User> }) {
 }
 ```
 
-## Forced skeletons for previews
+## Forced skeletons
 
-Use `<BonesForce>` to show skeleton states without real data:
+`<BonesForce>` shows skeleton states without real data:
 
 ```tsx
-import { BonesForce } from "bones";
+import { BonesForce } from "@lovo/bones";
 
 function SkeletonDemo() {
   return (
@@ -62,10 +62,10 @@ function SkeletonDemo() {
 
 ## Client-side data fetching
 
-When using hooks like React Query, SWR, or `useState` + `useEffect`, pass the `loading` option to control skeleton state. The options-only overload means you don't need to pass data as the first argument:
+With hooks like React Query or SWR, pass the `loading` option to control skeleton state:
 
 ```tsx
-import { createBones } from "bones";
+import { createBones } from "@lovo/bones";
 import useSWR from "swr";
 
 function UserCard() {
@@ -84,9 +84,9 @@ function UserCard() {
 }
 ```
 
-The component renders skeletons while `isLoading` is `true`, then shows content once data arrives — no Suspense boundary required.
+Skeletons show while `isLoading` is `true`, then content appears once data arrives. No Suspense boundary needed.
 
-When you only need `bone` and `repeat` helpers (no data to resolve), use the options-only signature:
+When you only need `bone` and `repeat` (no data to resolve), use the options-only signature:
 
 ```tsx
 const { bone, repeat } = createBones({ loading: !moveDetails });
@@ -94,10 +94,10 @@ const { bone, repeat } = createBones({ loading: !moveDetails });
 
 ## Multi-line text with `lines()`
 
-Use the `lines` helper for paragraphs and descriptions. It generates skeleton `<span>` elements inside your wrapper — full-width lines with a shorter last line, each with its own shimmer animation:
+`lines` generates skeleton `<span>` elements inside your wrapper. Full-width lines with a shorter last line, each with its own animation:
 
 ```tsx
-import { createBones } from "bones";
+import { createBones } from "@lovo/bones";
 
 function ArticleCard({ article }: { article: Promise<Article> }) {
   const { bone, data, lines } = createBones(article);
@@ -114,14 +114,14 @@ function ArticleCard({ article }: { article: Promise<Article> }) {
 }
 ```
 
-During loading, `item` is an array of skeleton spans that render inside the `<p>`. When data resolves, `item` is the real excerpt string. No `bone()` call needed in the callback — `lines` handles the skeleton content internally.
+During loading, `item` is an array of skeleton spans that render inside the `<p>`. When data resolves, `item` is the real string. No `bone()` call needed in the callback.
 
 ## List placeholders with `repeat()`
 
-Use `repeat` to render a fixed number of placeholder items while data loads. The render callback receives each item (or `undefined` during loading) and its index:
+`repeat` renders a fixed number of placeholder items while data loads. The callback receives each item (or `undefined` during loading) and its index:
 
 ```tsx
-import { createBones, minMax } from "bones";
+import { createBones, minMax } from "@lovo/bones";
 
 function TagList({ pokemon }: { pokemon: Promise<Pokemon> }) {
   const { bone, data, repeat } = createBones(pokemon);
@@ -141,29 +141,23 @@ function TagList({ pokemon }: { pokemon: Promise<Pokemon> }) {
 }
 ```
 
-`repeat(data?.types, 2, render)` calls the render callback twice with `(undefined, index)` while loading (rendering two skeleton pills), then maps over the real `types` array once data arrives — the count is ignored when loaded.
+`repeat(data?.types, 2, render)` calls the callback twice with `(undefined, index)` while loading, giving you two skeleton pills. Once data arrives it maps over the real array and ignores the count.
 
-Use `minMax` for natural-looking varied widths in skeleton lists:
-
-```tsx
-{repeat(data?.moves, 10, (item, i) => (
-  <span key={item ?? i} {...bone("text", { length: minMax(5, 12), contained: true })}>
-    {item}
-  </span>
-))}
-```
-
-A count-only signature is available when there's no array to pass through:
+`minMax` gives you varied widths so skeleton lists look more natural:
 
 ```tsx
-{repeat(3, (_, i) => (
-  <div key={i} className={styles.row} {...bone("text", { length: minMax(10, 20) })} />
-))}
+{
+  repeat(data?.moves, 10, (item, i) => (
+    <span key={item ?? i} {...bone("text", { length: minMax(5, 12), contained: true })}>
+      {item}
+    </span>
+  ));
+}
 ```
 
 ## Skeleton animations
 
-By default, skeletons are static. Add the `data-bone-animate` attribute to any parent element to animate all skeletons inside it.
+Skeletons are static by default. Add `data-bone-animate` to a parent element to animate them.
 
 ### Shimmer
 
@@ -189,11 +183,11 @@ A gentle opacity fade:
 </div>
 ```
 
-Bones automatically applies `bone-pulse` when `prefers-reduced-motion: reduce` is active, so reduced-motion users get a comfortable fallback regardless of which animation you choose.
+Bones uses `pulse` automatically when `prefers-reduced-motion: reduce` is active, regardless of which animation you set.
 
 ### Global animation
 
-Set the attribute on `<body>` to animate every skeleton in your app:
+Set it on `<body>` to animate every skeleton in your app:
 
 ```tsx
 <body data-bone-animate="shimmer">

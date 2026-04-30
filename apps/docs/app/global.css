@@ -1,12 +1,30 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/catppuccin.css";
 @import "fumadocs-ui/css/preset.css";
 @import "bones/css";
 
 @source "../node_modules/fumadocs-ui/dist/**/*.js";
 
-@media (max-width: 768px) {
-  .preview-grid {
-    grid-template-columns: 1fr !important;
-  }
+.comparison-grid > div {
+  display: flex;
+  flex-direction: column;
+  max-height: 393px;
+  overflow: hidden;
+}
+
+.comparison-grid figure {
+  margin-block: 0;
+}
+
+.comparison-grid > div > *:last-child {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.comparison-grid pre {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }

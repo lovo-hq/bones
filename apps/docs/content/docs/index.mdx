@@ -1,151 +1,161 @@
 ---
 title: Introduction
-description: Primitives for inline skeleton loaders in React.
+description: Skeleton loaders designed for React Server Components and streaming.
 ---
 
-<div className="flex justify-center gap-2 not-prose mb-6">
+<div className="flex gap-2 not-prose mb-8 -mt-8">
   <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-mono text-green-600 dark:text-green-400">
     ~2.7 kB gzipped
   </span>
   <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-mono text-blue-600 dark:text-blue-400">
     0 dependencies
   </span>
+  <span className="rounded-full bg-purple-500/10 px-3 py-1 text-xs font-mono text-purple-600 dark:text-purple-400">
+    RSC ready
+  </span>
 </div>
 
-Bones lets you write a single component that handles both its loaded and loading states. Instead of building separate skeleton components, you add a few attributes to your existing markup and Bones takes care of the rest.
+With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so `{data || <Skeleton />}` doesn't work anymore. The typical workaround is writing a separate skeleton component for every piece of UI and passing it as a Suspense fallback.
+
+Bones skips the duplication. You write your markup once and it handles both states. The skeleton and the real UI are the same component, so they can't drift apart.
 
 ## How it works
 
-`createBones` accepts data that may or may not be resolved yet. When the data is still loading, its `bone` function returns HTML attributes that turn your elements into skeletons. When the data arrives, `bone` returns an empty object and your component renders normally.
+`createBones` accepts data or a promise of data. While loading, its `bone` function returns HTML attributes that style elements as skeletons via CSS. Once the data resolves, `bone` returns an empty object and your component renders normally. There are no hooks and no context providers.
 
-<Preview
-  title="UserCard.tsx"
-  code={`import { createBones } from "bones";
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
+<div>
 
-function UserCard({ user }: { user: Promise<User> }) {
-  const { bone, data, lines } = createBones(user);
+```tsx title="PokemonCard.tsx"
+import { createBones } from "@lovo/bones";
+
+function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
+  const { bone, data, repeat } = createBones(pokemon);
 
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+    <div className="card">
       <img
-        src={data?.avatar}
-        alt=""
-        width={48}
-        height={48}
-        style={{ borderRadius: "50%" }}
+        className="card-image"
+        src={data?.sprite}
+        alt={data?.name ?? "Pokemon"}
+        width={120}
+        height={120}
         {...bone("block")}
       />
-      <div>
-        <h3 {...bone("text", { length: 12 })}>{data?.name}</h3>
-        {lines(data?.bio, 2, (item) => (
-          <p>{item}</p>
+      <h3 className="card-name" {...bone("text", { length: 6 })}>
+        {data?.name}
+      </h3>
+      <div className="card-types">
+        {repeat(data?.types, 2, (type, i) => (
+          <span
+            key={type ?? i}
+            className="badge"}
+            {...bone("text", { contained: true, length: 7 })}
+          >
+            {type}
+          </span>
         ))}
       </div>
     </div>
   );
-}`}
->
-  <DemoUserCard />
-</Preview>
+}
+```
+
+</div>
+<div className="not-prose flex items-center justify-center p-6 rounded-xl border border-fd-border bg-fd-card">
+  <DemoPokemonCard />
+</div>
+</div>
 
 ## Key ideas
 
-- **Same component, both states** — one component definition, no separate skeleton.
-- **No hooks** — `createBones` is a plain function, not a hook.
-- **Promise-native** — works with React Suspense out of the box via `readPromise`.
-- **CSS-driven** — all skeleton visuals are pure CSS. Customize with CSS custom properties.
-- **Accessible** — sets `aria-busy="true"` on loading elements automatically.
+- Works in Server Components. No hooks, no context, no `'use client'`.
+- One component handles both loading and loaded states.
+- Pass a promise as a prop. Bones wires up Suspense for you.
+- Skeletons are pure CSS, themed with custom properties.
+- Loading elements get `aria-busy="true"` automatically.
 
-## A different approach
+## The problem with separate skeletons
 
-Most skeleton libraries require you to build and maintain separate skeleton components that mirror your real UI. Bones takes a different approach — you write one component that handles both states.
+The standard RSC approach means every component that loads data needs a matching skeleton component wired up as a Suspense fallback. Change the layout of the real component and the skeleton quietly falls out of sync.
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
 <div>
 
-**Traditional approach**
+```tsx title="RSC + Suspense (standard approach)"
+// PokemonCard.tsx — the real component
+function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
+  const data = use(pokemon);
 
-```tsx
-// UserCard.tsx
-function UserCard({ user }) {
   return (
-    <div>
-      <img src={user.avatar} alt="" />
-      <h2>{user.name}</h2>
-      <p>{user.bio}</p>
+    <div className="card">
+      <img src={data.sprite} alt={data.name} />
+      <h3>{data.name}</h3>
+      <div className="types">
+        {data.types.map((item) => (
+          <span key={item} className="badge">
+            {item}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
 
-// UserCardSkeleton.tsx
-function UserCardSkeleton() {
+// PokemonCardSkeleton.tsx — a separate component you maintain
+function PokemonCardSkeleton() {
   return (
-    <div>
-      <Skeleton circle width={48} height={48} />
-      <Skeleton width={120} />
-      <Skeleton count={2} />
+    <div className="card">
+      <div className="skeleton skeleton-image" />
+      <div className="skeleton skeleton-title" />
+      <div className="types">
+        <div className="skeleton skeleton-badge" />
+        <div className="skeleton skeleton-badge" />
+      </div>
     </div>
   );
 }
 
-// Page.tsx — conditional rendering
+// Page.tsx — you wire them together manually
 function Page() {
-  const { data, isLoading } = useFetch("/api/user");
-
-  if (isLoading) return <UserCardSkeleton />;
-  return <UserCard user={data} />;
+  return (
+    <Suspense fallback={<PokemonCardSkeleton />}>
+      <PokemonCard pokemon={fetchPokemon()} />
+    </Suspense>
+  );
 }
 ```
 
 </div>
 <div>
 
-**With Bones**
-
-```tsx
-// UserCard.tsx — handles both states
-function UserCard({ user }: { user: Promise<User> }) {
-  const { bone, data, lines } = createBones(user);
+```tsx title="With Bones"
+// PokemonCard.tsx — handles both states
+function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
+  const { bone, data, repeat } = createBones(pokemon);
 
   return (
-    <div>
-      <img
-        src={data?.avatar}
-        alt=""
-        {...bone("block")}
-      />
-      <h2 {...bone("text", { length: 12 })}>
-        {data?.name}
-      </h2>
-      {lines(data?.bio, 2, (item) => (
-        <p>{item}</p>
+    <div className="card">
+      <img src={data?.sprite} alt="" {...bone("block")} />
+      <h3 {...bone("text", { length: 6 })}>{data?.name}</h3>
+      {repeat(data?.types, 2, (item, i) => (
+        <span key={item ?? i} className="badge">
+          {item}
+        </span>
       ))}
     </div>
   );
 }
 
-// Page.tsx — no conditional rendering
+// Page.tsx — no separate skeleton needed
 function Page() {
   return (
     <Bones>
-      <UserCard user={fetchUser()} />
+      <PokemonCard pokemon={fetchPokemon()} />
     </Bones>
   );
 }
 ```
 
 </div>
-</div>
-
-## Get started
-
-Ready to try Bones? Install it and build your first skeleton in minutes.
-
-<div className="flex gap-3 not-prose mt-4">
-  <a href="/getting-started" className="inline-flex items-center rounded-lg bg-fd-primary px-4 py-2 text-sm font-medium text-fd-primary-foreground hover:bg-fd-primary/90">
-    Get Started
-  </a>
-  <a href="https://github.com/bigcommercecloud/bones" className="inline-flex items-center rounded-lg border border-fd-border px-4 py-2 text-sm font-medium hover:bg-fd-muted">
-    GitHub
-  </a>
 </div>

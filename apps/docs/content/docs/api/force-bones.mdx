@@ -4,15 +4,15 @@ description: Sentinel value for forcing skeleton mode on individual components.
 ---
 
 ```tsx
-import { forceBones } from "bones";
+import { forceBones } from "@lovo/bones";
 ```
 
-`forceBones` is a frozen empty object typed as `Promise<never>`. When passed as data to `createBones`, it triggers skeleton mode for that specific component without needing a Suspense boundary or `<BonesForce>` wrapper.
+`forceBones` is a frozen empty object typed as `Promise<never>`. Pass it as data to `createBones` to trigger skeleton mode for a single component without a Suspense boundary or `<BonesForce>` wrapper.
 
 ## Usage
 
 ```tsx
-import { createBones, forceBones } from "bones";
+import { createBones, forceBones } from "@lovo/bones";
 
 function UserCard({ user }: { user: Promise<User> }) {
   const { bone, data } = createBones(user);
@@ -29,11 +29,11 @@ function UserCard({ user }: { user: Promise<User> }) {
 
 ## How it works
 
-`createBones` checks if the input is the `forceBones` sentinel by identity comparison (`===`). When matched, it sets `isLoading = true` and `data = undefined` without throwing a promise or consulting the loading context.
+`createBones` checks for `forceBones` by identity (`===`). When matched, it sets `isLoading = true` and `data = undefined` without throwing a promise or reading the loading context.
 
-Since `forceBones` is typed as `Promise<never>`, it's assignable to any `Promise<T>` prop.
+Typed as `Promise<never>` so it's assignable to any `Promise<T>` prop.
 
 ## When to use
 
-- When you need to force skeleton mode on **one specific component** rather than an entire subtree (use `<BonesForce>` for that).
-- Used internally by `<Bones>` to swap promise props in the Suspense fallback tree.
+- Force skeleton mode on a single component (use `<BonesForce>` for an entire subtree).
+- Used internally by `<Bones>` to swap promise props in the Suspense fallback.

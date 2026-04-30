@@ -1,9 +1,9 @@
 ---
 title: Styling
-description: Customize skeleton appearance with CSS custom properties.
+description: Customize skeletons with CSS custom properties.
 ---
 
-Bones uses CSS custom properties for all visual aspects of skeletons. Override them globally or scope them to specific components.
+All skeleton visuals are controlled by CSS custom properties. Override them globally or scope them to a specific section.
 
 ## CSS custom properties
 
@@ -41,7 +41,7 @@ Or use a CSS class:
 
 ## Dark mode
 
-Bones includes built-in dark mode support via `prefers-color-scheme`:
+Dark mode works via `prefers-color-scheme`:
 
 ```css
 @media (prefers-color-scheme: dark) {
@@ -56,10 +56,10 @@ Override these in your own dark mode styles if your app uses a class-based dark 
 
 ## Animations
 
-Add the `data-bone-animate` attribute to any parent element to animate skeletons inside it. Two animations are available:
+Add `data-bone-animate` to any parent element to animate skeletons inside it:
 
-- **`shimmer`** — a horizontal highlight sweep
-- **`pulse`** — a gentle opacity fade (also applied automatically when `prefers-reduced-motion: reduce` is active)
+- `shimmer` - horizontal highlight sweep
+- `pulse` - gentle opacity fade (also kicks in automatically for `prefers-reduced-motion: reduce`)
 
 ```tsx
 {/* Animate a section */}
@@ -71,10 +71,10 @@ Add the `data-bone-animate` attribute to any parent element to animate skeletons
 <body data-bone-animate="shimmer">
 ```
 
-Animation speed is controlled by the `--bone-duration` custom property, and shimmer colors use `--bone-base` and `--bone-highlight`.
+Speed is controlled by `--bone-duration`. Shimmer colors use `--bone-base` and `--bone-highlight`.
 
 ## Accessibility
 
-- All skeleton elements get `aria-busy="true"` automatically.
-- The `bone-pulse` animation activates for users who prefer reduced motion.
-- Skeleton elements are non-interactive (`pointer-events: none` on pseudo-elements).
+- Skeleton elements get `aria-busy="true"` automatically.
+- `pulse` animation activates for users who prefer reduced motion.
+- Skeleton pseudo-elements have `pointer-events: none`.
