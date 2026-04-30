@@ -1,0 +1,172 @@
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  max-width: 200px;
+  margin-inline: auto;
+}
+
+.sliderLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fd-color-fd-muted-foreground);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.slider {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--fd-color-fd-foreground);
+  cursor: pointer;
+}
+
+.cardStack {
+  position: relative;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.card {
+  border: 1px solid var(--fd-color-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.cardImage {
+  display: block;
+  margin: 0 auto 0.75rem;
+  border-radius: 8px;
+}
+
+.cardName {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  margin: 0 auto 0.5rem;
+}
+
+.cardTypes {
+  display: flex;
+  gap: 0.375rem;
+  justify-content: center;
+  min-height: 1.5rem;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.6;
+  text-transform: capitalize;
+  padding: 0.2em 0.6em;
+  border-radius: 999px;
+  background: var(--fd-color-border);
+}
+
+.badge[data-bone] {
+  min-width: 4.5em;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+@media (prefers-color-scheme: light) {
+  .badge[data-bone] {
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.normal {
+  background: #a8a878;
+  color: #fff;
+}
+
+.fire {
+  background: #f08030;
+  color: #fff;
+}
+
+.water {
+  background: #6890f0;
+  color: #fff;
+}
+
+.electric {
+  background: #f8d030;
+  color: #333;
+}
+
+.grass {
+  background: #78c850;
+  color: #fff;
+}
+
+.ice {
+  background: #98d8d8;
+  color: #333;
+}
+
+.fighting {
+  background: #c03028;
+  color: #fff;
+}
+
+.poison {
+  background: #a040a0;
+  color: #fff;
+}
+
+.ground {
+  background: #e0c068;
+  color: #333;
+}
+
+.flying {
+  background: #a890f0;
+  color: #fff;
+}
+
+.psychic {
+  background: #f85888;
+  color: #fff;
+}
+
+.bug {
+  background: #a8b820;
+  color: #fff;
+}
+
+.rock {
+  background: #b8a038;
+  color: #fff;
+}
+
+.ghost {
+  background: #705898;
+  color: #fff;
+}
+
+.dragon {
+  background: #7038f8;
+  color: #fff;
+}
+
+.dark {
+  background: #705848;
+  color: #fff;
+}
+
+.steel {
+  background: #b8b8d0;
+  color: #333;
+}
+
+.fairy {
+  background: #ee99ac;
+  color: #333;
+}

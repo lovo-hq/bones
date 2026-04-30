@@ -1,19 +1,12 @@
 import { source } from "@/lib/source";
-import {
-  DocsPage,
-  DocsBody,
-  DocsTitle,
-  DocsDescription,
-} from "fumadocs-ui/layouts/docs/page";
+import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page";
 import { notFound } from "next/navigation";
 import defaultMdxComponents from "fumadocs-ui/mdx";
-import { Preview } from "@/components/preview";
-import { DemoUserCard } from "@/components/demo/user-card";
+import { DemoPokemonCard } from "@/components/demo/pokemon-card";
 
 const customMdxComponents = {
   ...defaultMdxComponents,
-  Preview,
-  DemoUserCard,
+  DemoPokemonCard,
 };
 
 interface Props {
