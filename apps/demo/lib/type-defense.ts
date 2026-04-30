@@ -21,7 +21,7 @@ const ALL_TYPES = [
   "fairy",
 ];
 
-export interface DamageRelations {
+interface DamageRelations {
   double_damage_from: string[];
   half_damage_from: string[];
   no_damage_from: string[];

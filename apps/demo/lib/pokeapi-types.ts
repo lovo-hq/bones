@@ -142,7 +142,7 @@ export interface PokemonListItem {
   types: string[];
 }
 
-export interface PokemonStat {
+interface PokemonStat {
   name: string;
   value: number;
   effort: number;
