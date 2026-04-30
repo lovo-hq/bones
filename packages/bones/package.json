@@ -1,6 +1,6 @@
 {
   "name": "bones",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Skeleton loaders designed for React Server Components and streaming.",
   "homepage": "https://github.com/lovo-hq/bones#readme",
   "bugs": {
