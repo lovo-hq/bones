@@ -35,7 +35,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: vp dlx changeset publish
+          publish: vp exec changeset publish
           title: "Version Packages"
           commit: "Version Packages"
           createGithubReleases: false
