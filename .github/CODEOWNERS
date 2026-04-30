@@ -1,0 +1,15 @@
+# Default owner for everything
+* @hunter-garrett
+
+# Core library
+/packages/bones/ @hunter-garrett
+
+# Demo app
+/apps/demo/ @hunter-garrett
+
+# Documentation site
+/apps/docs/ @hunter-garrett
+
+# CI and release workflows
+/.github/ @hunter-garrett
+/.changeset/ @hunter-garrett
