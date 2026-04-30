@@ -1,5 +1,11 @@
 # bones
 
+## 0.1.2
+
+### Patch Changes
+
+- [#15](https://github.com/lovo-hq/bones/pull/15) [`3ca7852`](https://github.com/lovo-hq/bones/commit/3ca78522050cf07220802e6e5ce1599c535efefc) Thanks [@hunterbecton](https://github.com/hunterbecton)! - Add README to npm package page.
+
 ## 0.1.1
 
 ### Patch Changes
