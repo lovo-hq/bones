@@ -1,5 +1,11 @@
 # bones
 
+## 0.1.1
+
+### Patch Changes
+
+- [#10](https://github.com/lovo-hq/bones/pull/10) [`7704d83`](https://github.com/lovo-hq/bones/commit/7704d83aefcc08d89910a5a811b767bceaa71462) Thanks [@hunterbecton](https://github.com/hunterbecton)! - Initial release of @lovo/bones.
+
 ## 0.1.0
 
 ### Minor Changes
