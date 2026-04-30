@@ -3,11 +3,9 @@ import styles from "./styles.module.css";
 export function HeroSection() {
   return (
     <section className={styles.hero}>
-      <h1>Bones</h1>
+      <h1>bones</h1>
       <p className={styles.heroSubtitle}>
-        Primitives for inline skeleton loaders in React.
-        <br />
-        One component, both states.
+        Skeleton loaders designed for React Server Components and streaming.
       </p>
     </section>
   );

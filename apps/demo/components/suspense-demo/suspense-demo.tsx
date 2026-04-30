@@ -10,9 +10,9 @@ export function SuspenseDemo() {
       title="Streaming with Suspense"
       description={
         <>
-          Wrap a component in <code>{"<Bones>"}</code> and pass a promise as data. The{" "}
-          <strong>same component</strong> renders as skeletons while the data streams in, then swaps
-          to content when it resolves.
+          Wrap a component in <code>{"<Bones>"}</code> and pass a promise as data. The same
+          component renders as skeletons while the data streams in, then swaps to content when it
+          resolves.
         </>
       }
       hint="Refresh the page to see the skeleton → content transition."

@@ -10,7 +10,7 @@ export function MultiLineTextDemo() {
       description={
         <>
           Use the <code>lines()</code> helper to create paragraph-sized placeholders. Each skeleton
-          line is a real element with its own shimmer animation.
+          line is a real element with its own animation.
         </>
       }
     >
