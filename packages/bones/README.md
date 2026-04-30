@@ -1,5 +1,7 @@
 # Bones
 
+[![Bundle Size](https://deno.bundlejs.com/badge?q=@lovo/bones)](https://bundlejs.com/?q=%40lovo%2Fbones)
+
 Skeleton loaders designed for React Server Components and streaming. ~2.7 kB gzipped, 0 dependencies.
 
 With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so `{data || <Skeleton />}` doesn't work anymore. The typical workaround is writing a separate skeleton component for every piece of UI and passing it as a Suspense fallback.
