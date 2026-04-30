@@ -12,7 +12,7 @@
     "preview": "opennextjs-cloudflare preview"
   },
   "dependencies": {
-    "bones": "workspace:*",
+    "bones": "workspace:@lovo/bones@*",
     "fumadocs-core": "latest",
     "fumadocs-mdx": "latest",
     "fumadocs-ui": "latest",
