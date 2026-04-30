@@ -81,6 +81,9 @@ jobs:
         with:
           cache: true
 
+      - name: Build bones library
+        run: vp run --filter bones build
+
       - name: Build demo app
         run: vp run --filter bones-demo build
 
@@ -126,6 +129,9 @@ jobs:
         uses: voidzero-dev/setup-vp@v1
         with:
           cache: true
+
+      - name: Build bones library
+        run: vp run --filter bones build
 
       - name: Build docs site
         run: vp run --filter bones-docs build
