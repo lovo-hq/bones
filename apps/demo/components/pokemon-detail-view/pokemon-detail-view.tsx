@@ -17,8 +17,6 @@ export function PokemonDetailView({
         <img
           className={styles.detailImage}
           src={data?.artwork}
-          width={200}
-          height={200}
           alt={data?.name ?? "Pokemon"}
           {...bone("block")}
         />

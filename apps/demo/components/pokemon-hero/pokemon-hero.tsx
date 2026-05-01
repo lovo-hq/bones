@@ -19,8 +19,6 @@ export function PokemonHero({
         <img
           className={styles.artwork}
           src={poke?.artwork}
-          width={140}
-          height={140}
           alt={poke?.name ?? "Pokemon"}
           {...pokeBone("block")}
         />

@@ -41,6 +41,9 @@
 
 .cardImage {
   display: block;
+  width: 100%;
+  max-width: 120px;
+  aspect-ratio: 1;
   margin: 0 auto 0.75rem;
   border-radius: 8px;
 }

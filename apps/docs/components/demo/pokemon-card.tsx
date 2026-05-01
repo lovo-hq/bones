@@ -26,8 +26,6 @@ function PokemonCard({ pokemon, loading }: { pokemon?: Pokemon; loading?: boolea
         className={styles.cardImage}
         src={data?.sprite}
         alt={data?.name ?? "Pokemon"}
-        width={120}
-        height={120}
         {...bone("block")}
       />
       <h3 className={styles.cardName} {...bone("text", { length: 5 })}>

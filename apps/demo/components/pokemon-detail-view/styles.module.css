@@ -11,6 +11,8 @@
 
 .detailImage {
   flex-shrink: 0;
+  width: 200px;
+  aspect-ratio: 1;
   border-radius: var(--radius);
 }
 

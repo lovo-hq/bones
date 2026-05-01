@@ -12,8 +12,6 @@ export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem | Promise<P
       <img
         className={styles.cardImage}
         src={data?.sprite}
-        width={120}
-        height={120}
         alt={data?.name ?? "Pokemon"}
         {...bone("block")}
       />
