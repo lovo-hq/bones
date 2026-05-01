@@ -136,14 +136,11 @@ export interface CreateBonesReturn<T> {
     (type: "block" | "container"): BoneProps;
   };
   data: T | null | undefined;
-  repeat: {
-    (count: number, render: (item: undefined, index: number) => ReactNode): ReactNode[];
-    <U>(
-      arr: U[] | undefined | null,
-      count: number,
-      render: (item: U | undefined, index: number) => ReactNode,
-    ): ReactNode[];
-  };
+  repeat: <U>(
+    arr: U[] | undefined | null,
+    count: number,
+    render: (item: U | undefined, index: number) => ReactNode,
+  ) => ReactNode[];
   lines: <V>(
     value: V | null | undefined,
     count: number,
@@ -225,36 +222,12 @@ export function createBones<T>(
     return props;
   };
 
-  function repeat(
-    count: number,
-    render: (item: undefined, index: number) => ReactNode,
-  ): ReactNode[];
   function repeat<U>(
     arr: U[] | undefined | null,
     count: number,
     render: (item: U | undefined, index: number) => ReactNode,
-  ): ReactNode[];
-  function repeat<U>(
-    arrOrCount: U[] | undefined | null | number,
-    countOrRender: number | ((item: U | undefined, index: number) => ReactNode),
-    maybeRender?: (item: U | undefined, index: number) => ReactNode,
   ): ReactNode[] {
-    let arr: U[] | undefined | null;
-    let count: number;
-    let render: (item: U | undefined, index: number) => ReactNode;
-
-    if (typeof arrOrCount === "number") {
-      arr = undefined;
-      count = arrOrCount;
-      render = countOrRender as (item: U | undefined, index: number) => ReactNode;
-    } else {
-      arr = arrOrCount;
-      count = countOrRender as number;
-      render = maybeRender!;
-    }
-
     const items: (U | undefined)[] = isLoading ? Array.from({ length: count }) : (arr ?? []);
-
     return items.map(render);
   }
 

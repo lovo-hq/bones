@@ -132,7 +132,7 @@ export function MovesInteractive({ moves = [], moveDetails }: MovesInteractivePr
                     {item &&
                       (activeMethod === "machine"
                         ? (item.detail?.machineNumbers[activeGame] ?? "—")
-                        : (item.level || "—"))}
+                        : item.level || "—")}
                   </span>
                 </td>
                 <td className={styles.tdName}>

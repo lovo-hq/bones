@@ -67,11 +67,7 @@ interface GenGroup {
   entries: (FlavorEntry | undefined)[];
 }
 
-export function DexEntriesPanel({
-  entries,
-}: {
-  entries?: FlavorEntry[] | Promise<FlavorEntry[]>;
-}) {
+export function DexEntriesPanel({ entries }: { entries?: FlavorEntry[] | Promise<FlavorEntry[]> }) {
   const { bone, data } = createBones(entries);
 
   let generations: GenGroup[];
@@ -100,16 +96,20 @@ export function DexEntriesPanel({
       {generations.map((group, gi) => (
         <div key={group.label || gi} className={styles.genGroup}>
           <div className={styles.genHeader}>
-            <span {...bone("text", { length: minMax(8, 14), contained: true })}>
-              {group.label}
-            </span>
+            <span {...bone("text", { length: minMax(8, 14), contained: true })}>{group.label}</span>
           </div>
           {group.entries.map((entry, ei) => (
             <div key={entry?.version ?? ei} className={styles.entry}>
-              <span className={styles.versionLabel} {...bone("text", { length: minMax(4, 8), contained: true })}>
+              <span
+                className={styles.versionLabel}
+                {...bone("text", { length: minMax(4, 8), contained: true })}
+              >
                 {entry?.version.replace(/-/g, " ")}
               </span>
-              <span className={styles.flavorText} {...bone("text", { length: minMax(20, 35), contained: true })}>
+              <span
+                className={styles.flavorText}
+                {...bone("text", { length: minMax(20, 35), contained: true })}
+              >
                 {entry?.text}
               </span>
             </div>
