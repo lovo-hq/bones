@@ -24,8 +24,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             nav={{
               title: (
                 <>
-                  <Logo height={20} style={{ display: "inline-block", verticalAlign: "middle" }} />{" "}
-                  bones
+                  <Logo height={20} />
+                  <span className="sr-only">bones</span>
                 </>
               ),
             }}
