@@ -14,4 +14,12 @@ describe("HeroSection", () => {
     render(<HeroSection />);
     expect(screen.getByText(/Skeleton loaders designed for React Server Components/)).toBeDefined();
   });
+
+  test("renders docs and github links", () => {
+    render(<HeroSection />);
+    const docsLink = screen.getByRole("link", { name: "Docs" });
+    const githubLink = screen.getByRole("link", { name: "GitHub" });
+    expect(docsLink.getAttribute("href")).toBe("https://bones.lovo.sh");
+    expect(githubLink.getAttribute("href")).toBe("https://github.com/lovo-hq/bones");
+  });
 });

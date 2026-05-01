@@ -14,3 +14,29 @@
   font-size: 1.125rem;
   margin-top: 0.5rem;
 }
+
+.heroLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.heroLink {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.heroLink:hover {
+  text-decoration: underline;
+}
+
+.heroDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+}
