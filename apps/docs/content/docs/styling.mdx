@@ -7,12 +7,12 @@ All skeleton visuals are controlled by CSS custom properties. Override them glob
 
 ## CSS custom properties
 
-| Property           | Default (light) | Default (dark) | Description                    |
-| ------------------ | --------------- | -------------- | ------------------------------ |
-| `--bone-base`      | `#e0e0e0`       | `#2a2a2a`      | Skeleton background color      |
-| `--bone-highlight` | `#f0f0f0`       | `#3a3a3a`      | Highlight color (for shimmer)  |
-| `--bone-radius`    | `4px`           | `4px`          | Border radius of skeleton bars |
-| `--bone-duration`  | `1.5s`          | `1.5s`         | Animation duration             |
+| Property           | Default (light)       | Default (dark)              | Description                    |
+| ------------------ | --------------------- | --------------------------- | ------------------------------ |
+| `--bone-base`      | `rgba(0, 0, 0, 0.12)` | `rgba(255, 255, 255, 0.12)` | Skeleton background color      |
+| `--bone-highlight` | `rgba(0, 0, 0, 0.06)` | `rgba(255, 255, 255, 0.06)` | Highlight color (for shimmer)  |
+| `--bone-radius`    | `4px`                 | `4px`                       | Border radius of skeleton bars |
+| `--bone-duration`  | `1.5s`                | `1.5s`                      | Animation duration             |
 
 ## Theming
 
@@ -46,8 +46,8 @@ Dark mode works via `prefers-color-scheme`:
 ```css
 @media (prefers-color-scheme: dark) {
   :root {
-    --bone-base: #2a2a2a;
-    --bone-highlight: #3a3a3a;
+    --bone-base: rgba(255, 255, 255, 0.12);
+    --bone-highlight: rgba(255, 255, 255, 0.06);
   }
 }
 ```

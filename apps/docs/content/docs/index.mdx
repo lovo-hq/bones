@@ -111,9 +111,9 @@ function Dashboard() {
 
 ## How Bones works
 
-`<Bones>` renders the same component tree as its own Suspense fallback. It sets a loading flag via `React.cache()`, and every `createBones()` call in the tree checks that flag. While loading, `bone()` returns HTML attributes that apply skeleton styles with CSS. Once the data resolves, it returns an empty object and your component renders normally. No hooks, no context, no `'use client'`.
+`<Bones>` renders the same component tree as its own Suspense fallback. It sets a loading flag via `React.cache()`, and every `createBones()` call in the tree checks that flag. While loading, `bone()` returns HTML attributes that apply skeleton styles with CSS. Once the data resolves, it returns an empty object and your component renders normally.
 
-The children don't know they're inside a fallback. You could get the same effect with React Context, but a context provider is a client component, and adding `'use client'` defeats the point.
+Why `React.cache()` instead of React Context? A context provider is a client component. Adding `'use client'` to a shared provider defeats the purpose of keeping your components on the server.
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
 <div>
