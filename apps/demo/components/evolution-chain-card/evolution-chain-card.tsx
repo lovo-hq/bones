@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createBones } from "bones";
 import type { EvolutionChain } from "@/lib/pokeapi";
 import styles from "./styles.module.css";
@@ -32,7 +33,7 @@ export function EvolutionChainCard({
                   data-current={item?.name === currentName ? "true" : undefined}
                 >
                   <div className={styles.sprite} {...bone("block")}>
-                    {item && <img src={item.spriteUrl} alt={item.name} />}
+                    {item && <Image src={item.spriteUrl} alt={item.name} width={96} height={96} />}
                   </div>
                   <span className={styles.stageName} {...bone("text", { length: 6 })}>
                     {item?.name}

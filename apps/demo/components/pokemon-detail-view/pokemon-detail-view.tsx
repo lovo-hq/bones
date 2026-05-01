@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createBones } from "bones";
 import type { PokemonDetail } from "@/lib/pokeapi";
 import { StatBar } from "@/components/stat-bar/stat-bar";
@@ -14,10 +15,12 @@ export function PokemonDetailView({
   return (
     <div className={styles.detail}>
       <div className={styles.detailHeader}>
-        <img
+        <Image
           className={styles.detailImage}
-          src={data?.artwork}
+          src={data?.artwork ?? ""}
           alt={data?.name ?? "Pokemon"}
+          width={475}
+          height={475}
           {...bone("block")}
         />
         <div className={styles.detailInfo}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { createBones } from "bones";
 import styles from "./pokemon-card.module.css";
 
@@ -22,10 +23,12 @@ function PokemonCard({ pokemon, loading }: { pokemon?: Pokemon; loading?: boolea
 
   return (
     <div className={styles.card}>
-      <img
+      <Image
         className={styles.cardImage}
-        src={data?.sprite}
+        src={data?.sprite ?? ""}
         alt={data?.name ?? "Pokemon"}
+        width={120}
+        height={120}
         {...bone("block")}
       />
       <h3 className={styles.cardName} {...bone("text", { length: 5 })}>
