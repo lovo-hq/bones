@@ -11,10 +11,10 @@ interface Pokemon {
 }
 
 const MOCK_POKEMON: Pokemon = {
-  name: "ditto",
+  name: "cubone",
   sprite:
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png",
-  types: ["normal"],
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/104.png",
+  types: ["ground"],
 };
 
 function PokemonCard({ pokemon, loading }: { pokemon?: Pokemon; loading?: boolean }) {
