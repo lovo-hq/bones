@@ -32,7 +32,7 @@ export function EvolutionChainCard({
                   data-current={item?.name === currentName ? "true" : undefined}
                 >
                   <div className={styles.sprite} {...bone("block")}>
-                    {item && <img src={item.spriteUrl} alt={item.name} width={52} height={52} />}
+                    {item && <img src={item.spriteUrl} alt={item.name} />}
                   </div>
                   <span className={styles.stageName} {...bone("text", { length: 6 })}>
                     {item?.name}
