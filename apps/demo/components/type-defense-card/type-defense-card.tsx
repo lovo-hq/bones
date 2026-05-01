@@ -19,8 +19,20 @@ export function TypeDefenseCard({
   type PillItem = { type: string; text: string };
   const groups: { label: string; items: (PillItem | undefined)[] }[] = data
     ? [
-        { label: "Weak to", items: data.weakTo.map((w) => ({ type: w.type, text: `${w.type} ${formatMultiplier(w.multiplier)}` })) },
-        { label: "Resistant to", items: data.resistantTo.map((r) => ({ type: r.type, text: `${r.type} ${formatMultiplier(r.multiplier)}` })) },
+        {
+          label: "Weak to",
+          items: data.weakTo.map((w) => ({
+            type: w.type,
+            text: `${w.type} ${formatMultiplier(w.multiplier)}`,
+          })),
+        },
+        {
+          label: "Resistant to",
+          items: data.resistantTo.map((r) => ({
+            type: r.type,
+            text: `${r.type} ${formatMultiplier(r.multiplier)}`,
+          })),
+        },
         { label: "Immune to", items: data.immuneTo.map((t) => ({ type: t, text: `${t} 0x` })) },
         { label: "Neutral", items: data.neutral.map((t) => ({ type: t, text: t })) },
       ].filter((g) => g.items.length > 0)

@@ -12,7 +12,7 @@ import styles from "@/app/pokemon/[id]/page.module.css";
 
 /**
  * Skeleton-only mirror of the Pokemon detail page.
- * Used by the Compare Bones devtool overlay — renders the same component
+ * Used by the Compare Bones devtool overlay—renders the same component
  * tree with forceBones so every createBones call shows skeletons.
  * No data fetching, no API calls, instant render.
  */
@@ -35,9 +35,21 @@ export default function ComparePokemonPage() {
           </div>
 
           <div className={styles.bentoRow2}>
-            <InfoCard title="Training" labels={["EV Yield", "Catch Rate", "Base Exp", "Growth"]} rows={forceBones} />
-            <InfoCard title="Breeding" labels={["Egg Groups", "Gender", "Egg Cycles", "Friendship"]} rows={forceBones} />
-            <InfoCard title="Pokedex Data" labels={["Species", "Generation", "Habitat", "Shape"]} rows={forceBones} />
+            <InfoCard
+              title="Training"
+              labels={["EV Yield", "Catch Rate", "Base Exp", "Growth"]}
+              rows={forceBones}
+            />
+            <InfoCard
+              title="Breeding"
+              labels={["Egg Groups", "Gender", "Egg Cycles", "Friendship"]}
+              rows={forceBones}
+            />
+            <InfoCard
+              title="Pokedex Data"
+              labels={["Species", "Generation", "Habitat", "Shape"]}
+              rows={forceBones}
+            />
           </div>
 
           <EvolutionChainCard chain={forceBones} currentName="" />

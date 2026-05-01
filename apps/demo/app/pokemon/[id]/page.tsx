@@ -78,7 +78,7 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
   const cookieStore = await cookies();
   const delays = getDelays(cookieStore.get("bones-delays")?.value);
 
-  // Independent fetches — each powers a different Suspense boundary
+  // Independent fetches—each powers a different Suspense boundary
   const pokemonPromise = delay(fetchPokemon(id), delays.pokemon);
   const speciesPromise = delay(fetchSpecies(id), delays.species);
   const typeDefensePromise = pokemonPromise.then((p) =>
@@ -131,13 +131,25 @@ export default async function PokemonPage({ params }: { params: Promise<{ id: st
 
         <div className={styles.bentoRow2}>
           <Bones>
-            <InfoCard title="Training" labels={["EV Yield", "Catch Rate", "Base Exp", "Growth"]} rows={trainingPromise} />
+            <InfoCard
+              title="Training"
+              labels={["EV Yield", "Catch Rate", "Base Exp", "Growth"]}
+              rows={trainingPromise}
+            />
           </Bones>
           <Bones>
-            <InfoCard title="Breeding" labels={["Egg Groups", "Gender", "Egg Cycles", "Friendship"]} rows={breedingPromise} />
+            <InfoCard
+              title="Breeding"
+              labels={["Egg Groups", "Gender", "Egg Cycles", "Friendship"]}
+              rows={breedingPromise}
+            />
           </Bones>
           <Bones>
-            <InfoCard title="Pokedex Data" labels={["Species", "Generation", "Habitat", "Shape"]} rows={pokedexPromise} />
+            <InfoCard
+              title="Pokedex Data"
+              labels={["Species", "Generation", "Habitat", "Shape"]}
+              rows={pokedexPromise}
+            />
           </Bones>
         </div>
 
