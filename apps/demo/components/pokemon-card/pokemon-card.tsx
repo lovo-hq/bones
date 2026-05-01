@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createBones } from "bones";
 import Link from "next/link";
 import type { PokemonListItem } from "@/lib/pokeapi";
@@ -9,10 +10,12 @@ export function PokemonCard({ pokemon }: { pokemon?: PokemonListItem | Promise<P
 
   const card = (
     <div className={styles.card}>
-      <img
+      <Image
         className={styles.cardImage}
-        src={data?.sprite}
+        src={data?.sprite ?? ""}
         alt={data?.name ?? "Pokemon"}
+        width={120}
+        height={120}
         {...bone("block")}
       />
       <h3 className={styles.cardName} {...bone("text", { length: 9 })}>

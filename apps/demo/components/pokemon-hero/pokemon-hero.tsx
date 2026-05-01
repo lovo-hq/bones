@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createBones } from "bones";
 import type { PokemonData, SpeciesData } from "@/lib/pokeapi";
 import { TypeBadge } from "@/components/type-badge/type-badge";
@@ -16,10 +17,12 @@ export function PokemonHero({
   return (
     <div className={styles.hero}>
       <div className={styles.imageBox}>
-        <img
+        <Image
           className={styles.artwork}
-          src={poke?.artwork}
+          src={poke?.artwork ?? ""}
           alt={poke?.name ?? "Pokemon"}
+          width={475}
+          height={475}
           {...pokeBone("block")}
         />
       </div>

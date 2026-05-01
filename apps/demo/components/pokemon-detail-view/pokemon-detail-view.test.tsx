@@ -3,6 +3,7 @@ import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import { PokemonDetailView } from "./pokemon-detail-view";
 
 vi.mock("bones", async () => (await import("@/test/mocks")).bonesMockFactory());
+vi.mock("next/image", async () => (await import("@/test/mocks")).nextImageMockFactory());
 
 afterEach(cleanup);
 
