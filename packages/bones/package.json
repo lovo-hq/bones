@@ -13,7 +13,8 @@
     "url": "git+https://github.com/lovo-hq/bones.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "src/css"
   ],
   "type": "module",
   "sideEffects": [
@@ -23,8 +24,8 @@
     ".": "./dist/index.mjs",
     "./package.json": "./package.json",
     "./css": {
-      "style": "./dist/css/bones.css",
-      "default": "./dist/css/bones.css"
+      "style": "./src/css/bones.css",
+      "default": "./src/css/bones.css"
     }
   },
   "publishConfig": {

@@ -14,8 +14,8 @@ export default defineConfig({
     exports: {
       customExports: {
         "./css": {
-          style: "./dist/css/bones.css",
-          default: "./dist/css/bones.css",
+          style: "./src/css/bones.css",
+          default: "./src/css/bones.css",
         },
       },
     },
