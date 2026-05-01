@@ -15,13 +15,105 @@ description: Skeleton loaders designed for React Server Components and streaming
   </span>
 </div>
 
-With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so patterns like `{data || <Skeleton />}` can't handle loading states. Instead, you write a separate skeleton component for every piece of UI and pass it as a Suspense fallback.
+With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so `{data || <Skeleton />}` doesn't work. Instead, you write your component, then write a second component that looks like it but shows placeholder blocks, and wire the two together with `<Suspense>`.
 
-Bones skips the duplication. You write your markup once and it handles both states. The skeleton and the real UI are the same component, so they can't drift apart.
+## The problem with Suspense fallbacks
 
-## How it works
+Every async component needs a matching skeleton component. The two look alike but share no code, so they fall out of sync over time.
 
-`createBones` accepts data or a promise of data. While loading, its `bone` function returns HTML attributes that style elements as skeletons via CSS. Once the data resolves, `bone` returns an empty object and your component renders normally. There are no hooks and no context providers.
+```tsx title="PokemonCard.tsx — two components that must stay in sync"
+async function PokemonCard() {
+  const data = await fetchPokemon();
+
+  return (
+    <div className="card">
+      <img className="card-image" src={data.sprite} alt={data.name} />
+      <h3 className="card-name">{data.name}</h3>
+      <div className="card-types">
+        {data.types.map((t) => (
+          <span key={t} className="badge">
+            {t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PokemonCardSkeleton() {
+  return (
+    <div className="card">
+      <div className="skeleton card-image" />
+      <div className="skeleton card-name" />
+      <div className="card-types">
+        <div className="skeleton badge" />
+        <div className="skeleton badge" />
+      </div>
+    </div>
+  );
+}
+```
+
+```tsx title="Page.tsx"
+function Page() {
+  return (
+    <Suspense fallback={<PokemonCardSkeleton />}>
+      <PokemonCard />
+    </Suspense>
+  );
+}
+```
+
+Add a field to the card? You have to update both components. Rename a class? Both. Change the layout? Both. The skeleton is a copy of your UI that contributes nothing except loading state.
+
+It gets worse fast. A dashboard with three async components means three skeleton components:
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
+<div>
+
+```tsx title="Suspense — one boundary, three skeletons"
+function Dashboard() {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <UserCardSkeleton />
+          <StatsSkeleton />
+          <ActivityFeedSkeleton />
+        </>
+      }
+    >
+      <UserCard />
+      <Stats />
+      <ActivityFeed />
+    </Suspense>
+  );
+}
+```
+
+</div>
+<div>
+
+```tsx title="Bones — no skeletons to maintain"
+function Dashboard() {
+  return (
+    <Bones>
+      <UserCard />
+      <Stats />
+      <ActivityFeed />
+    </Bones>
+  );
+}
+```
+
+</div>
+</div>
+
+## How Bones works
+
+`<Bones>` renders the same component tree as its own Suspense fallback. It sets a loading flag via `React.cache()`, and every `createBones()` call in the tree checks that flag. While loading, `bone()` returns HTML attributes that apply skeleton styles with CSS. Once the data resolves, it returns an empty object and your component renders normally. No hooks, no context, no `'use client'`.
+
+The children don't know they're inside a fallback. You could get the same effect with React Context, but a context provider is a client component, and adding `'use client'` defeats the point.
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
 <div>
@@ -63,17 +155,41 @@ function PokemonCard() {
 </div>
 </div>
 
+Same component, same markup. The skeleton can't get out of sync with the real UI because there's only one version of it.
+
 ## Key ideas
 
-- Works in Server Components. No hooks, no context, no `'use client'`.
+- Works in Server Components without hooks, context, or `'use client'`.
 - One component handles both loading and loaded states.
 - Pass data or a promise. Bones wires up Suspense for you.
 - Skeletons are pure CSS, themed with custom properties.
 - Loading elements get `aria-busy="true"` automatically.
 
-## Why not just add a `loading` prop?
+## Nested and independent loading
 
-You could keep both states in a single component by adding a `loading` prop and branching on it:
+All components inside a `<Bones>` boundary show skeletons until the slowest promise resolves. If you want components to load independently, wrap each one in its own `<Bones>`:
+
+```tsx
+function Dashboard() {
+  return (
+    <>
+      <Bones>
+        <UserCard />
+      </Bones>
+      <Bones>
+        <Stats />
+      </Bones>
+      <Bones>
+        <ActivityFeed />
+      </Bones>
+    </>
+  );
+}
+```
+
+## What about a `loading` prop?
+
+You don't need two components to solve this. You could keep both states in one component with a `loading` prop:
 
 ```tsx title="Single component with loading prop"
 function PokemonCard({ loading }: { loading?: boolean }) {
@@ -89,11 +205,19 @@ function PokemonCard({ loading }: { loading?: boolean }) {
     </div>
   );
 }
+
+function Page() {
+  return (
+    <Suspense fallback={<PokemonCard loading />}>
+      <PokemonCard />
+    </Suspense>
+  );
+}
 ```
 
-This avoids a separate file, but every element still has two branches that can drift apart. `loading` also has to be passed through every layer of the tree. If a user card lives inside a sidebar inside a dashboard, all three components need the prop even though only the card uses it.
+This avoids a separate file, but every element still has two branches that can get out of sync. `loading` also has to be passed through every layer of the tree. If a user card lives inside a sidebar inside a dashboard, all three components need the prop even though only the card uses it.
 
-With Bones, none of that is needed. A component at any depth just calls `createBones()` and gets skeletons:
+With `createBones()`, a component at any depth gets skeletons without prop drilling:
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
 <div>
@@ -155,70 +279,3 @@ function Page() {
 
 </div>
 </div>
-
-## Multiple async components
-
-You can wrap multiple components in a single `<Suspense>` boundary so they resolve together. But you still need a skeleton component for each one in the fallback.
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
-<div>
-
-```tsx title="Suspense — one boundary, three skeletons"
-function Dashboard() {
-  return (
-    <Suspense
-      fallback={
-        <>
-          <UserCardSkeleton />
-          <StatsSkeleton />
-          <ActivityFeedSkeleton />
-        </>
-      }
-    >
-      <UserCard />
-      <Stats />
-      <ActivityFeed />
-    </Suspense>
-  );
-}
-```
-
-</div>
-<div>
-
-```tsx title="Bones — no skeletons to maintain"
-function Dashboard() {
-  return (
-    <Bones>
-      <UserCard />
-      <Stats />
-      <ActivityFeed />
-    </Bones>
-  );
-}
-```
-
-</div>
-</div>
-
-`<Bones>` renders the same component tree as its own Suspense fallback, with a loading flag set via `React.cache()`. Every `createBones()` call in the tree sees that flag and shows skeletons. The children don't even know they're in a fallback. React Context could do the same thing, but a context provider is a client component. Adding `'use client'` defeats the point.
-
-All components inside a `<Bones>` boundary show skeletons until the slowest promise resolves. If you want components to load independently, wrap each one in its own `<Bones>`:
-
-```tsx
-function Dashboard() {
-  return (
-    <>
-      <Bones>
-        <UserCard />
-      </Bones>
-      <Bones>
-        <Stats />
-      </Bones>
-      <Bones>
-        <ActivityFeed />
-      </Bones>
-    </>
-  );
-}
-```
