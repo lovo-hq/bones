@@ -3,7 +3,7 @@ title: Introduction
 description: Skeleton loaders designed for React Server Components and streaming.
 ---
 
-<div className="flex gap-2 not-prose mb-8 -mt-8">
+<div className="flex flex-wrap gap-2 not-prose mb-8 -mt-8">
   <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-mono text-green-600 dark:text-green-400">
     ~4.16 kB gzipped
   </span>
@@ -15,7 +15,7 @@ description: Skeleton loaders designed for React Server Components and streaming
   </span>
 </div>
 
-With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so `{data || <Skeleton />}` doesn't work anymore. The typical workaround is writing a separate skeleton component for every piece of UI and passing it as a Suspense fallback.
+With React Server Components, your component renders once on the server. There's no re-render from "loading" to "loaded," so patterns like `{data || <Skeleton />}` can't handle loading states. Instead, you write a separate skeleton component for every piece of UI and pass it as a Suspense fallback.
 
 Bones skips the duplication. You write your markup once and it handles both states. The skeleton and the real UI are the same component, so they can't drift apart.
 
@@ -29,8 +29,8 @@ Bones skips the duplication. You write your markup once and it handles both stat
 ```tsx title="PokemonCard.tsx"
 import { createBones } from "@lovo/bones";
 
-function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
-  const { bone, data, repeat } = createBones(pokemon);
+function PokemonCard() {
+  const { bone, data, repeat } = createBones(fetchPokemon());
 
   return (
     <div className="card">
@@ -47,11 +47,7 @@ function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
       </h3>
       <div className="card-types">
         {repeat(data?.types, 2, (type, i) => (
-          <span
-            key={type ?? i}
-            className="badge"}
-            {...bone("text", { contained: true, length: 7 })}
-          >
+          <span key={type ?? i} className="badge" {...bone("text", { contained: true, length: 7 })}>
             {type}
           </span>
         ))}
@@ -71,56 +67,57 @@ function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
 
 - Works in Server Components. No hooks, no context, no `'use client'`.
 - One component handles both loading and loaded states.
-- Pass a promise as a prop. Bones wires up Suspense for you.
+- Pass data or a promise. Bones wires up Suspense for you.
 - Skeletons are pure CSS, themed with custom properties.
 - Loading elements get `aria-busy="true"` automatically.
 
-## The problem with separate skeletons
+## Why not just add a `loading` prop?
 
-The standard RSC approach means every component that loads data needs a matching skeleton component wired up as a Suspense fallback. Change the layout of the real component and the skeleton quietly falls out of sync.
+You could keep both states in a single component by adding a `loading` prop and branching on it:
+
+```tsx title="Single component with loading prop"
+function PokemonCard({ loading }: { loading?: boolean }) {
+  const data = loading ? undefined : use(fetchPokemon());
+
+  return (
+    <div className="card">
+      {loading ? <div className="skeleton skeleton-image" /> : <img src={data.sprite} />}
+      {loading ? <div className="skeleton skeleton-title" /> : <h3>{data.name}</h3>}
+      {loading
+        ? Array.from({ length: 2 }, (_, i) => <div key={i} className="skeleton skeleton-badge" />)
+        : data.types.map((t) => <span key={t}>{t}</span>)}
+    </div>
+  );
+}
+```
+
+This avoids a separate file, but every element still has two branches that can drift apart. `loading` also has to be passed through every layer of the tree. If a user card lives inside a sidebar inside a dashboard, all three components need the prop even though only the card uses it.
+
+With Bones, none of that is needed. A component at any depth just calls `createBones()` and gets skeletons:
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
 <div>
 
-```tsx title="RSC + Suspense (standard approach)"
-// PokemonCard.tsx — the real component
-function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
-  const data = use(pokemon);
+```tsx title="Loading prop — two branches per element"
+function PokemonCard({ loading }: { loading?: boolean }) {
+  const data = loading ? undefined : use(fetchPokemon());
 
   return (
     <div className="card">
-      <img src={data.sprite} alt={data.name} />
-      <h3>{data.name}</h3>
-      <div className="types">
-        {data.types.map((item) => (
-          <span key={item} className="badge">
-            {item}
-          </span>
-        ))}
-      </div>
+      {loading ? <div className="skeleton skeleton-image" /> : <img src={data.sprite} />}
+      {loading ? <div className="skeleton skeleton-title" /> : <h3>{data.name}</h3>}
+      {loading
+        ? [1, 2].map((i) => <div key={i} className="skeleton skeleton-badge" />)
+        : data.types.map((t) => <span key={t}>{t}</span>)}
     </div>
   );
 }
 
-// PokemonCardSkeleton.tsx — a separate component you maintain
-function PokemonCardSkeleton() {
-  return (
-    <div className="card">
-      <div className="skeleton skeleton-image" />
-      <div className="skeleton skeleton-title" />
-      <div className="types">
-        <div className="skeleton skeleton-badge" />
-        <div className="skeleton skeleton-badge" />
-      </div>
-    </div>
-  );
-}
-
-// Page.tsx — you wire them together manually
+// Page.tsx — you still manage loading state
 function Page() {
   return (
-    <Suspense fallback={<PokemonCardSkeleton />}>
-      <PokemonCard pokemon={fetchPokemon()} />
+    <Suspense fallback={<PokemonCard loading />}>
+      <PokemonCard />
     </Suspense>
   );
 }
@@ -129,10 +126,9 @@ function Page() {
 </div>
 <div>
 
-```tsx title="With Bones"
-// PokemonCard.tsx — handles both states
-function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
-  const { bone, data, repeat } = createBones(pokemon);
+```tsx title="Bones — single code path"
+function PokemonCard() {
+  const { bone, data, repeat } = createBones(fetchPokemon());
 
   return (
     <div className="card">
@@ -147,11 +143,11 @@ function PokemonCard({ pokemon }: { pokemon: Promise<Pokemon> }) {
   );
 }
 
-// Page.tsx — no separate skeleton needed
+// Page.tsx — no loading prop, no separate fallback
 function Page() {
   return (
     <Bones>
-      <PokemonCard pokemon={fetchPokemon()} />
+      <PokemonCard />
     </Bones>
   );
 }
@@ -159,3 +155,70 @@ function Page() {
 
 </div>
 </div>
+
+## Multiple async components
+
+You can wrap multiple components in a single `<Suspense>` boundary so they resolve together. But you still need a skeleton component for each one in the fallback.
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 comparison-grid">
+<div>
+
+```tsx title="Suspense — one boundary, three skeletons"
+function Dashboard() {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <UserCardSkeleton />
+          <StatsSkeleton />
+          <ActivityFeedSkeleton />
+        </>
+      }
+    >
+      <UserCard />
+      <Stats />
+      <ActivityFeed />
+    </Suspense>
+  );
+}
+```
+
+</div>
+<div>
+
+```tsx title="Bones — no skeletons to maintain"
+function Dashboard() {
+  return (
+    <Bones>
+      <UserCard />
+      <Stats />
+      <ActivityFeed />
+    </Bones>
+  );
+}
+```
+
+</div>
+</div>
+
+`<Bones>` renders the same component tree as its own Suspense fallback, with a loading flag set via `React.cache()`. Every `createBones()` call in the tree sees that flag and shows skeletons. The children don't even know they're in a fallback. React Context could do the same thing, but a context provider is a client component. Adding `'use client'` defeats the point.
+
+All components inside a `<Bones>` boundary show skeletons until the slowest promise resolves. If you want components to load independently, wrap each one in its own `<Bones>`:
+
+```tsx
+function Dashboard() {
+  return (
+    <>
+      <Bones>
+        <UserCard />
+      </Bones>
+      <Bones>
+        <Stats />
+      </Bones>
+      <Bones>
+        <ActivityFeed />
+      </Bones>
+    </>
+  );
+}
+```
